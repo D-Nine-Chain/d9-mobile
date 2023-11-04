@@ -1,0 +1,8 @@
+{
+  "name": "d9_mobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "22bbf63e"
+}
