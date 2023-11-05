@@ -1,12 +1,12 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'd9_mobile',
-  webDir: 'www',
-  server: {
-    androidScheme: 'https'
-  }
+   appId: 'com.d9.mobile-app',
+   appName: 'D9 Mobile',
+   webDir: 'www',
+   server: {
+      androidScheme: 'https'
+   }
 };
 
 export default config;

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en-US" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="first-run-get-started" datatype="html">
+        <source>Get started with D9 Network</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/first-run/first-run.component.html</context>
+          <context context-type="linenumber">6</context>
+          <target>开始使用D9 Network</target>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="new-wallet" datatype="html">
+        <source>New Wallet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/first-run/first-run.component.html</context>
+          <context context-type="linenumber">8,9</context>
+          <target>新建钱包</target>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="recover-wallet" datatype="html">
+        <source>Recover Wallet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/first-run/first-run.component.html</context>
+          <context context-type="linenumber">11</context>
+          <target>恢复钱包</target>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

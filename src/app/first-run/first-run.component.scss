@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+h1 {
+  color: #000;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.logo {
+   width:50%;
+  
+}
+ion-button{
+width:150px;
+}
