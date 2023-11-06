@@ -1,0 +1,63 @@
+<ion-content>
+   <div id="top-row">
+      <button class="top-button">
+         <fa-icon [icon]="walletIcon"></fa-icon>
+      </button>
+      <span>name</span>
+      <button class="top-button">
+         <fa-icon [icon]="qrCodeIcon"></fa-icon>
+      </button>
+   </div>
+   <div id="name-row">
+      <ion-label>
+         <h1>Name</h1>
+         <p id="address">5ED3AFmssWV9BbrkBmsTpBSNSoJESLuX5YKHBnVxo15PQ4mc</p>
+      </ion-label>
+   </div>
+   <div id="middle">
+      <ion-card id="balance-card">
+         <ion-card-header>
+            <ion-card-title>10283102938</ion-card-title>
+            <ion-card-subtitle>Portfolio Value</ion-card-subtitle>
+         </ion-card-header>
+         <ion-card-content>
+            <div class="primary-assets">
+               <h2 class="asset-name">D9</h2>
+               <h2 class="asset-amount">122,239</h2>
+            </div>
+            <div class="primary-assets">
+               <h2 class="asset-name">USDT</h2>
+               <h2 class="asset-amount">78,303</h2>
+            </div>
+         </ion-card-content>
+      </ion-card>
+      <div id="transaction-buttons-container">
+         <div class="transaction-button">
+            <button id="receive-button">
+               <fa-icon [icon]="receiveIcon"></fa-icon>
+            </button>
+            <span>receive</span>
+         </div>
+         <div class="transaction-button">
+            <button id="send-button">
+               <fa-icon [icon]="sendIcon"></fa-icon>
+            </button>
+            <span>send</span>
+         </div>
+         <div class="transaction-button">
+            <button>
+               <fa-icon [icon]="swapIcon"></fa-icon>
+            </button>
+            <span>swap</span>
+         </div>
+      </div>
+   </div>
+   <ion-card id="exchange-card">
+      <ion-card-header>
+         <ion-card-subtitle>Currency Swap</ion-card-subtitle>
+         <ion-content>
+
+         </ion-content>
+      </ion-card-header>
+   </ion-card>
+</ion-content>

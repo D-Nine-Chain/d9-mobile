@@ -15,21 +15,16 @@ register();
    styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-   public appPages = [
-      { title: 'Inbox', url: '/folder/inbox', icon: 'mail' },
-      { title: 'Outbox', url: '/folder/outbox', icon: 'paper-plane' },
-      { title: 'Favorites', url: '/folder/favorites', icon: 'heart' },
-      { title: 'Archived', url: '/folder/archived', icon: 'archive' },
-      { title: 'Trash', url: '/folder/trash', icon: 'trash' },
-      { title: 'Spam', url: '/folder/spam', icon: 'warning' },
-   ];
-   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+
    constructor(private _router: Router) {
       Preferences.get({ key: 'firstLoad' }).then(({ value }) => {
          console.log('firstLoad', value);
          if (value === null) {
             console.log("the value is null")
-            this._router.navigate(['/first-run']);
+            // this._router.navigate(['/first-run']);
+            this._router.navigate(['/new-mnemonic']);
+         } else {
+            this._router.navigate(['/home']);
          }
       });
 

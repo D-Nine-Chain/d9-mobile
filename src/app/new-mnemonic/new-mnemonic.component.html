@@ -1,0 +1,18 @@
+<ion-content style="background-color: white;">
+   <div id="centered-content">
+      <div id="main-container">
+         <div id="mnemonic-container">
+            <div class="mnemonic-word" *ngFor="let word of mnemonicArray; let wordNumber = index "><span
+                  class="number">{{wordNumber + 1
+                  }}.</span> <span class="word">{{word}}</span>
+            </div>
+         </div>
+      </div>
+      <div id="action-container">
+         <ion-button expand="block" fill="solid" color="primary" (click)="saveWallet()"
+            style="background-color: #0065b2; margin-top: 20px;">Got it!</ion-button>
+
+      </div>
+   </div>
+
+</ion-content>

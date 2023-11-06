@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-   appId: 'com.d9.mobile-app',
+   appId: 'com.d9.mobile',
    appName: 'D9 Mobile',
    webDir: 'www',
    server: {

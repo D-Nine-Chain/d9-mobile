@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 
 
@@ -9,10 +10,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FirstRunComponent implements OnInit {
 
-   constructor() {
+   constructor(private router: Router) {
    }
 
    ngOnInit() {
    }
-
+   public createWallet() {
+      console.log("create wallet")
+      this.router.navigate(['new-mnemonic'])
+   }
 }
