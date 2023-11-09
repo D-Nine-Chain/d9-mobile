@@ -1,24 +1,20 @@
 <ion-content>
-   <div id="top-row">
-      <button class="top-button">
-         <fa-icon [icon]="walletIcon"></fa-icon>
-      </button>
-      <span>name</span>
-      <button class="top-button">
-         <fa-icon [icon]="qrCodeIcon"></fa-icon>
-      </button>
-   </div>
-   <div id="name-row">
-      <ion-label>
-         <h1>Name</h1>
+
+   <ion-card id="account-card">
+      <ion-card-header>
+         <ion-card-subtitle>Account Info</ion-card-subtitle>
+         <ion-card-title>Name</ion-card-title>
+
+      </ion-card-header>
+      <ion-card-content>
          <p id="address">5ED3AFmssWV9BbrkBmsTpBSNSoJESLuX5YKHBnVxo15PQ4mc</p>
-      </ion-label>
-   </div>
+      </ion-card-content>
+   </ion-card>
    <div id="middle">
       <ion-card id="balance-card">
          <ion-card-header>
-            <ion-card-title>10283102938</ion-card-title>
             <ion-card-subtitle>Portfolio Value</ion-card-subtitle>
+            <ion-card-title>$1028.10</ion-card-title>
          </ion-card-header>
          <ion-card-content>
             <div class="primary-assets">
@@ -33,9 +29,9 @@
       </ion-card>
       <div id="transaction-buttons-container">
          <div class="transaction-button">
-            <button id="receive-button">
+            <ion-button shape="round" id="receive-button">
                <fa-icon [icon]="receiveIcon"></fa-icon>
-            </button>
+            </ion-button>
             <span>receive</span>
          </div>
          <div class="transaction-button">
@@ -52,12 +48,5 @@
          </div>
       </div>
    </div>
-   <ion-card id="exchange-card">
-      <ion-card-header>
-         <ion-card-subtitle>Currency Swap</ion-card-subtitle>
-         <ion-content>
-
-         </ion-content>
-      </ion-card-header>
-   </ion-card>
+   <!-- <home-assests-list></home-assests-list> -->
 </ion-content>

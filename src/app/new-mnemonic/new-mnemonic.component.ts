@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WalletService } from '../services/wallet/wallet.service';
 import { Preferences } from '@capacitor/preferences';
 import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 @Component({
    selector: 'app-new-mnemonic',
    templateUrl: './new-mnemonic.component.html',
@@ -11,7 +12,8 @@ export class NewMnemonicComponent implements OnInit {
    mnemonicArray: string[] = [];
    wordNumber: number = 1;
 
-   constructor(private wallet: WalletService, private toastController: ToastController) { }
+   constructor(private wallet: WalletService, private toastController: ToastController, private router
+      : Router) { }
 
    ngOnInit() {
       console.log(this.wallet.createNewMnemonic());
@@ -22,9 +24,9 @@ export class NewMnemonicComponent implements OnInit {
 
    async saveWallet() {
       try {
-         await this.wallet.saveWallet();
          await Preferences.set({ key: 'firstLoad', value: 'false' })
          await this.presentToast();
+         this.router.navigate(['/home']);
       } catch (e) {
          console.log(e);
       }

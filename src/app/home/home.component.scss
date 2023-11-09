@@ -5,26 +5,47 @@ ion-content {
    align-items: center;
    gap: 8px;
 }
+
 #top-row {
    display: flex;
    flex-direction: row;
    justify-content: space-between;
    align-items: center;
    box-sizing: border-box;
-   padding-left: 20px;
-   padding-right: 20px;
+   // padding-left: 20px;
+   // padding-right: 20px;
    padding-top: 10px;
    margin-top: 10px;
+   ion-button {
+      font-size: 1.1rem;
+      color: var(--ion-color-primary);
+   }
 }
-#name-row {
+#account-info {
    display: flex;
    flex-direction: column;
    box-sizing: border-box;
    padding: 0 20px;
-   margin-top: 10px;
+   margin-top: 25px;
+   margin-bottom: 15px;
+   h1 {
+      margin-top: 0;
+   }
 }
 #address {
    font-size: 0.6rem;
+}
+#account-card {
+   background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%);
+   color: white;
+   ion-card-subtitle {
+      color: rgb(220, 230, 235);
+   }
+   ion-card-title {
+      color: white;
+      font-weight: 800;
+      font-size: 1.8rem;
+   }
 }
 #balance-card {
    background-color: #0093e9;
@@ -32,6 +53,8 @@ ion-content {
    color: white;
    ion-card-title {
       color: white;
+      font-weight: 800;
+      font-size: 1.8rem;
    }
    ion-card-subtitle {
       color: rgb(220, 230, 235);
@@ -64,14 +87,7 @@ ion-icon {
       font-size: 0.6rem;
    }
 }
-.top-button {
-   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-   border-radius: 4px;
-   padding: 4px;
-   background-color: white;
-   font-size: 1.1rem;
-   color: var(--ion-color-primary);
-}
+
 .transaction-button {
    display: flex;
    flex-direction: column;
@@ -84,12 +100,4 @@ ion-icon {
 }
 .asset-name {
    width: 70px;
-}
-.asset-amount {
-}
-#exchange-card {
-   background-image: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);
-   ion-card-subtitle {
-      color: black;
-   }
 }

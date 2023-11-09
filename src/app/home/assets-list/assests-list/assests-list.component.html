@@ -1,0 +1,24 @@
+<div id="assets-list-container" *ngIf="assets && assets.length > 0">
+   <ion-list>
+      <ion-list-header>
+         <ion-label>Assets</ion-label>
+      </ion-list-header>
+      <ion-item *ngFor="let asset of assets">
+         <div class="asset-holder">
+            <div class="left">
+               <img src="../../../../assets/icon.png" alt="{{ asset.name }} logo">
+               <div class="vertical-info">
+                  <p>{{ asset.name }}</p>
+                  <p>{{currencySymbol}}{{asset.valueInBase}}</p>
+               </div>
+
+            </div>
+            <div class="right"></div>
+
+         </div>
+
+
+
+      </ion-item>
+   </ion-list>
+</div>

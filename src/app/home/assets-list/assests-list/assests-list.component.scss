@@ -1,0 +1,20 @@
+.asset-holder {
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   justify-content: space-between;
+   align-items: center;
+   img {
+      width: 30px;
+      height: 30px;
+      float: right;
+   }
+   .left {
+      display: flex;
+      flex-direction: row;
+   }
+   .vertical-info {
+      display: flex;
+      flex-direction: column;
+   }
+}

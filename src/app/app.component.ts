@@ -2,7 +2,11 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
 import { register } from 'swiper/element/bundle';
-
+import { faQrcode, faWallet, faArrowDown, faArrowUp, faShuffle, faBars, faHome, faBell } from "@fortawesome/free-solid-svg-icons";
+import { MenuController } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
+import { AssetsService } from './services/asset/asset.service';
+import '@polkadot/api-augment'
 register();
 
 
@@ -15,8 +19,29 @@ register();
    styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+   walletIcon = faWallet;
+   qrCodeIcon = faQrcode;
+   notificationIcon = faBell;
+   receiveIcon = faArrowDown;
+   sendIcon = faArrowUp;
+   swapIcon = faShuffle;
+   menuIcon = faBars;
+   homeIcon = faHome;
+   hasNotifications = false;
+   constructor(private _router: Router, private menuController: MenuController, private platform: Platform, private assets: AssetsService) {
+      this.prepPlatformFunctions();
+      this.checkFirstLoad();
+   }
 
-   constructor(private _router: Router) {
+   prepPlatformFunctions() {
+      this.platform.ready().then(() => {
+         this.platform.pause.subscribe(async () => {
+            await this.assets.saveAssetsToPreferences();
+         });
+      })
+   }
+
+   checkFirstLoad() {
       Preferences.get({ key: 'firstLoad' }).then(({ value }) => {
          console.log('firstLoad', value);
          if (value === null) {
@@ -27,7 +52,9 @@ export class AppComponent {
             this._router.navigate(['/home']);
          }
       });
-
-      //todo ionic error handling
+   }
+   toggleMenu() {
+      console.log("toggling menu")
+      this.menuController.toggle('main-menu')
    }
 }

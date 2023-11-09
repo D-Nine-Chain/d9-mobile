@@ -1,4 +1,42 @@
 <ion-app>
-   <ion-router-outlet></ion-router-outlet>
+
+   <ion-header [translucent]="true" class="ion-no-border">
+      <ion-toolbar>
+         <div id="top-row">
+            <ion-button fill="clear" (click)="toggleMenu()">
+
+               <fa-icon [icon]="walletIcon"></fa-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="toggleMenu()">
+
+               <fa-icon [icon]="notificationIcon" id="notification-icon"
+                  [ngClass]="hasNotifications ? 'has-notifications' : 'no-notifications' "></fa-icon>
+            </ion-button>
+
+            <ion-button fill="clear">
+               <fa-icon [icon]="qrCodeIcon"></fa-icon>
+            </ion-button>
+
+         </div>
+      </ion-toolbar>
+   </ion-header>
+
+   <main-menu [menuId]="'main-menu'"></main-menu>
+   <ion-content id="main-content">
+      <ion-router-outlet></ion-router-outlet>
+   </ion-content>
+   <ion-footer [translucent]="true">
+      <ion-toolbar>
+         <div id="bottom-menu">
+            <ion-button fill="clear" (click)="toggleMenu()">
+               <ion-icon name="menu"></ion-icon>
+            </ion-button>
+
+         </div>
+
+      </ion-toolbar>
+   </ion-footer>
+
+
 
 </ion-app>
