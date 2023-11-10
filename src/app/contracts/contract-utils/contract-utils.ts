@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 import path from 'path';
+
 export class ContractUtils {
 
    static async getABIJSON(contractInfo: { address: string, file_name: string }): Promise<any> {

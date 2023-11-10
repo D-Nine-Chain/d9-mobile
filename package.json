@@ -1,5 +1,5 @@
 {
-   "name": "d-9-mobile",
+   "name": "d9-mobile",
    "version": "0.0.1",
    "author": "Ionic Framework",
    "homepage": "https://ionicframework.com/",
@@ -72,7 +72,7 @@
       "karma-jasmine": "~5.1.0",
       "karma-jasmine-html-reporter": "~2.0.0",
       "ts-node": "^8.3.0",
-      "typescript": "~5.0.2"
+      "typescript": "^5.0.4"
    },
    "description": "An Ionic project"
 }

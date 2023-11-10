@@ -1,32 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { Asset, BurnPortfolio, CurrencyInfo } from 'app/types';
+import { Asset, CurrencyInfo } from 'app/types';
 import { environment } from 'environments/environment';
 import { BehaviorSubject } from 'rxjs';
 import { BN } from '@polkadot/util';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
+// import { D9BalancesService } from '../assets/d9-balances/d9-balances.service';
 @Injectable({
    providedIn: 'root'
 })
 export class AssetsService {
    public appBaseCurrencyInfo: CurrencyInfo = Utils.currenciesRecord[CurrencyTickerEnum.D9];
 
-   private burnPortfolioSource = new BehaviorSubject<BurnPortfolio>({
-      amountBurned: 0,
-      balanceDue: 0,
-      balancePaid: 0,
-      lastBurn: {
-         time: 0,
-         contract: ''
-      },
-      lastWithdrawal: {
-         time: 0,
-         contract: ''
-      }
-   });
-
    private assetsSource = new BehaviorSubject<Asset[]>([]);
-   private totalNetworkBurn = new BehaviorSubject<number>(0);
 
    constructor() {
       this.loadAssetsFromPreferences();
@@ -94,24 +80,4 @@ export class AssetsService {
    }
 
 
-
-   getBurnPortfolioSub() {
-      return this.burnPortfolioSource.asObservable();
-   }
-
-   getNetworkBurn() {
-      return this.totalNetworkBurn.getValue();
-   }
-
-   getNetworkBurnSub() {
-      return this.totalNetworkBurn.asObservable();
-   }
-
-   updateBurnPortfolio(burnPortfolio: BurnPortfolio) {
-      this.burnPortfolioSource.next(burnPortfolio);
-   }
-
-   updateNetworkBurn(totalNetworkBurn: number) {
-      this.totalNetworkBurn.next(totalNetworkBurn);
-   }
 }

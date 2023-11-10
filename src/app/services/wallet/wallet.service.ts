@@ -1,25 +1,37 @@
 import { Injectable } from '@angular/core';
-import { mnemonicGenerate, mnemonicToMiniSecret, mnemonicValidate, ed25519PairFromSeed } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
+import { mnemonicGenerate, mnemonicToMiniSecret, mnemonicValidate, ed25519PairFromSeed, encodeAddress } from '@polkadot/util-crypto';
+import { u8aToHex, hexToU8a } from '@polkadot/util';
 import { Keypair } from '@polkadot/util-crypto/types';
 import { DataType, SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Preferences } from '@capacitor/preferences';
 import { environment } from 'environments/environment';
 import { SubmittableExtrinsic } from '@polkadot/api/types/submittable';
 import { ISubmittableResult } from '@polkadot/types/types';
+import { BehaviorSubject } from 'rxjs';
 const { Keyring } = require('@polkadot/api');
 @Injectable({
    providedIn: 'root'
 })
 export class WalletService {
+   //todo add hard/soft derivatives
    private publicKey: Uint8Array | null = null;
-   constructor() { }
+   publicKeyObservable = new BehaviorSubject<string>("");
+   addressObservable = new BehaviorSubject<string>("");
+   constructor() {
+      this.loadPublicKey();
+   }
    public getPublicKey(): string {
       if (this.publicKey != null) {
          return u8aToHex(this.publicKey);
       }
       return "";
    }
+
+   public getAddress(): string {
+      console.log("public key is ", this.publicKey)
+      return this.publicKey ? encodeAddress(this.publicKey) : "";
+   }
+
    public createNewMnemonic(): string {
       let validMnemonic = false;
       let mnemonic = "";
@@ -36,6 +48,19 @@ export class WalletService {
       this.publicKey = keyPair.publicKey;
       console.info("wallet created")
       return this.saveWallet(keyPair);
+   }
+
+   public async loadPublicKey(): Promise<void> {
+      const result = await Preferences.get({ key: environment.preferences_publickey_key });
+      if (result.value) {
+         console.log("public key found", result.value);
+         this.addressObservable.next(encodeAddress(result.value));
+         this.publicKey = hexToU8a(result.value);
+      }
+      else {
+         console.log("no public key found");
+         console.log("this function may create a wallet in the future")
+      }
    }
 
    public saveWallet(keyPair: Keypair): Promise<void> {

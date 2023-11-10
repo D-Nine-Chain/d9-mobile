@@ -3,10 +3,6 @@ import { CurrencySymbol, CurrencyTickerEnum } from "./utils/utils";
 export interface Account {
    address: string;
    name: string;
-
-   d9_balances: D9Balances;
-   usdt_balance: number;
-   assets: Asset[];
 }
 // strings can be hexadecimal or decimal representations
 export interface D9Balances {

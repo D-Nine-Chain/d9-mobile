@@ -3,18 +3,18 @@
    <ion-card id="account-card">
       <ion-card-header>
          <ion-card-subtitle>Account Info</ion-card-subtitle>
-         <ion-card-title>Name</ion-card-title>
+         <ion-card-title>{{account.name}}</ion-card-title>
 
       </ion-card-header>
       <ion-card-content>
-         <p id="address">5ED3AFmssWV9BbrkBmsTpBSNSoJESLuX5YKHBnVxo15PQ4mc</p>
+         <p id="address">{{account.address}}</p>
       </ion-card-content>
    </ion-card>
    <div id="middle">
       <ion-card id="balance-card">
          <ion-card-header>
             <ion-card-subtitle>Portfolio Value</ion-card-subtitle>
-            <ion-card-title>$1028.10</ion-card-title>
+            <ion-card-title>{{d9Balances.free}}</ion-card-title>
          </ion-card-header>
          <ion-card-content>
             <div class="primary-assets">
