@@ -14,7 +14,8 @@
       <ion-card id="balance-card">
          <ion-card-header>
             <ion-card-subtitle>Portfolio Value</ion-card-subtitle>
-            <ion-card-title>{{d9Balances.free}}</ion-card-title>
+            <ion-card-title><span id="currency-symbol">{{currencySymbol }}</span>
+               {{formatNumber(d9Balances.free)}}</ion-card-title>
          </ion-card-header>
          <ion-card-content>
             <div class="primary-assets">
@@ -29,9 +30,9 @@
       </ion-card>
       <div id="transaction-buttons-container">
          <div class="transaction-button">
-            <ion-button shape="round" id="receive-button">
+            <button shape="round" id="receive-button">
                <fa-icon [icon]="receiveIcon"></fa-icon>
-            </ion-button>
+            </button>
             <span>receive</span>
          </div>
          <div class="transaction-button">

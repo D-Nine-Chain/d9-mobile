@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { VoidFn } from '@polkadot/api/types';
 import { D9ApiService } from 'app/services/d9-api/d9-api.service';
+import { D9Balances } from 'app/types';
 import { Observable } from 'rxjs';
 @Injectable({
    providedIn: 'root'
@@ -9,7 +10,7 @@ export class D9BalancesService {
    d9BalancesSub: VoidFn | null = null;
    constructor(private d9: D9ApiService) { }
 
-   connectToD9BalancesSub(address: string): Observable<any> {
+   connectToD9BalancesSub(address: string): Observable<D9Balances> {
       console.log("getting balance");
 
       return new Observable(subscriber => {

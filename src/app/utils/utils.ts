@@ -51,6 +51,9 @@ export class Utils {
       return numberString
    }
 
+   static formatNumber(number: number): string {
+      return number.toLocaleString('zh-CN', { compactDisplay: "short", maximumFractionDigits: 2, notation: "compact" })
+   }
 
    static reduceByCurrencyDecimal(number: string | number, currency: CurrencyTickerEnum): number {
       // Check if the input is an empty string
