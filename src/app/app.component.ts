@@ -48,7 +48,8 @@ export class AppComponent {
             console.log("the value is null")
             // this._router.navigate(['/first-run']);
             this._router.navigate(['/new-mnemonic']);
-         } else {
+         }
+         else {
             this._router.navigate(['/burn-mining']);
          }
       });
