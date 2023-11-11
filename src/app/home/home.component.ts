@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit {
 
    }
    formatNumber(number: string | number) {
-      return Utils.formatNumber(number as number)
+      return Utils.formatNumberForUI(number as number)
    }
    ngOnInit() {
 

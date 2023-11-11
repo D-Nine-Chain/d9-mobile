@@ -1,34 +1,36 @@
-import { ContractsService } from "app/services/contracts/contracts.service";
 import { CurrencyTickerEnum, Utils } from "app/utils/utils";
 import { environment } from "environments/environment";
 import { BN } from '@polkadot/util';
-import { D9ApiService } from "app/services/d9-api/d9-api.service";
+import { GasLimits } from "app/types";
 export class BurnManager {
-   constructor(private contractsService: ContractsService, private d9: D9ApiService) {
-
+   contract: any;//is actually ContractPromise
+   gasLimits: GasLimits;
+   constructor(contract: any, gasLimits: GasLimits) {
+      this.contract = contract;
+      this.gasLimits = gasLimits;
    }
 
    async makeBurnTx(amount: number) {
-      const contract = await this.contractsService.getContract(environment.contracts.burn_manager)
-      return await contract.tx['burn']({
-         gasLimit: await this.d9.getGasLimit(),
+
+      return await this.contract.tx['burn']({
+         gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
          value: Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
       }, environment.contracts.burn.address)
    }
 
    async makeWithdrawTx() {
-      const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
-      return await contract.tx['withdraw']({
-         gasLimit: await this.d9.getGasLimit(),
+      // const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
+      return await this.contract.tx['withdraw']({
+         gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
       }, environment.contracts.burn.address)
    }
 
    async getBurnPortfolio(address: string) {
-      const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
-      const { result, output } = await contract.query['getPortfolio'](address, {
-         gasLimit: await this.d9.getReadGasLimit(),
+      // const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
+      const { result, output } = await this.contract.query['getPortfolio'](address, {
+         gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit
       }, address);
 
@@ -48,9 +50,9 @@ export class BurnManager {
     */
    async getTotalNetworkBurned(address: string): Promise<string> {
       console.log("total burned called")
-      const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
-      const { output } = await contract.query['getTotalBurned'](address, {
-         gasLimit: await this.d9.getReadGasLimit(),
+      // const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
+      const { output } = await this.contract.query['getTotalBurned'](address, {
+         gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit
       });
       if (output) {

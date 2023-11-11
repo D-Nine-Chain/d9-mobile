@@ -51,7 +51,7 @@ export class Utils {
       return numberString
    }
 
-   static formatNumber(number: number): string {
+   static formatNumberForUI(number: number): string {
       return number.toLocaleString('zh-CN', { compactDisplay: "short", maximumFractionDigits: 2, notation: "compact" })
    }
 

@@ -13,7 +13,7 @@ export const STORAGE_DEPOSIT_LIMIT = null;
 })
 export class D9ApiService {
    chainAPI: ApiPromise | null = null;
-   wsProvider = new WsProvider(environment.ws_endpoint,);
+   wsProvider = new WsProvider(environment.ws_endpoint);
 
 
    constructor() {
@@ -22,7 +22,14 @@ export class D9ApiService {
             console.error(err);
          })
    }
+   // async getContract(contractInfo: { address: string, file_name: string }): Promise<ContractPromise> {
 
+   //    const abiJSON = await ContractUtils.getABIJSON(contractInfo);
+   //    const abi = new Abi(abiJSON, this.chainAPI?.registry.getChainProperties())
+   //    const contract = new ContractPromise(this.chainAPI!, abi, contractInfo.address);//todo fix the ! issue
+   //    return contract;
+
+   // }
    public async getAPI(): Promise<ApiPromise> {
       await this.prepAPI();
       if (this.chainAPI) {
@@ -39,8 +46,6 @@ export class D9ApiService {
    public async getReadGasLimit() {
       return this.chainAPI?.registry.createType('WeightV2', { refTime: MAX_CALL_WEIGHT, proofSize: PROOFSIZE }) as WeightV2
    }
-
-
 
    private async prepAPI() {
       if (!this.chainAPI) {

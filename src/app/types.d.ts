@@ -1,5 +1,5 @@
 import { CurrencySymbol, CurrencyTickerEnum } from "./utils/utils";
-
+import type { WeightV2 } from '@polkadot/types/interfaces'
 export interface Account {
    address: string;
    name: string;
@@ -10,7 +10,10 @@ export interface D9Balances {
    frozen: number | string;
    reserved: number | string;
 }
-
+export interface GasLimits {
+   readLimit: WeightV2,
+   writeLimit: WeightV2,
+}
 export interface Asset {
    name: string;
    ticker: CurrencyTickerEnum;

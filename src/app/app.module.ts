@@ -12,9 +12,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ExchangeCardComponent } from './home/exchange-card/exchange-card.component';
 import { MenuComponent } from './menu/menu.component';
 import { AssestsListComponent } from './home/assets-list/assests-list/assests-list.component';
+import { BurnMiningComponent } from './burn-mining/burn-mining/burn-mining.component';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],

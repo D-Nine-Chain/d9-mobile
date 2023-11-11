@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import { BurnPortfolio } from 'app/types';
 import { BehaviorSubject } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
-import { D9ApiService } from 'app/services/d9-api/d9-api.service';
+// import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
+import { formatNumber } from '@angular/common';
+import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
+import { environment } from 'environments/environment';
 @Injectable({
    providedIn: 'root'
 })
@@ -21,29 +24,35 @@ export class BurnMiningService {
          contract: ''
       }
    });
-   burnManager: BurnManager;
-   private totalNetworkBurn = new BehaviorSubject<number>(0);
-   constructor(private d9api: D9ApiService, private wallet: WalletService) {
-      this.burnManager = new BurnManager(d9api);
+   burnManager: BurnManager | null = null;
+   private totalNetworkBurnSubject = new BehaviorSubject<number>(0);
+   constructor(private wallet: WalletService) {
+
    }
 
    getBurnPortfolioSub() {
       return this.burnPortfolioSource.asObservable();
    }
 
-   getNetworkBurn() {
-      return
+   async getNetworkBurn(): Promise<number> {
+      const totalBurned = await this.burnManager?.getTotalNetworkBurned(this.wallet.getAddress())
+      if (totalBurned == null) {
+         return 0;
+      } else {
+         return Utils.reduceByCurrencyDecimal(totalBurned, CurrencyTickerEnum.D9);
+      }
    }
 
    getNetworkBurnSub() {
-      return this.totalNetworkBurn.asObservable();
+      return this.totalNetworkBurnSubject.asObservable();
    }
 
    updateBurnPortfolio(burnPortfolio: BurnPortfolio) {
       this.burnPortfolioSource.next(burnPortfolio);
    }
 
-   updateNetworkBurn(totalNetworkBurn: number) {
-      this.totalNetworkBurn.next(totalNetworkBurn);
+   updateNetworkBurn(totalNetworkBurn: number | string) {
+      const formattedNumber = Utils.reduceByCurrencyDecimal(totalNetworkBurn, CurrencyTickerEnum.D9);
+      this.totalNetworkBurnSubject.next(formattedNumber);
    }
 }

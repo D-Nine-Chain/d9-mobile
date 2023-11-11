@@ -3,6 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { FirstRunComponent } from './first-run/first-run.component';
 import { NewMnemonicComponent } from './new-mnemonic/new-mnemonic.component';
 import { HomeComponent } from './home/home.component';
+import { BurnMiningComponent } from './burn-mining/burn-mining/burn-mining.component';
 
 const routes: Routes = [
 
@@ -12,6 +13,11 @@ const routes: Routes = [
    },
    { path: 'new-mnemonic', component: NewMnemonicComponent },
    { path: 'home', component: HomeComponent },
+   {
+      path: 'burn-mining', component: BurnMiningComponent, children: [
+
+      ]
+   },
 ];
 
 @NgModule({
