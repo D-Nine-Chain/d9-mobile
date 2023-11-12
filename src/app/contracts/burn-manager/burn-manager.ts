@@ -2,12 +2,20 @@ import { CurrencyTickerEnum, Utils } from "app/utils/utils";
 import { environment } from "environments/environment";
 import { BN } from '@polkadot/util';
 import { GasLimits } from "app/types";
+import { AppError } from "app/utils/app-error/app-error";
+import { ContractPromise } from "app/utils/api-contract";
 export class BurnManager {
-   contract: any;//is actually ContractPromise
+   contract: ContractPromise;
    gasLimits: GasLimits;
    constructor(contract: any, gasLimits: GasLimits) {
       this.contract = contract;
       this.gasLimits = gasLimits;
+   }
+
+   Errors = {
+      GettingTotalNetworkBurned: "BurnManager::ErrorGettingTotalNetworkBurned",
+      GettingBurnPortfolio: "BurnManager::ErrorGettingBurnPortfolio",
+
    }
 
    async makeBurnTx(amount: number) {
@@ -35,7 +43,8 @@ export class BurnManager {
       }, address);
 
       if (result.isOk && output != null) {
-         // sendNotification()
+         console.log("burn portfolio result is ", result.toJSON())
+         console.log("burn portfolio output is ", output.toJSON())
          let burnPortfolio = (output!.toJSON()! as any).ok
          console.log(burnPortfolio)
          if (burnPortfolio) {
@@ -43,6 +52,10 @@ export class BurnManager {
             burnPortfolio.balanceDue = Utils.reduceByCurrencyDecimal(burnPortfolio.balanceDue, CurrencyTickerEnum.D9);
             burnPortfolio.balancePaid = Utils.reduceByCurrencyDecimal(burnPortfolio.balancePaid, CurrencyTickerEnum.D9);
          }
+         return burnPortfolio;
+      }
+      else {
+         throw new AppError("Error getting burn portfolio.");
       }
    }
    /**
@@ -51,10 +64,12 @@ export class BurnManager {
    async getTotalNetworkBurned(address: string): Promise<string> {
       console.log("total burned called")
       // const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
-      const { output } = await this.contract.query['getTotalBurned'](address, {
+      const { output, result } = await this.contract.query['getTotalBurned'](address, {
          gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit
       });
+      console.log("output is ", output)
+      console.log("result is ", result.toJSON())
       if (output) {
          console.log("total burned", (output!.toJSON()! as any).ok)
          const totalBurned = (output!.toJSON()! as any).ok
@@ -64,7 +79,7 @@ export class BurnManager {
          return typeof totalBurned === 'string' ? totalBurned : totalBurned.toString();
       }
       else {
-         throw Error("ErrorGettingTotalBurned");
+         throw Error(this.Errors.GettingTotalNetworkBurned);
       }
 
    }

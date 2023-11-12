@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { WalletService } from '../services/wallet/wallet.service';
+import { WalletService } from '../../services/wallet/wallet.service';
 import { Preferences } from '@capacitor/preferences';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';

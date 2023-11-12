@@ -14,6 +14,11 @@
       <ion-content class="ion-padding">
 
          <ion-list>
+
+            <ion-item button (click)="navigateTo('home')">
+               main
+            </ion-item>
+
             <ion-item button (click)="navigateTo('account-management')">
                account management
             </ion-item>
@@ -36,7 +41,7 @@
                cross-chain transfer
             </ion-item>
 
-            <ion-item button>
+            <ion-item button (click)="navigateTo('settings')">
                settings
             </ion-item>
          </ion-list>

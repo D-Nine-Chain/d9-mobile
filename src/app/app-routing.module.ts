@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { FirstRunComponent } from './first-run/first-run.component';
-import { NewMnemonicComponent } from './new-mnemonic/new-mnemonic.component';
-import { HomeComponent } from './home/home.component';
-import { BurnMiningComponent } from './burn-mining/burn-mining/burn-mining.component';
+import { FirstRunComponent } from './pages/first-run/first-run.component';
+import { NewMnemonicComponent } from './pages/new-mnemonic/new-mnemonic.component';
+import { HomeComponent } from './pages/home/home.component';
+import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining.component';
+import { SettingsComponent } from './pages/settings/settings/settings.component';
 
 const routes: Routes = [
 
@@ -13,6 +14,7 @@ const routes: Routes = [
    },
    { path: 'new-mnemonic', component: NewMnemonicComponent },
    { path: 'home', component: HomeComponent },
+   { path: 'settings', component: SettingsComponent },
    {
       path: 'burn-mining', component: BurnMiningComponent, children: [
 

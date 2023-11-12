@@ -1,16 +1,20 @@
 // const fs = require('fs/promises');
 
 import { environment } from "environments/environment"
-import { burnContractABI } from "../burn-manager/burnManagerContract"
+import { burnContractABI } from "../burn-manager/burnManagerABI"
 
 // import path from 'path';
 const contracts: Record<string, any> = {
-   "burnManager": {
+   [environment.contracts.burn_manager.name]: {
       abi: burnContractABI,
       address: environment.contracts.burn_manager.address
    }
 }
+const enum Contracts {
+   BurnManager,
+}
 export class ContractUtils {
+   constructor() { }
 
    static async getContractMetadata(contractName: string): Promise<any> {
       return contracts[contractName]

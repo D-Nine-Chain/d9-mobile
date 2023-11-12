@@ -8,7 +8,9 @@ import { ContractUtils } from 'app/contracts/contract-utils/contract-utils';
 import { ContractPromise } from 'app/utils/api-contract';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { toPromiseMethod } from '@polkadot/api';
-import { burnContractABI } from 'app/contracts/burn-manager/burnManagerContract';
+import { burnContractABI } from 'app/contracts/burn-manager/burnManagerABI';
+import { GasLimits } from 'app/types';
+import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 export const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
 export const PROOFSIZE = new BN(119903836479112);
 export const STORAGE_DEPOSIT_LIMIT = null;
@@ -28,16 +30,26 @@ export class D9ApiService {
             console.error(err);
          })
    }
-   async getContractPromise(contractName: string): Promise<any> {
+   async getContract(contractName: string): Promise<any> {
       if (!this.d9) {
          await this.prepAPI();
       }
       const contractMetadata = await ContractUtils.getContractMetadata(contractName);
+      console.log("contract metadata is ", contractMetadata)
       const contract = new ContractPromise(this.d9!, contractMetadata.abi, contractMetadata.address);
+      const gasLimits: GasLimits = {
+         readLimit: await this.getReadGasLimit(),
+         writeLimit: await this.getGasLimit()
+      }
 
-      return contract;
-
+      switch (contractName) {
+         case environment.contracts.burn_manager.name:
+            return new BurnManager(contract, gasLimits);
+         default:
+            throw new Error("Contract not found");
+      }
    }
+
    public async getAPI(): Promise<ApiPromise> {
       await this.prepAPI();
       if (this.d9) {

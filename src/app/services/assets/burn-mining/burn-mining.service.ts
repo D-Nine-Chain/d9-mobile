@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BurnPortfolio, GasLimits } from 'app/types';
+import { Account, BurnPortfolio, GasLimits } from 'app/types';
 import { BehaviorSubject } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
@@ -14,7 +14,7 @@ import { D9ApiService } from 'app/services/d9-api/d9-api.service';
    providedIn: 'root'
 })
 export class BurnMiningService {
-   private burnPortfolioSource = new BehaviorSubject<BurnPortfolio>({
+   private burnPortfolioSubject = new BehaviorSubject<BurnPortfolio>({
       amountBurned: 0,
       balanceDue: 0,
       balancePaid: 0,
@@ -28,30 +28,40 @@ export class BurnMiningService {
       }
    });
    burnManager: BurnManager | null = null;
+   userAccount: Account | null = null;
    private totalNetworkBurnedSubject = new BehaviorSubject<number>(0);
    constructor(private account: AccountService, private d9: D9ApiService) {
-      this.prepContract()
-         .then(() => {
-            console.log("calling prep contract")
-         })
+      this.account.getAccountObservable().subscribe((account) => {
+         this.userAccount = account;
+         if (account.address.length > 0) {
+            this.initData()
+               .then(() => {
+                  console.log("calling prep contract")
+               })
+         }
+      })
+
+   }
+   async executeBurn(amount: number) {
+      const bigNumber = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9);
+      this.
    }
 
-   async prepContract() {
+   async initData() {
       try {
-         const burnManagerContractPromise = await this.d9.getContractPromise('burnManager');
-         const gasLimits: GasLimits = {
-            readLimit: await this.d9.getReadGasLimit(),
-            writeLimit: await this.d9.getGasLimit()
-         }
-         this.burnManager = new BurnManager(burnManagerContractPromise, gasLimits);
-         console.log("contract is ", this.burnManager)
-         this.getTotalNetworkBurn()
+         this.burnManager = await this.d9.getContract(environment.contracts.burn_manager.name);
+         this.getTotalNetworkBurn(this.userAccount!.address)
             .then((totalNetworkBurn) => {
                console.log("network burn is ", totalNetworkBurn)
                if (totalNetworkBurn) {
                   this.updateTotalNetworkBurn(totalNetworkBurn);
                }
             })
+         const burnPortfolio = await this.getBurnPortfolio(this.userAccount!.address);
+         if (burnPortfolio) {
+            console.info("updating burn portfolio");
+            this.updateBurnPortfolio(burnPortfolio);
+         }
       } catch (err) {
          console.log("error in prepping contract ", err)
 
@@ -59,27 +69,39 @@ export class BurnMiningService {
 
    }
 
-   getBurnPortfolioSub() {
-      return this.burnPortfolioSource.asObservable();
+   async getBurnPortfolio(address: string) {
+      return this.burnManager?.getBurnPortfolio(address)
    }
 
-   async getTotalNetworkBurn() {
+   getBurnPortfolioObservable() {
+      return this.burnPortfolioSubject.asObservable();
+   }
+
+   updateBurnPortfolio(burnPortfolio: BurnPortfolio) {
+      this.burnPortfolioSubject.next(burnPortfolio);
+   }
+
+   async getTotalNetworkBurn(address: string) {
+
       if (!this.burnManager) {
          console.log("burn manager is not ready")
       } else if (this.burnManager) {
          console.log("burn manager is ready")
       }
-      // return 300000000000000;
-      return await this.burnManager?.getTotalNetworkBurned(environment.contracts.burn.address);
+      try {
+         return await this.burnManager?.getTotalNetworkBurned(address);
+      } catch (err) {
+         throw err;
+      }
    }
-
+   /**
+    * @description get total network burn observable
+    * @returns returns a number in human decimal format
+    */
    getTotalNetworkBurnedObservable() {
       return this.totalNetworkBurnedSubject.asObservable();
    }
 
-   updateBurnPortfolio(burnPortfolio: BurnPortfolio) {
-      this.burnPortfolioSource.next(burnPortfolio);
-   }
 
    updateTotalNetworkBurn(totalNetworkBurn: number | string) {
       const formattedNumber = Utils.reduceByCurrencyDecimal(totalNetworkBurn, CurrencyTickerEnum.D9);

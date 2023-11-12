@@ -1,0 +1,45 @@
+<ion-content class="ion-padding">
+   <div id="burn">
+      <div>
+         <h1>Burn Mining</h1>
+         <div id="burn-amount-container">
+            <div>
+               <p>Total Network Burn</p>
+               <h2>{{formatNumber(totalBurned)}}</h2>
+            </div>
+            <div>
+               <p>My Burn Contribution</p>
+               <h2>{{calculateContributionPercentage().toFixed(3)}}% </h2>
+            </div>
+         </div>
+         <ion-card id="portfolio-data">
+            <ion-card-header>
+               <ion-card-subtitle>My Burn Portfolio</ion-card-subtitle>
+               <p>Dividends Due</p>
+               <ion-card-title>{{burnPortfolio.balanceDue}}</ion-card-title>
+               <p>Amount Burned</p>
+               <ion-card-title>{{burnPortfolio.amountBurned}}</ion-card-title>
+            </ion-card-header>
+         </ion-card>
+         <ion-card id="last-actions" *ngIf="burnPortfolio.lastBurn">
+            <ion-card-header>
+               <ion-card-subtitle>History</ion-card-subtitle>
+               <p>Last Burn</p>
+               <ion-card-title>{{toHumanDate(burnPortfolio.lastBurn.time)}}</ion-card-title>
+               <div *ngIf="burnPortfolio.lastWithdrawal">
+                  <p>Last Withdrawal</p>
+                  <ion-card-title>{{toHumanDate(burnPortfolio.lastWithdrawal.time)}}</ion-card-title>
+               </div>
+            </ion-card-header>
+         </ion-card>
+      </div>
+      <div id="burn-input-container">
+         <form>
+            <ion-input type="number" fill="solid" label="Burn D9" labelPlacement="floating"
+               helperText="enter an amount you would like to burn" errorText="Invalid email" id="burnInput"
+               [formControl]="burnAmount"></ion-input>
+         </form>
+         <ion-button expand="full" (click)="burn"> burn </ion-button>
+      </div>
+   </div>
+</ion-content>

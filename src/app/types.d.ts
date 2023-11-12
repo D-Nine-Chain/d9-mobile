@@ -79,3 +79,9 @@ export type CurrencyRecord = Record<CurrencyTickerEnum, CurrencyInfo>
 export enum AssetUpdate {
    AssetReceived = "AssetReceived",
 }
+
+export type AppError = {
+   title: string;
+   message: string;
+   data: any;
+}

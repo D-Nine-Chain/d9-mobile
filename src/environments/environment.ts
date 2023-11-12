@@ -2,17 +2,20 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+
 export const environment = {
    production: false,
    ws_endpoint: "wss://testnet.d9network.com:40300",
    storage_deposit_limit: null,
-   secure_storage_privatekey_key: "d9_privateKey",
-   preferences_publickey_key: "d9_publicKey",
+   secure_storage_keypair_aggregate: "d9_keyring",
+   preferences_default_address_key: "d9_default_address",
+   preferences_addresses: "d9_addresses",
+   preferences_d9_hard_derivation_counter_key: "d9_hard_derivation_counter",
    preferences_assets_key: "d9_assets",
    contracts: {
       burn_manager: {
          address: "zcoT4v6UgbzDrx2VV75VTV2SqpYnWv8ff54njr6ddhmLyRr",
-         file_name: "burn_manager"
+         name: "d9_burn_manager",
       },
       burn: {
          address: "vsCSRPGbhAUsWxtxtAwaqex7QKYRpxd7mSKLz4LT6P1vwjg",

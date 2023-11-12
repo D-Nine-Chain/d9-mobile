@@ -1,0 +1,58 @@
+#burn {
+   width: 100%;
+   height: 100%;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+}
+#burn-amount-container {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   p {
+      margin: 0;
+      padding: 0;
+      font-size: 0.8rem;
+   }
+   h2 {
+      margin: 0;
+      padding: 0;
+   }
+}
+
+#portfolio-data {
+   background-color: #ffe53b;
+   background-image: linear-gradient(298deg, #ffe53b 0%, #ff2525 74%);
+   color: white;
+   ion-card-title {
+      color: white;
+      font-weight: 700;
+   }
+   ion-card-subtitle {
+      color: white;
+   }
+   p {
+      color: white;
+      margin: 0;
+      margin-top: 10px;
+      padding: 0;
+   }
+}
+#last-actions {
+   background-color: var(--ion-color-primary);
+
+   color: white;
+   ion-card-title {
+      color: white;
+      font-weight: 700;
+   }
+   ion-card-subtitle {
+      color: white;
+   }
+   p {
+      color: white;
+      margin: 0;
+      margin-top: 10px;
+      padding: 0;
+   }
+}
