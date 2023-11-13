@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { VoidFn } from '@polkadot/api/types';
 import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { D9Balances } from 'app/types';
-import { Observable } from 'rxjs';
+import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
+import { Observable, firstValueFrom, from, map, switchMap } from 'rxjs';
 @Injectable({
    providedIn: 'root'
 })
@@ -10,24 +11,34 @@ export class D9BalancesService {
    d9BalancesSub: VoidFn | null = null;
    constructor(private d9: D9ApiService) { }
 
-   connectToD9BalancesSub(address: string): Observable<D9Balances> {
-      console.log("getting balance");
+   d9BalancesObservable(address: string): Observable<any> {
 
-      return new Observable(subscriber => {
-         this.d9.getAPI().then(d9 => {
-            d9.query.system.account(address, (rawData) => {
-               let accountInfo = rawData.toJSON() as any;
-               console.log("balances data is ", accountInfo)
-               subscriber.next({
-                  free: accountInfo.data.free,
-                  reserved: accountInfo.data.reserved,
-                  frozen: accountInfo.data.frozen
-               });
-            }).then(unsub => {
-               // Store the unsubscribe function if you need to unsubscribe later
-               this.d9BalancesSub = unsub;
-            });
-         }).catch(error => subscriber.error(error));
-      });
+      console.log("getting balance");
+      const d9 = from(this.d9.getApi());
+      return d9.pipe(
+         switchMap(api =>
+            api.derive.balances.all(address).pipe(
+               map(balanceInfo => {
+                  console.log("balance info is ", balanceInfo);
+                  return this.formatBalances(balanceInfo);
+               })
+            )
+         ),
+      );
+   }
+   private formatBalances(balanceInfo: any): D9Balances {
+      let formattedBalances: Record<string, any> = {
+         free: balanceInfo.freeBalance.toString(),
+
+         reserved: balanceInfo.reservedBalance.toString(),
+         locked: balanceInfo.lockedBalance.toString(),
+         vested: balanceInfo.vestedBalance.toString(),
+         voting: balanceInfo.votingBalance.toString(),
+         available: balanceInfo.availableBalance.toString()
+      }
+      for (const balance in formattedBalances) {
+         formattedBalances[balance] = Utils.reduceByCurrencyDecimal(formattedBalances[balance], CurrencyTickerEnum.D9)
+      }
+      return formattedBalances as D9Balances;
    }
 }

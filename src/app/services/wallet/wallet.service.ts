@@ -130,12 +130,12 @@ export class WalletService {
 
    }
 
-   public signContractTransaction(address: string, transaction: SubmittableExtrinsic<"promise", ISubmittableResult>): Promise<any> {
+   public signContractTransaction(transaction: any): Promise<any> {
       return new Promise(async (resolve, reject) => {
          try {
-            const keyPair = await this.getKeyPair(address);
-            const signedTransaction = await transaction.signAsync(keyPair);
-            resolve(signedTransaction);
+            const keyPair = await this.getKeyPair(this.activeAddress);
+            const signedTx = await transaction.signAsync(keyPair);
+            return await signedTx
          } catch (error) {
             reject(error);
          }

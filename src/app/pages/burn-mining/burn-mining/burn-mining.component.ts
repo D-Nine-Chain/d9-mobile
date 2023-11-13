@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { BurnMiningService } from 'app/services/assets/burn-mining/burn-mining.service';
 import { BurnPortfolio } from 'app/types';
 import { Utils } from 'app/utils/utils';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin, from, map, switchMap } from 'rxjs';
 import { FormControl } from '@angular/forms';
+import { AccountService } from 'app/services/account/account.service';
 @Component({
    selector: 'app-burn-mining',
    templateUrl: './burn-mining.component.html',
@@ -11,7 +12,7 @@ import { FormControl } from '@angular/forms';
 })
 export class BurnMiningComponent implements OnInit {
    burnAmount = new FormControl(0);
-   totalBurned: number = 0;
+   networkBurned: number = 0;
    totalBurnedSub: Subscription | null = null;
    burnPortfolioSub: Subscription | null = null;
    burnPortfolio: BurnPortfolio = {
@@ -28,7 +29,7 @@ export class BurnMiningComponent implements OnInit {
       }
    };
 
-   constructor(private burnMiningService: BurnMiningService) {
+   constructor(private burnMiningService: BurnMiningService, private accountService: AccountService) {
       this.subscribeToLiveData();
    }
 
@@ -47,20 +48,35 @@ export class BurnMiningComponent implements OnInit {
    }
    subscribeToLiveData() {
       console.info("burn mining component is subscribing to live data")
-      this.totalBurnedSub = this.burnMiningService.getTotalNetworkBurnedObservable().subscribe((totalBurned) => {
-         console.log("total burned on burn mining component is ", totalBurned)
-         this.totalBurned = totalBurned;
-      });
 
-      this.burnPortfolioSub = this.burnMiningService.getBurnPortfolioObservable().subscribe((burnPortfolio) => {
-         console.log("burn portfolio in bunr mining component is ", burnPortfolio)
+      this.accountService.getAccountObservable().pipe(
+         switchMap(account => {
+            // Convert both promises to observables and execute them in parallel
+            const burnPortfolio$ = from(this.burnMiningService.getBurnPortfolio(account.address));
+            const networkBurned$ = from(this.burnMiningService.getNetworkBurned(account.address));
+
+            return forkJoin([burnPortfolio$, networkBurned$]).pipe(
+               map(([burnPortfolio, networkBurned]) => {
+                  return { burnPortfolio, networkBurned };
+               })
+            );
+         })
+      ).subscribe(({ burnPortfolio, networkBurned }) => {
+         // Handle the data here
          this.burnPortfolio = burnPortfolio;
+         this.networkBurned = networkBurned;
+         console.log("Burn Portfolio:", burnPortfolio);
+         console.log("Network Burned:", networkBurned);
       });
+      // this.burnPortfolioSub = this.burnMiningService.getBurnPortfolioObservable().subscribe((burnPortfolio) => {
+      //    console.log("burn portfolio in bunr mining component is ", burnPortfolio)
+      //    this.burnPortfolio = burnPortfolio;
+      // });
    }
 
    calculateContributionPercentage() {
-      if (this.totalBurned > 0) {
-         return this.burnPortfolio.amountBurned / this.totalBurned * 100;
+      if (this.networkBurned > 0) {
+         return this.burnPortfolio.amountBurned / this.networkBurned * 100;
       }
       else {
          return 0;

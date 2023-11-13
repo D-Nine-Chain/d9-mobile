@@ -6,9 +6,13 @@ export interface Account {
 }
 // strings can be hexadecimal or decimal representations
 export interface D9Balances {
+   available: number | string;
    free: number | string;
-   frozen: number | string;
+
    reserved: number | string;
+   locked: number | string;
+   vested: number | string;
+   voting: number | string;
 }
 export interface GasLimits {
    readLimit: WeightV2,

@@ -14,8 +14,29 @@
       <ion-card id="balance-card">
          <ion-card-header>
             <ion-card-subtitle>Portfolio Value</ion-card-subtitle>
-            <ion-card-title><span id="currency-symbol">{{currencySymbol }}</span>
-               {{formatNumber(d9Balances.free)}}</ion-card-title>
+            <div id="balances-container">
+               <div id="left-balances">
+                  <ion-card-title><span id="currency-symbol">{{currencySymbol }}</span>
+                     {{formatNumber(d9Balances.free)}}
+                  </ion-card-title>
+               </div>
+               <div id="right-balances">
+                  <div class="balances-row">
+                     <p>Reserved</p>
+                     <p>{{formatNumber(d9Balances.reserved)}}</p>
+                  </div>
+                  <div class="balances-row">
+                     <span>Locked</span><span>{{formatNumber(d9Balances.locked)}}</span>
+                  </div>
+                  <div class="balances-row">
+                     <span>Vested</span><span>{{formatNumber(d9Balances.vested)}}</span>
+                  </div>
+                  <div class="balances-row">
+                     <span>Voting Free</span><span>{{formatNumber(d9Balances.voting)}}</span>
+                  </div>
+               </div>
+
+            </div>
          </ion-card-header>
          <ion-card-content>
             <div class="primary-assets">
