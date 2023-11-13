@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Account, BurnPortfolio, GasLimits } from 'app/types';
-import { BehaviorSubject, filter, first, firstValueFrom, of, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, first, firstValueFrom, from, of, switchMap, tap } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
@@ -9,6 +9,7 @@ import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { environment } from 'environments/environment';
 import { AccountService } from 'app/services/account/account.service';
 import { D9ApiService } from 'app/services/d9-api/d9-api.service';
+import { TransactionsService } from 'app/services/transactions/transactions.service';
 
 @Injectable({
    providedIn: 'root'
@@ -31,7 +32,7 @@ export class BurnMiningService {
    burnManager: BurnManager | null = null;
    userAccount: Account | null = null;
    private totalNetworkBurnedSubject = new BehaviorSubject<number>(0);
-   constructor(private account: AccountService, private d9: D9ApiService, private wallet: WalletService) {
+   constructor(private account: AccountService, private d9: D9ApiService, private wallet: WalletService, private transaction: TransactionsService) {
       this.account.getAccountObservable().subscribe((account) => {
          this.userAccount = account;
          if (account.address.length > 0) {
@@ -53,14 +54,25 @@ export class BurnMiningService {
          ))
    }
 
-   async executeBurn(amount: number) {
-      try {
-         const burnTx = await this.burnManager?.makeBurnTx(amount);
-         const signedTx = await this.wallet.signContractTransaction(burnTx as any);
-         signedTx.send((result: any) => { })
-      } catch (err) {
-         console.log("error in execute burn ", err)
-      }
+   executeBurn(amount: number) {
+      return from(this.getBurnManager()).pipe(
+         switchMap(bm => {
+            const burnTx = bm!.makeBurnTx(amount);
+            return from(this.wallet.signContractTransaction(burnTx))
+               .pipe(switchMap(signedTx => {
+                  return from(this.transaction.sendSignedTransaction(signedTx))
+                  // .pipe(
+                  //    tap((result) => {
+
+                  //       if (result.status.isFinalized) {
+
+                  //       }
+                  //    })
+                  // );
+               }))
+         }),
+
+      );
    }
 
 
@@ -73,9 +85,6 @@ export class BurnMiningService {
          this.getNetworkBurned(this.userAccount!.address)
             .then((totalNetworkBurn) => {
                console.log("network burn is ", totalNetworkBurn)
-               // if (totalNetworkBurn) {
-               //    this.updateTotalNetworkBurn(totalNetworkBurn);
-               // }
             })
 
       } catch (err) {
@@ -85,13 +94,10 @@ export class BurnMiningService {
 
    }
 
-   async getBurnPortfolio(address: string) {
-      console.log("address being used ", address)
+   async getBurnPortfolio(address: string): Promise<BurnPortfolio> {
       let bm = await this.getBurnManager();
       const { output, result } = await bm!.getBurnPortfolio(address)
       if (result.isOk && output != null) {
-         console.log("burn portfolio result is ", result.toJSON())
-         console.log("burn portfolio output is ", output.toJSON())
          let burnPortfolio = (output!.toJSON()! as any).ok
          console.log(burnPortfolio)
          if (burnPortfolio) {
@@ -113,8 +119,6 @@ export class BurnMiningService {
    async getNetworkBurned(address: string) {
       let bm = await this.getBurnManager();
       let { output, result } = await bm!.getNetworkBurned(address)
-      console.log("output is ", output)
-      console.log("result is ", result.toJSON())
       if (result.isOk && output != null) {
          let totalBurned = (output!.toJSON()! as any).ok
          if (totalBurned) {
@@ -137,14 +141,4 @@ export class BurnMiningService {
       this.totalNetworkBurnedSubject.next(formattedNumber);
    }
 
-   // prepService() {
-   //    this.account.getAccountObservable().subscribe((account) => {
-   //       this.burnManager = new BurnManager()
-   //    })
-   //    this.getNetworkBurn()
-   //       .then((totalNetworkBurn) => {
-   //          console.log("network burn is ", totalNetworkBurn)
-   //          this.updateTotalNetworkBurn(totalNetworkBurn);
-   //       })
-   // }
 }

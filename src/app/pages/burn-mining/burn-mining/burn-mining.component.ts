@@ -3,15 +3,16 @@ import { BurnMiningService } from 'app/services/assets/burn-mining/burn-mining.s
 import { BurnPortfolio } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription, forkJoin, from, map, switchMap } from 'rxjs';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { AccountService } from 'app/services/account/account.service';
+import { LoadingController } from '@ionic/angular';
 @Component({
    selector: 'app-burn-mining',
    templateUrl: './burn-mining.component.html',
    styleUrls: ['./burn-mining.component.scss'],
 })
 export class BurnMiningComponent implements OnInit {
-   burnAmount = new FormControl(0);
+   burnAmount = new FormControl(100, [Validators.required, Validators.min(100)]);
    networkBurned: number = 0;
    totalBurnedSub: Subscription | null = null;
    burnPortfolioSub: Subscription | null = null;
@@ -29,7 +30,7 @@ export class BurnMiningComponent implements OnInit {
       }
    };
 
-   constructor(private burnMiningService: BurnMiningService, private accountService: AccountService) {
+   constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController) {
       this.subscribeToLiveData();
    }
 
@@ -37,8 +38,40 @@ export class BurnMiningComponent implements OnInit {
    ngOnDestroy() {
 
    }
-   burn() {
+   async burn() {
+      const loading = await this.loadingController.create({
+         message: 'Burning D9...',
+      })
+      loading.present();
+      if (this.burnAmount.valid) {
+         const amount = this.burnAmount.value;
+         console.log('Amount to burn:', amount);
+         this.burnMiningService.executeBurn(amount!).subscribe((result) => {
+            console.log("result in burn component is ", result)
+            if (result.status.isInBlock) {
+               loading.message = "Waiting for confirmation..."
+            }
 
+            if (result.status.isFinalized) {
+               loading.message = "Updating burn portfolio..."
+               this.accountService.getAccount()
+                  .then((account) => {
+
+                     return Promise.all([
+                        this.burnMiningService.getNetworkBurned(account.address),
+                        this.burnMiningService.getBurnPortfolio(account.address)
+                     ])
+                  })
+                  .then(([networkBurned, burnPortfolio]) => {
+                     loading.dismiss()
+                     this.networkBurned = networkBurned;
+                     this.burnPortfolio = burnPortfolio;
+                  })
+            }
+         })
+
+         console.log("current portofol", this.burnPortfolio)
+      }
    }
    /** 
     * @description a wrapper function that formats numbers for UI. reduces decimals, formats for region. 
@@ -68,10 +101,7 @@ export class BurnMiningComponent implements OnInit {
          console.log("Burn Portfolio:", burnPortfolio);
          console.log("Network Burned:", networkBurned);
       });
-      // this.burnPortfolioSub = this.burnMiningService.getBurnPortfolioObservable().subscribe((burnPortfolio) => {
-      //    console.log("burn portfolio in bunr mining component is ", burnPortfolio)
-      //    this.burnPortfolio = burnPortfolio;
-      // });
+
    }
 
    calculateContributionPercentage() {

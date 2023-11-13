@@ -22,7 +22,7 @@ export class BurnManager {
 
    }
 
-   makeBurnTx(amount: number) {
+   makeBurnTx(amount: number): SubmittableExtrinsic<"rxjs"> {
 
       return this.contract.tx['burn']({
          gasLimit: this.gasLimits.writeLimit,
@@ -55,31 +55,6 @@ export class BurnManager {
          storageDepositLimit: environment.storage_deposit_limit
       }))
    }
-   /**
-    * @description total burned by whole network
-    */
-   // async getTotalNetworkBurned(address: string): Promise<string> {
-   //    console.log("total burned called")
-   //    // const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
-   //    const { output, result } = await this.contract.query['getTotalBurned'](address, {
-   //       gasLimit: this.gasLimits.readLimit,
-   //       storageDepositLimit: environment.storage_deposit_limit
-   //    });
-   //    console.log("output is ", output)
-   //    console.log("result is ", result.toJSON())
-   //    if (output) {
-   //       console.log("total burned", (output!.toJSON()! as any).ok)
-   //       const totalBurned = (output!.toJSON()! as any).ok
-   //       //polkadot api may return string or number depending 
-   //       //on the size of the number. small numbers are returned as numbers
-   //       // large are returned as hex strings
-   //       return typeof totalBurned === 'string' ? totalBurned : totalBurned.toString();
-   //    }
-   //    else {
-   //       throw Error(this.Errors.GettingTotalNetworkBurned);
-   //    }
-
-   // }
    /**
     * @description the network daily return is determined by the total amount burned by the network.
     * @returns percentage of return

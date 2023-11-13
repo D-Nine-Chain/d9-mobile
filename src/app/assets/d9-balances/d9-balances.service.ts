@@ -36,6 +36,7 @@ export class D9BalancesService {
          voting: balanceInfo.votingBalance.toString(),
          available: balanceInfo.availableBalance.toString()
       }
+      console.log("formated balances ", formattedBalances)
       for (const balance in formattedBalances) {
          formattedBalances[balance] = Utils.reduceByCurrencyDecimal(formattedBalances[balance], CurrencyTickerEnum.D9)
       }

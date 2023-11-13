@@ -36,10 +36,10 @@
       <div id="burn-input-container">
          <form>
             <ion-input type="number" fill="solid" label="Burn D9" labelPlacement="floating"
-               helperText="enter an amount you would like to burn" errorText="Invalid email" id="burnInput"
+               helperText="enter an amount you would like to burn" errorText="Insufficient amount" id="burnInput"
                [formControl]="burnAmount"></ion-input>
          </form>
-         <ion-button expand="full" (click)="burn"> burn </ion-button>
+         <ion-button expand="full" (click)="burn()"> burn </ion-button>
       </div>
    </div>
 </ion-content>

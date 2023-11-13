@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { WalletService } from '../wallet/wallet.service';
 import { Account } from 'app/types';
-import { BehaviorSubject, Observable, Subscription, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest, firstValueFrom, map } from 'rxjs';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 /**
  * @description let an account be the metadata for the child nodes a HD wallet
@@ -28,8 +28,8 @@ export class AccountService {
 
    }
 
-   public getAccount(): Account {
-      return this.accountSubject.getValue();
+   public getAccount(): Promise<Account> {
+      return firstValueFrom(this.getAccountObservable());
    }
 
 

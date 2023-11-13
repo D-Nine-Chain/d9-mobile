@@ -14,10 +14,11 @@ import { MenuComponent } from './menu/menu.component';
 import { AssestsListComponent } from './pages/home/assets-list/assests-list/assests-list.component';
 import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining.component';
 import { SettingsComponent } from './pages/settings/settings/settings.component';
+import { ReactiveFormsModule } from '@angular/forms';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
    declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent],
-   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule],
+   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],
 })

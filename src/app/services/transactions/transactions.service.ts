@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SubmittableExtrinsic } from '@polkadot/api/types/submittable';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, from, tap, throwError } from 'rxjs';
 
 @Injectable({
    providedIn: 'root'
@@ -9,16 +9,26 @@ import { BehaviorSubject } from 'rxjs';
 export class TransactionsService {
    private transactionResultSub: BehaviorSubject<ISubmittableResult | null> = new BehaviorSubject<ISubmittableResult | null>(null);
    constructor() { }
-   public getTransactionResultSub() {
-      return this.transactionResultSub.asObservable();
-   }
 
-   public async sendSignedTransaction(transaction: SubmittableExtrinsic<"promise", ISubmittableResult>): Promise<any> {
-      transaction.send(this.processResult)
+   public sendSignedTransaction(transaction: SubmittableExtrinsic<'rxjs', ISubmittableResult>): Observable<ISubmittableResult> {
+      console.log("sending signed transactions");
+
+      // Convert the Promise returned by `send` to an Observable
+      return from(transaction.send()).pipe(
+         tap(result => {
+            console.log("result from sending signed");
+            console.log(result.toHuman());
+         }),
+         catchError(err => {
+            console.error("Error sending transaction:", err);
+            return throwError(err); // or handle the error as appropriate
+         })
+      );
    }
 
 
    private processResult(result: ISubmittableResult): void {
+      console.log("processing result")
       if (result.status.isInBlock) {
          this.transactionResultSub.next(result);
          console.log(`Transaction included in block: ${result.status.asInBlock}`);
