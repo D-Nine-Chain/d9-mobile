@@ -15,10 +15,21 @@
          <ion-card id="portfolio-data">
             <ion-card-header>
                <ion-card-subtitle>My Burn Portfolio</ion-card-subtitle>
-               <p>Dividends Due</p>
-               <ion-card-title>{{burnPortfolio.balanceDue}}</ion-card-title>
-               <p>Amount Burned</p>
-               <ion-card-title>{{burnPortfolio.amountBurned}}</ion-card-title>
+
+               <div id="burn-amounts">
+                  <div>
+                     <p>Dividends Due</p>
+                     <h2>{{burnPortfolio.balanceDue}}</h2>
+                  </div>
+                  <div>
+                     <p>Amount Burned</p>
+                     <h2>{{burnPortfolio.amountBurned}}</h2>
+                  </div>
+               </div>
+               <ion-card-subtitle>
+                  <p>Dividends Paid</p>
+                  <h2>{{burnPortfolio.balancePaid}}</h2>
+               </ion-card-subtitle>
             </ion-card-header>
          </ion-card>
          <ion-card id="last-actions" *ngIf="burnPortfolio.lastBurn">
@@ -39,7 +50,11 @@
                helperText="enter an amount you would like to burn" errorText="Insufficient amount" id="burnInput"
                [formControl]="burnAmount"></ion-input>
          </form>
-         <ion-button expand="full" (click)="burn()"> burn </ion-button>
+         <div id="bottom-button-container">
+            <ion-button expand="full" (click)="burn()"> burn </ion-button><ion-button
+               (click)="withdraw()">withdraw</ion-button>
+         </div>
       </div>
+
    </div>
 </ion-content>

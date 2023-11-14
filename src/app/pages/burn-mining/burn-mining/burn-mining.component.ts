@@ -6,6 +6,8 @@ import { Subscription, forkJoin, from, map, switchMap } from 'rxjs';
 import { FormControl, Validators } from '@angular/forms';
 import { AccountService } from 'app/services/account/account.service';
 import { LoadingController } from '@ionic/angular';
+
+
 @Component({
    selector: 'app-burn-mining',
    templateUrl: './burn-mining.component.html',
@@ -16,6 +18,7 @@ export class BurnMiningComponent implements OnInit {
    networkBurned: number = 0;
    totalBurnedSub: Subscription | null = null;
    burnPortfolioSub: Subscription | null = null;
+   dataSubs: Subscription | null = null;
    burnPortfolio: BurnPortfolio = {
       amountBurned: 0,
       balanceDue: 0,
@@ -31,77 +34,51 @@ export class BurnMiningComponent implements OnInit {
    };
 
    constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController) {
-      this.subscribeToLiveData();
+      this.subscribeToLiveData()
    }
 
-   ngOnInit() { }
+   async ngOnInit() {
+
+   }
    ngOnDestroy() {
 
    }
    async burn() {
-      const loading = await this.loadingController.create({
-         message: 'Burning D9...',
-      })
-      loading.present();
       if (this.burnAmount.valid) {
          const amount = this.burnAmount.value;
-         console.log('Amount to burn:', amount);
-         this.burnMiningService.executeBurn(amount!).subscribe((result) => {
-            console.log("result in burn component is ", result)
-            if (result.status.isInBlock) {
-               loading.message = "Waiting for confirmation..."
-            }
+         this.burnMiningService.executeBurn(amount!)
 
-            if (result.status.isFinalized) {
-               loading.message = "Updating burn portfolio..."
-               this.accountService.getAccount()
-                  .then((account) => {
-
-                     return Promise.all([
-                        this.burnMiningService.getNetworkBurned(account.address),
-                        this.burnMiningService.getBurnPortfolio(account.address)
-                     ])
-                  })
-                  .then(([networkBurned, burnPortfolio]) => {
-                     loading.dismiss()
-                     this.networkBurned = networkBurned;
-                     this.burnPortfolio = burnPortfolio;
-                  })
-            }
-         })
-
-         console.log("current portofol", this.burnPortfolio)
       }
    }
+
+   async withdraw() {
+      console.log("withdraw called")
+      this.burnMiningService.executeWithdraw()
+   }
+
    /** 
     * @description a wrapper function that formats numbers for UI. reduces decimals, formats for region. 
     * */
    formatNumber(number: number) {
       return Utils.formatNumberForUI(number as number)
    }
-   subscribeToLiveData() {
-      console.info("burn mining component is subscribing to live data")
-
-      this.accountService.getAccountObservable().pipe(
-         switchMap(account => {
-            // Convert both promises to observables and execute them in parallel
-            const burnPortfolio$ = from(this.burnMiningService.getBurnPortfolio(account.address));
-            const networkBurned$ = from(this.burnMiningService.getNetworkBurned(account.address));
-
-            return forkJoin([burnPortfolio$, networkBurned$]).pipe(
-               map(([burnPortfolio, networkBurned]) => {
-                  return { burnPortfolio, networkBurned };
-               })
-            );
+   async subscribeToLiveData() {
+      const loading = await this.loadingController.create({
+         message: 'Loading...',
+      })
+      loading.present();
+      this.burnMiningService.getNetworkBurnObservable()
+         .subscribe((burned) => {
+            this.networkBurned = burned;
+            if (burned > 0) {
+               loading.dismiss();
+            }
          })
-      ).subscribe(({ burnPortfolio, networkBurned }) => {
-         // Handle the data here
-         this.burnPortfolio = burnPortfolio;
-         this.networkBurned = networkBurned;
-         console.log("Burn Portfolio:", burnPortfolio);
-         console.log("Network Burned:", networkBurned);
-      });
+      this.burnMiningService.getPortfolioObservable()
+         .subscribe((portfolio) => {
+            this.burnPortfolio = portfolio;
 
+         })
    }
 
    calculateContributionPercentage() {
@@ -118,6 +95,6 @@ export class BurnMiningComponent implements OnInit {
    }
 
    unsubscribeToAll() {
-      this.totalBurnedSub?.unsubscribe();
+      this.dataSubs?.unsubscribe();
    }
 }

@@ -17,9 +17,12 @@
    h2 {
       margin: 0;
       padding: 0;
+      font-size: 0.8rem;
    }
 }
-
+h2 {
+   margin: 0;
+}
 #portfolio-data {
    background-color: #ffe53b;
    background-image: linear-gradient(298deg, #ffe53b 0%, #ff2525 74%);
@@ -34,8 +37,23 @@
    p {
       color: white;
       margin: 0;
-      margin-top: 10px;
+      // margin-top: 10px;
       padding: 0;
+   }
+   #burn-amounts {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      p {
+         color: white;
+         margin: 0;
+         padding: 0;
+      }
+      h2 {
+         color: white;
+         margin: 0;
+         padding: 0;
+      }
    }
 }
 #last-actions {
@@ -54,5 +72,28 @@
       margin: 0;
       margin-top: 10px;
       padding: 0;
+   }
+}
+ion-modal {
+   --height: 50%;
+   --border-radius: 16px;
+   --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+ion-modal::part(backdrop) {
+   background: rgba(209, 213, 219);
+   opacity: 1;
+}
+
+ion-modal ion-toolbar {
+   --background: rgb(14 116 144);
+   --color: white;
+}
+#bottom-button-container {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   ion-button {
+      width: 48%;
    }
 }

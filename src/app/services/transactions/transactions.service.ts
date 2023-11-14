@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { SubmittableExtrinsic } from '@polkadot/api/types/submittable';
 import { ISubmittableResult } from '@polkadot/types/types';
 import { BehaviorSubject, Observable, catchError, from, tap, throwError } from 'rxjs';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable({
    providedIn: 'root'
 })
 export class TransactionsService {
    private transactionResultSub: BehaviorSubject<ISubmittableResult | null> = new BehaviorSubject<ISubmittableResult | null>(null);
-   constructor() { }
+   constructor(private notification: NotificationService) { }
 
    public sendSignedTransaction(transaction: SubmittableExtrinsic<'rxjs', ISubmittableResult>): Observable<ISubmittableResult> {
       console.log("sending signed transactions");
@@ -16,8 +17,7 @@ export class TransactionsService {
       // Convert the Promise returned by `send` to an Observable
       return from(transaction.send()).pipe(
          tap(result => {
-            console.log("result from sending signed");
-            console.log(result.toHuman());
+            this.processResult(result);
          }),
          catchError(err => {
             console.error("Error sending transaction:", err);
@@ -28,6 +28,8 @@ export class TransactionsService {
 
 
    private processResult(result: ISubmittableResult): void {
+      console.log("processing result", result.status)
+      this.notification.transactionNotification(result);
       console.log("processing result")
       if (result.status.isInBlock) {
          this.transactionResultSub.next(result);

@@ -23,7 +23,7 @@ export class BurnManager {
    }
 
    makeBurnTx(amount: number): SubmittableExtrinsic<"rxjs"> {
-
+      console.log("making burn tx")
       return this.contract.tx['burn']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
@@ -33,7 +33,7 @@ export class BurnManager {
 
 
    makeWithdrawTx(): SubmittableExtrinsic<'rxjs'> {
-      // const contract = await this.contractsService.getContract(environment.contracts.burn_manager);
+      console.log("making withdraw tx")
       return this.contract.tx['withdraw']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
@@ -48,7 +48,7 @@ export class BurnManager {
       }, address))
    }
 
-   getNetworkBurned(address: string): Promise<ContractCallOutcome> {
+   getRawNetworkBurned(address: string): Promise<ContractCallOutcome> {
       console.log("total burned called")
       return firstValueFrom(this.contract.query['getTotalBurned'](address, {
          gasLimit: this.gasLimits.readLimit,

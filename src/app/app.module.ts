@@ -15,10 +15,12 @@ import { AssestsListComponent } from './pages/home/assets-list/assests-list/asse
 import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining.component';
 import { SettingsComponent } from './pages/settings/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
    declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent],
-   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule],
+   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot()],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],
 })
