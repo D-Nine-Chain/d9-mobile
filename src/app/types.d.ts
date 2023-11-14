@@ -46,6 +46,16 @@ export interface BurnPortfolio {
    };
 }
 
+export interface MerchantAccount {
+   greenPoints: number;
+   lastConversion: any;
+   redeemedUsdt: number;
+   redeemedD9: number;
+   createdAt: number;
+   //locale date string
+   expiry: number;
+}
+
 export interface Notification {
    message: NotificationMessage;
    timestamp: number;

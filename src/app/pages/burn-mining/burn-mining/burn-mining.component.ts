@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BurnMiningService } from 'app/services/assets/burn-mining/burn-mining.service';
+import { BurnMiningService } from 'app/services/contracts/burn-mining/burn-mining.service';
 import { BurnPortfolio } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription, forkJoin, from, map, switchMap } from 'rxjs';

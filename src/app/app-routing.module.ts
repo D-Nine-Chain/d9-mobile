@@ -5,6 +5,7 @@ import { NewMnemonicComponent } from './pages/new-mnemonic/new-mnemonic.componen
 import { HomeComponent } from './pages/home/home.component';
 import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining.component';
 import { SettingsComponent } from './pages/settings/settings/settings.component';
+import { MerchantMiningComponent } from './pages/merchant-mining/merchant-mining/merchant-mining.component';
 
 const routes: Routes = [
 
@@ -20,6 +21,9 @@ const routes: Routes = [
 
       ]
    },
+   {
+      path: 'merchant-mining', component: MerchantMiningComponent
+   }
 ];
 
 @NgModule({

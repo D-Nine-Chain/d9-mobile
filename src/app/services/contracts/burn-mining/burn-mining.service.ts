@@ -4,7 +4,6 @@ import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, map
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
-import { formatNumber } from '@angular/common';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { environment } from 'environments/environment';
 import { AccountService } from 'app/services/account/account.service';
@@ -43,8 +42,8 @@ export class BurnMiningService {
                })
          }
       })
-
    }
+
    public getPortfolioObservable() {
       return this.burnPortfolioSubject.asObservable();
    }

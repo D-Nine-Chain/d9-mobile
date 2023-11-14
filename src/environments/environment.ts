@@ -22,15 +22,15 @@ export const environment = {
       },
       merchant: {
          address: "uXgbtFchEBq4frLX5HH55ZM5vPDmfbJb2NYFzpow19etiQD",
-         file_name: "d9_merchant_mining"
+         name: "d9_merchant_mining"
       },
       amm: {
          address: "xEBMqViw3aKaH4NSHHC9qjMCzFA7JQEnMa3rRPsxZaYPJFH",
-         file_name: "market_makers"
+         name: "d9_amm"
       },
       usdt: {
          address: "z4mr21CwkZW6njfyGUBFP3JGm9KeBgzD5dsYqSotrYfxuaz",
-         file_name: "d9_usdt"
+         name: "d9_usdt"
       }
    }
 };
