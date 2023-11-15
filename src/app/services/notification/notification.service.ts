@@ -31,6 +31,10 @@ export class NotificationService {
          this.loading.dismiss();
          this.loading = null;
       }
+      if (result.status.isReady) {
+         this.loading?.dismiss();
+         this.loading = null;
+      }
       if (result.dispatchError) {
          console.log("dispatch error", result.dispatchError)
          this.loading?.dismiss();

@@ -1,0 +1,26 @@
+<ion-content class="ion-padding">
+   <ion-card id="send-account-card">
+      <ion-card-header>
+         <ion-card-subtitle>Parent</ion-card-subtitle>
+         <div>
+            <ion-card-content>
+               <h2>{{parent}}</h2>
+            </ion-card-content>
+         </div>
+      </ion-card-header>
+   </ion-card>
+   <ion-card id="send-account-card">
+      <ion-card-header>
+         <ion-card-subtitle>Ancestors</ion-card-subtitle>
+         <div>
+            <ion-card-content>
+               <ion-list>
+                  <ion-item *ngFor="let ancestor of ancestors">
+                     <ion-label>{{ancestor}}</ion-label>
+                  </ion-item>
+               </ion-list>
+            </ion-card-content>
+         </div>
+      </ion-card-header>
+   </ion-card>
+</ion-content>

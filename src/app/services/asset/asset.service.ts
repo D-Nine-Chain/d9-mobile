@@ -2,9 +2,13 @@ import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Asset, CurrencyInfo } from 'app/types';
 import { environment } from 'environments/environment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, from, map, switchMap, tap } from 'rxjs';
 import { BN } from '@polkadot/util';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
+import { D9ApiService } from '../d9-api/d9-api.service';
+import { TransactionsService } from '../transactions/transactions.service';
+import { WalletService } from '../wallet/wallet.service';
+import { Router } from '@angular/router';
 // import { D9BalancesService } from '../assets/d9-balances/d9-balances.service';
 @Injectable({
    providedIn: 'root'
@@ -13,10 +17,30 @@ export class AssetsService {
    public appBaseCurrencyInfo: CurrencyInfo = Utils.currenciesRecord[CurrencyTickerEnum.D9];
 
    private assetsSource = new BehaviorSubject<Asset[]>([]);
+   private transactionSub: any;
+   constructor(private d9: D9ApiService, private transaction: TransactionsService, private wallet: WalletService, private router: Router) {
+      // this.loadAssetsFromPreferences();
 
-   constructor() {
-      this.loadAssetsFromPreferences();
-      console.log(this.appBaseCurrencyInfo)
+   }
+
+   public async transfer(toAddress: string, amount: number) {
+      const numberString = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9);
+      const api = await this.d9.getApi();
+      const transferTx = api.tx.balances.transfer(toAddress, numberString)
+      const signedTransaction = await this.wallet.signContractTransaction(transferTx)
+      this.transactionSub = this.transaction.sendSignedTransaction(signedTransaction)
+         .pipe(
+            tap(
+               async (result) => {
+                  if (result.status.isFinalized) {
+                     this.transactionSub.unsubscribe();
+                     this.router.navigate(['/home']);
+                  }
+               }
+            )
+         )
+         .subscribe()
+
    }
 
    getConversionRate(baseCurrency: CurrencyTickerEnum, targetCurrency: CurrencyTickerEnum): Promise<number> {
@@ -24,6 +48,31 @@ export class AssetsService {
       // For now, we return a dummy value
       return Promise.resolve(1); // Replace with actual implementation
    }
+
+   getParent() {
+      return this.wallet.getActiveAddressObservable()
+         .pipe(switchMap(
+            async (account) => {
+               const d9 = await this.d9.getApi();
+               return await (d9.rpc as any).referral.getParent(account)
+            }
+         ),
+
+         )
+   }
+
+   getAncestors() {
+      return this.wallet.getActiveAddressObservable()
+         .pipe(switchMap(
+            async (account) => {
+               const d9 = await this.d9.getApi();
+               return await (d9.rpc as any).referral.getAncestors(account)
+            }
+         ),
+
+         )
+   }
+
 
    async calculateAssetValue(asset: Asset): Promise<BN> {
       const conversionRate = new BN(await this.getConversionRate(asset.ticker, this.appBaseCurrencyInfo.ticker as CurrencyTickerEnum));

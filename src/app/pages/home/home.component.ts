@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { D9BalancesService } from 'app/assets/d9-balances/d9-balances.service';
 import { CurrencySymbol, CurrencyTickerEnum } from 'app/utils/utils';
 import { Utils } from 'app/utils/utils';
+import { Router } from '@angular/router';
 @Component({
    selector: 'app-home',
    templateUrl: './home.component.html',
@@ -36,7 +37,7 @@ export class HomeComponent implements OnInit {
    currencySymbol = CurrencySymbol.D9
    accountSub: Subscription | null = null;
    balancesSub: Subscription | null = null;
-   constructor(private accountService: AccountService, private d9BalancesService: D9BalancesService) {
+   constructor(private accountService: AccountService, private d9BalancesService: D9BalancesService, private router: Router) {
 
       this.accountSub = this.accountService.getAccountObservable().subscribe((account) => {
          this.account = account
@@ -56,6 +57,10 @@ export class HomeComponent implements OnInit {
    ngOnInit() {
 
       // this.d9BalancesService.connectToD9BalancesSub()
+   }
+
+   goTo(route: string) {
+      this.router.navigate([`/${route}`])
    }
 
    ngOnDestroy() {

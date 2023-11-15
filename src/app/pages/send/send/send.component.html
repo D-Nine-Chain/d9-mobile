@@ -1,0 +1,18 @@
+<ion-content class="ion-padding">
+   <ion-card id="send-account-card">
+      <ion-card-header>
+         <ion-card-subtitle>Send D9</ion-card-subtitle>
+         <div>
+            <ion-card-content>
+               <form>
+                  <ion-input type="text" fill="solid" label="enter address" labelPlacement="floating"
+                     errorText="must be valid address" id="addressInput" [formControl]="toAddress"></ion-input>
+                  <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
+                     errorText="must be greater than zero" id="burnInput" [formControl]="amountToSend"></ion-input>
+               </form>
+            </ion-card-content>
+            <ion-button (click)="send()">send D9</ion-button>
+         </div>
+      </ion-card-header>
+   </ion-card>
+</ion-content>

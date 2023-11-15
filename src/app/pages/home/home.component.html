@@ -51,13 +51,13 @@
       </ion-card>
       <div id="transaction-buttons-container">
          <div class="transaction-button">
-            <button shape="round" id="receive-button">
+            <button shape="round" id="receive-button" (click)="goTo('receive')">
                <fa-icon [icon]="receiveIcon"></fa-icon>
             </button>
             <span>receive</span>
          </div>
          <div class="transaction-button">
-            <button id="send-button">
+            <button id="send-button" (click)="goTo('send')">
                <fa-icon [icon]="sendIcon"></fa-icon>
             </button>
             <span>send</span>

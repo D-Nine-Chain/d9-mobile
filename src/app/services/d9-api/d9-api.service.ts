@@ -32,11 +32,6 @@ export class D9ApiService {
          provider: this.wsProvider,
          rpc: customRpc
       })
-      // this.prepAPI()
-      //    .catch((err) => {
-      //       console.log("error in getting api")
-      //       console.error(err);
-      //    })
    }
 
    getApi() {
@@ -45,6 +40,8 @@ export class D9ApiService {
          first()
       ))
    }
+
+
 
    async getContract(contractName: string): Promise<any> {
       const d9 = await this.getApi();

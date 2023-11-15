@@ -6,6 +6,9 @@ import { HomeComponent } from './pages/home/home.component';
 import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining.component';
 import { SettingsComponent } from './pages/settings/settings/settings.component';
 import { MerchantMiningComponent } from './pages/merchant-mining/merchant-mining/merchant-mining.component';
+import { SendComponent } from './pages/send/send/send.component';
+import { ReceiveComponent } from './pages/receive/receive/receive.component';
+import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.component';
 
 const routes: Routes = [
 
@@ -23,6 +26,11 @@ const routes: Routes = [
    },
    {
       path: 'merchant-mining', component: MerchantMiningComponent
+   },
+   { path: 'send', component: SendComponent },
+   { path: 'receive', component: ReceiveComponent },
+   {
+      path: 'ancestors', component: AncestorsComponent
    }
 ];
 
