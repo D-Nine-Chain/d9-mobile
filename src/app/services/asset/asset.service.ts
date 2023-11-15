@@ -43,7 +43,6 @@ export class AssetsService {
 
 
    async loadAssetsFromPreferences() {
-      console.log("loading assets from preferences")
       const result = await Preferences.get({ key: environment.preferences_assets_key })
       if (result.value) {
          const assets = JSON.parse(result.value);

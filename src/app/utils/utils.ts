@@ -62,7 +62,6 @@ export class Utils {
       }
       // Check if the input is a string starting with '0x'
       else if (typeof number === 'string' && number.startsWith('0x')) {
-         console.log("starts with 0x");
          return hexToBn(number).div(new BN(10).pow(new BN(this.currenciesRecord[currency].decimals))).toNumber();
       }
       // If the input is a string but not a hex string, convert it using hexToU8a

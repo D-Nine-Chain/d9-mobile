@@ -45,7 +45,9 @@ export interface BurnPortfolio {
       contract: string;
    };
 }
-
+export interface ContractErr {
+   err: string;
+}
 export interface MerchantAccount {
    greenPoints: number;
    lastConversion: any;
@@ -53,7 +55,7 @@ export interface MerchantAccount {
    redeemedD9: number;
    createdAt: number;
    //locale date string
-   expiry: number;
+   expiry?: any;
 }
 
 export interface Notification {

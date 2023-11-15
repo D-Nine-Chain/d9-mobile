@@ -19,9 +19,9 @@ export class WalletService {
    private allAddresses: string[] = [];
    private publicKey: Uint8Array | null = null;
    private hardDerivationCounter = 0;
-   publicKeyObservable = new BehaviorSubject<string>("");
-   activeAddressSubject = new BehaviorSubject<string>("");
-   allAddressesSubject = new BehaviorSubject<string[]>([]);
+   private publicKeySubject = new BehaviorSubject<string>("");
+   private activeAddressSubject = new BehaviorSubject<string>("");
+   private allAddressesSubject = new BehaviorSubject<string[]>([]);
    constructor() {
       cryptoWaitReady()
          .then(() => {
@@ -42,9 +42,7 @@ export class WalletService {
       console.log("loading addresses");
       const allAddressesResult = await Preferences.get({ key: environment.preferences_addresses });
       const defaultAddressResult = await Preferences.get({ key: environment.preferences_default_address_key });
-      console.log("default address result", defaultAddressResult)
       if (allAddressesResult.value) {
-         console.log("all addresses, ", allAddressesResult.value)
          allAddresses = JSON.parse(allAddressesResult.value);
          this.updateAddreressesList(allAddresses)
       }
@@ -53,7 +51,6 @@ export class WalletService {
          this.activeAddressSubject.next(defaultAddressResult.value);
       }
       if (!defaultAddressResult.value && allAddresses.length > 0) {
-         console.log("setting default address to ", allAddresses[0])
          this.activeAddressSubject.next(allAddresses[0]);
       }
       if (allAddresses.length == 0 && !defaultAddressResult.value) {
@@ -64,16 +61,15 @@ export class WalletService {
    public async loadKeyring(): Promise<void> {
 
       this.keyRing = new Keyring({ type: 'sr25519' });
+      this.keyRing.setSS58Format(42);
       const keypairAggregate = await SecureStorage.get(environment.secure_storage_keypair_aggregate);
       if (!keypairAggregate) {
          console.log("cant find keypairs ")
          throw new Error("No keyring found");
       } else {
-         console.log("keypair aggregate is ", keypairAggregate)
       }
       const keyPairs = JSON.parse(keypairAggregate as string);
       keyPairs.forEach((keyPair: KeyringPair$Json) => {
-         console.log("adding keypair ", keyPair)
          this.keyRing!.addFromJson(keyPair);
       })
 

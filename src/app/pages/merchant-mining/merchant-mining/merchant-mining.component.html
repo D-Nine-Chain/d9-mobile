@@ -1,3 +1,44 @@
-<p>
-  merchant-mining works!
-</p>
+<ion-content class="ion-padding">
+   <ion-title>Green Points Account</ion-title>
+   <ion-card id="">
+      <ion-card-header id="green-points-card">
+         <ion-card-subtitle>My Green Points</ion-card-subtitle>
+         <ion-card-title>{{formatNumber(merchantAccount.greenPoints)}}</ion-card-title>
+         <div>
+            <p>redeemed D9 {{merchantAccount.redeemedD9}}</p>
+         </div>
+         <p>redeemed USDT {{merchantAccount.redeemedUsdt}}</p>
+         <ion-button (click)="withdraw()">redeem</ion-button>
+      </ion-card-header>
+   </ion-card>
+   <ion-card *ngIf="isExpired()" id="merchant-account-card">
+      <ion-card-header>
+         <ion-card-subtitle>Merchant Account</ion-card-subtitle>
+         <div>
+            <ion-card-content>
+               <form>
+                  <ion-input type="text" fill="solid" label="enter address" labelPlacement="floating"
+                     errorText="must be valid address" id="addressInput" [formControl]="toAddress"></ion-input>
+                  <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
+                     errorText="must be greater than zero" id="burnInput"
+                     [formControl]="amountToGreenPoints"></ion-input>
+               </form>
+            </ion-card-content>
+            <ion-button (click)="sendGreenPoints()">send green points</ion-button>
+         </div>
+      </ion-card-header>
+   </ion-card>
+   <ion-card *ngIf="!isExpired()" id="merchant-account-card">
+      <ion-card-header>
+         <ion-card-subtitle>Subscribe</ion-card-subtitle>
+         <!-- <ion-card-content>
+            <form>
+         
+               <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
+                  errorText="must be greater than zero" id="monthsInput"
+                  [formControl]="numberOfMonths"></ion-input>
+            </form>
+         </ion-card-content> -->
+      </ion-card-header>
+   </ion-card>
+</ion-content>

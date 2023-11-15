@@ -55,31 +55,5 @@ export class BurnManager {
          storageDepositLimit: environment.storage_deposit_limit
       }))
    }
-   /**
-    * @description the network daily return is determined by the total amount burned by the network.
-    * @returns percentage of return
-    */
-   // async getReturnPercent(address: string) {
-   //    let totalBurnedString = await this.getTotalNetworkBurned(address);
-   //    let isHex = /^0x[0-9A-Fa-f]+$/.test(totalBurnedString);
-
-   //    let totalBurnedBN = new BN(totalBurnedString, isHex ? 16 : 10);
-
-   //    let firstThresholdAmountBN = new BN('200000000');
-   //    let percentageBN = new BN('8000000'); // 0.008 * 10^6 to maintain precision without decimals
-
-   //    if (totalBurnedBN.lte(firstThresholdAmountBN)) {
-   //       return percentageBN.toNumber() / 10 ** 6;
-   //    }
-
-   //    let excessAmountBN = totalBurnedBN.sub(firstThresholdAmountBN);
-   //    let reductionsBN = excessAmountBN.div(new BN('100000000')).add(new BN(1));
-
-   //    for (let i = new BN(0); i.lt(reductionsBN); i.iadd(new BN(1))) {
-   //       percentageBN = percentageBN.div(new BN(2));
-   //    }
-
-   //    return percentageBN.toNumber() / 10 ** 6;
-   // }
 
 }

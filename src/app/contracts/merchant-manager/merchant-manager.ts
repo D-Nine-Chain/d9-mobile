@@ -6,7 +6,8 @@ import { environment } from "environments/environment";
 import { firstValueFrom } from "rxjs";
 import { BN } from '@polkadot/util';
 import { CurrencyTickerEnum, Utils } from "app/utils/utils";
-export class MerchantManager {
+import { D9Contract } from "../contracts";
+export class MerchantManager implements D9Contract {
    contract: ContractRx;
    gasLimits: GasLimits;
 
@@ -20,7 +21,15 @@ export class MerchantManager {
          gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit,
 
-      }))
+      }, address));
+   }
+
+   getMerchantAccount(address: string): Promise<ContractCallOutcome> {
+      console.log(`getting merchant account for ${address}`)
+      return firstValueFrom(this.contract.query['getAccount'](address, {
+         gasLimit: this.gasLimits.readLimit,
+         storageDepositLimit: environment.storage_deposit_limit,
+      }, address));
    }
 
    d9Subscribe(address: string, months: number): SubmittableExtrinsic<'rxjs'> {
@@ -39,18 +48,13 @@ export class MerchantManager {
       }, address)
    }
 
-   redeemD9(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {
+   redeemD9(address: string): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['redeemD9']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-      }, address)
+      })
    }
 
-   getMerchantAccount(address: string): Promise<ContractCallOutcome> {
-      return firstValueFrom(this.contract.query['getAccount'](address, {
-         gasLimit: this.gasLimits.readLimit,
-         storageDepositLimit: environment.storage_deposit_limit,
-      }))
-   }
+
 
 }
