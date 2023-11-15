@@ -26,6 +26,7 @@ export class MerchantMiningComponent implements OnInit {
    merchantSub: Subscription | null = null;
    expirySub: Subscription | null = null;
    loading: any;
+   numberOfMonths = new FormControl(1, [Validators.required, Validators.min(1)]);
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, Validators.min(47), substrateAddressValidator()]);
    constructor(private merchantMining: MerchantMiningService, private loadingController: LoadingController) {
@@ -57,6 +58,13 @@ export class MerchantMiningComponent implements OnInit {
       if (this.amountToGreenPoints.valid) {
          const amount = this.amountToGreenPoints.value!;
          this.merchantMining.withdrawD9(amount)
+      }
+   }
+
+   subscribe() {
+      if (this.numberOfMonths.valid) {
+         const months = this.numberOfMonths.value!;
+         this.merchantMining.subscribe(months)
       }
    }
 

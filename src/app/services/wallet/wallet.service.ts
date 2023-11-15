@@ -43,6 +43,7 @@ export class WalletService {
       const allAddressesResult = await Preferences.get({ key: environment.preferences_addresses });
       const defaultAddressResult = await Preferences.get({ key: environment.preferences_default_address_key });
       if (allAddressesResult.value) {
+
          allAddresses = JSON.parse(allAddressesResult.value);
          this.updateAddreressesList(allAddresses)
       }
@@ -51,6 +52,7 @@ export class WalletService {
          this.activeAddressSubject.next(defaultAddressResult.value);
       }
       if (!defaultAddressResult.value && allAddresses.length > 0) {
+
          this.activeAddressSubject.next(allAddresses[0]);
       }
       if (allAddresses.length == 0 && !defaultAddressResult.value) {
@@ -104,9 +106,11 @@ export class WalletService {
    public async createNewWallet(mnemonic: string): Promise<void> {
       await cryptoWaitReady();
       const keyring = new Keyring({ type: 'sr25519' })
-      const alice = keyring.addFromUri('//Alice', { name: 'Alice default' })
+      // const alice = keyring.addFromUri('//Alice', { name: 'Alice default' })
+      keyring.addFromUri(mnemonic)
       return this.saveWallet(keyring);
    }
+
    public async saveWallet(keyring: Keyring): Promise<void> {
 
       console.log("saving wallet")

@@ -32,12 +32,12 @@ export class MerchantManager implements D9Contract {
       }, address));
    }
 
-   d9Subscribe(address: string, months: number): SubmittableExtrinsic<'rxjs'> {
+   d9Subscribe(months: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['d9Subscribe']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
          value: new BN(months).mul(new BN(10).mul(new BN(10).pow(new BN(12)))).toString()
-      }, address)
+      })
    }
 
    giveGreenPoints(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {

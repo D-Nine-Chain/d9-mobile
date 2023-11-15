@@ -36,6 +36,13 @@ export class MerchantMiningService extends GenericContractService implements Gen
          })).subscribe();
    }
 
+   public async subscribe(months: number) {
+      this.currentTransactionSub = this.wallet.getActiveAddressObservable()
+         .pipe(switchMap(address => {
+            return this.executeWriteTransaction('d9Subscribe', [months])
+         })).subscribe();
+   }
+
    public async sendGreenPoints(toAddress: string, amount: number) {
       const updatePromises = [
          this.updateAccountFromChain(),

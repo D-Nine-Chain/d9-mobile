@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">D9 Mobile</string>
+    <string name="title_activity_main">D9 Mobile</string>
+    <string name="package_name">com.d9.mobile</string>
+    <string name="custom_url_scheme">com.d9.mobile</string>
+</resources>

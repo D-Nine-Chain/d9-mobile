@@ -2,12 +2,13 @@
    <ion-card id="send-account-card">
       <ion-card-header>
          <ion-card-subtitle>Receive D9</ion-card-subtitle>
-         <div>
+         <div (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
             <ion-card-content>
 
                <h2>{{address}}</h2>
             </ion-card-content>
          </div>
+         <ion-button (click)="copyTextToClipboard()">press to copy</ion-button>
       </ion-card-header>
    </ion-card>
 </ion-content>

@@ -36,7 +36,7 @@ export class NotificationService {
          this.loading = null;
       }
       if (result.dispatchError) {
-         console.log("dispatch error", result.dispatchError)
+         console.log("dispatch error", result.dispatchError.toHuman())
          this.loading?.dismiss();
          this.loading = null;
       }

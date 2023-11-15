@@ -31,14 +31,15 @@
    <ion-card *ngIf="!isExpired()" id="merchant-account-card">
       <ion-card-header>
          <ion-card-subtitle>Subscribe</ion-card-subtitle>
-         <!-- <ion-card-content>
+         <ion-card-content>
             <form>
-         
-               <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
-                  errorText="must be greater than zero" id="monthsInput"
-                  [formControl]="numberOfMonths"></ion-input>
+
+               <ion-input type="number" fill="solid" label="input number of months" labelPlacement="floating"
+                  errorText="must be greater than zero" id="monthsInput" [formControl]="numberOfMonths"></ion-input>
             </form>
-         </ion-card-content> -->
+            <ion-button (click)="subscribe()">subscribe</ion-button>
+         </ion-card-content>
       </ion-card-header>
    </ion-card>
+   <h1>1 month = 10 D9</h1>
 </ion-content>
