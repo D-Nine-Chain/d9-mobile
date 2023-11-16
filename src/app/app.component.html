@@ -13,7 +13,7 @@
                   [ngClass]="hasNotifications ? 'has-notifications' : 'no-notifications' "></fa-icon>
             </ion-button>
 
-            <ion-button fill="clear">
+            <ion-button fill="clear" (click)="scan()">
                <fa-icon [icon]="qrCodeIcon"></fa-icon>
             </ion-button>
 

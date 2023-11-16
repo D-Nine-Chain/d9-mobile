@@ -1,3 +1,4 @@
+
 import { CurrencySymbol, CurrencyTickerEnum } from "./utils/utils";
 import type { WeightV2 } from '@polkadot/types/interfaces'
 export interface Account {
@@ -100,4 +101,17 @@ export type AppError = {
    title: string;
    message: string;
    data: any;
+}
+
+export type D9QrCode = {
+   type: string,
+   data: string | QRGreenPoints;
+   version: number;
+   metadata: any;
+}
+
+
+
+export type QRGreenPoints = {
+   greenPoints: number,
 }

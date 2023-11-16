@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { AssetsService } from 'app/services/asset/asset.service';
 import { substrateAddressValidator } from 'app/utils/Validators';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
    selector: 'app-send',
@@ -9,11 +11,18 @@ import { substrateAddressValidator } from 'app/utils/Validators';
    styleUrls: ['./send.component.scss'],
 })
 export class SendComponent implements OnInit {
+   private destroy$ = new Subject<void>();
    amountToSend = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, Validators.min(1), substrateAddressValidator()]);
-   constructor(private asset: AssetsService) { }
+   queryParams: any;
+   constructor(private asset: AssetsService, private route: ActivatedRoute) { }
 
-   ngOnInit() { }
+   ngOnInit() {
+      this.queryParams = this.route.snapshot.queryParams;
+      if (this.queryParams) {
+         this.toAddress.setValue(this.queryParams.address)
+      }
+   }
 
    send() {
       if (this.amountToSend.valid && this.toAddress.valid) {

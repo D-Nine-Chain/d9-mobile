@@ -10,6 +10,7 @@ import { SendComponent } from './pages/send/send/send.component';
 import { ReceiveComponent } from './pages/receive/receive/receive.component';
 import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.component';
 import { SwapComponent } from './pages/swap/swap/swap.component';
+import { QrScannerComponent } from './pages/qr-scanner/qr-scanner/qr-scanner.component';
 
 const routes: Routes = [
 
@@ -35,6 +36,9 @@ const routes: Routes = [
    },
    {
       path: 'swap', component: SwapComponent
+   },
+   {
+      path: 'qr-scanner', component: QrScannerComponent
    }
 ];
 

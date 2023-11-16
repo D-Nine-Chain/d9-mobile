@@ -41,6 +41,9 @@ export class AppComponent {
       })
    }
 
+   scan() {
+      this._router.navigate(['/qr-scanner']);
+   }
    checkFirstLoad() {
       Preferences.get({ key: 'firstLoad' }).then(({ value }) => {
          console.log('firstLoad', value);
@@ -50,7 +53,7 @@ export class AppComponent {
             this._router.navigate(['/new-mnemonic']);
          }
          else {
-            this._router.navigate(['/swap']);
+            this._router.navigate(['/home']);
          }
       });
    }
