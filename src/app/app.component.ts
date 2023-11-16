@@ -50,7 +50,7 @@ export class AppComponent {
             this._router.navigate(['/new-mnemonic']);
          }
          else {
-            this._router.navigate(['/home']);
+            this._router.navigate(['/swap']);
          }
       });
    }

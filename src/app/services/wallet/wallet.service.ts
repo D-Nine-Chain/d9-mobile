@@ -52,7 +52,7 @@ export class WalletService {
          this.activeAddressSubject.next(defaultAddressResult.value);
       }
       if (!defaultAddressResult.value && allAddresses.length > 0) {
-
+         console.log("actived address set from all addresses array", allAddresses[0])
          this.activeAddressSubject.next(allAddresses[0]);
       }
       if (allAddresses.length == 0 && !defaultAddressResult.value) {

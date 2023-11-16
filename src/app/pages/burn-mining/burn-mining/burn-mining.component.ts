@@ -32,7 +32,7 @@ export class BurnMiningComponent implements OnInit {
          contract: ''
       }
    };
-
+   // 
    constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController) {
       this.subscribeToLiveData()
    }

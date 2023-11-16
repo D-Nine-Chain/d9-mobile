@@ -19,7 +19,7 @@ export class SendComponent implements OnInit {
       if (this.amountToSend.valid && this.toAddress.valid) {
          const address = this.toAddress.value;
          const amount = this.amountToSend.value;
-         this.asset.transfer(address!, amount!)
+         this.asset.transferD9(address!, amount!)
 
       }
    }

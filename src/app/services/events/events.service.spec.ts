@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { D9BalancesService } from './d9-balances.service';
+import { EventsService } from './events.service';
 
-describe('D9BalancesService', () => {
-  let service: D9BalancesService;
+describe('EventsService', () => {
+  let service: EventsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(D9BalancesService);
+    service = TestBed.inject(EventsService);
   });
 
   it('should be created', () => {

@@ -8,6 +8,7 @@ export function substrateAddressValidator(): ValidatorFn {
    };
 }
 
+
 function isValidPolkadotAddress(control: AbstractControl) {
    try {
       const address = control.value;

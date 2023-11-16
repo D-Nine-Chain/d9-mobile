@@ -14,6 +14,9 @@ import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 import { Observable, filter, first, firstValueFrom, from } from 'rxjs';
 import { env } from 'process';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
+import { AmmManager } from 'app/contracts/amm-manager/amm-manager';
+import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';
+import { D9Contract } from 'app/contracts/contracts';
 export const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
 export const PROOFSIZE = new BN(119903836479112);
 export const STORAGE_DEPOSIT_LIMIT = null;
@@ -57,6 +60,10 @@ export class D9ApiService {
             return new BurnManager(contract, gasLimits);
          case environment.contracts.merchant.name:
             return new MerchantManager(contract, gasLimits);
+         case environment.contracts.amm.name:
+            return new AmmManager(contract, gasLimits);
+         case environment.contracts.usdt.name:
+            return new UsdtManager(contract, gasLimits);
          default:
             throw new Error("Contract not found");
       }

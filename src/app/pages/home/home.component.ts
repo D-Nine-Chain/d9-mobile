@@ -3,10 +3,10 @@ import { faQrcode, faWallet, faArrowDown, faArrowUp, faShuffle, faBars, faHome }
 import { Account, Asset, D9Balances } from 'app/types';
 import { AccountService } from 'app/services/account/account.service';
 import { Subscription } from 'rxjs';
-import { D9BalancesService } from 'app/assets/d9-balances/d9-balances.service';
 import { CurrencySymbol, CurrencyTickerEnum } from 'app/utils/utils';
 import { Utils } from 'app/utils/utils';
 import { Router } from '@angular/router';
+import { AssetsService } from 'app/services/asset/asset.service';
 @Component({
    selector: 'app-home',
    templateUrl: './home.component.html',
@@ -34,21 +34,30 @@ export class HomeComponent implements OnInit {
       voting: "0",
       available: "0"
    }
+   usdtBalance: number = 0;
    currencySymbol = CurrencySymbol.D9
    accountSub: Subscription | null = null;
    balancesSub: Subscription | null = null;
-   constructor(private accountService: AccountService, private d9BalancesService: D9BalancesService, private router: Router) {
+   usdtBalanceSub: Subscription | null = null;
+   constructor(private accountService: AccountService, private router: Router, private assetsService: AssetsService) {
 
       this.accountSub = this.accountService.getAccountObservable().subscribe((account) => {
          this.account = account
          console.log("account is ", account);
          if (account.address.length > 0) {
-            this.balancesSub = this.d9BalancesService.d9BalancesObservable(account.address).subscribe((d9Balances) => {
+            this.balancesSub = this.assetsService.d9BalancesObservable().subscribe((d9Balances) => {
                console.log("d9 balances", d9Balances)
                this.d9Balances = d9Balances
             })
          }
       })
+
+      this.assetsService
+         .getUsdtBalanceObservable()
+         .subscribe((usdtBalance) => {
+            console.log("usdt balance in home component is ", usdtBalance)
+            this.usdtBalance = usdtBalance
+         })
 
    }
    formatNumber(number: string | number) {

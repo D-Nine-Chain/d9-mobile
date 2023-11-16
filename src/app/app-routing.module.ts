@@ -9,6 +9,7 @@ import { MerchantMiningComponent } from './pages/merchant-mining/merchant-mining
 import { SendComponent } from './pages/send/send/send.component';
 import { ReceiveComponent } from './pages/receive/receive/receive.component';
 import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.component';
+import { SwapComponent } from './pages/swap/swap/swap.component';
 
 const routes: Routes = [
 
@@ -31,6 +32,9 @@ const routes: Routes = [
    { path: 'receive', component: ReceiveComponent },
    {
       path: 'ancestors', component: AncestorsComponent
+   },
+   {
+      path: 'swap', component: SwapComponent
    }
 ];
 
