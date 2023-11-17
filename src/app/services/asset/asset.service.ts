@@ -129,16 +129,16 @@ export class AssetsService {
       return Utils.reduceByCurrencyDecimal(balance, CurrencyTickerEnum.USDT)
    }
 
-   getParent() {
-      return this.wallet.getActiveAddressObservable()
-         .pipe(switchMap(
-            async (account) => {
-               const d9 = await this.d9.getApi();
-               return await (d9.rpc as any).referral.getParent(account)
-            }
-         ),
-
+   getParent(): Promise<string> {
+      const observable$ = this.wallet.getActiveAddressObservable().pipe(
+         switchMap(account =>
+            from(this.d9.getApi()).pipe(
+               switchMap(d9 => from((d9.rpc as any).referral.getParent(account)))
+            )
          )
+      );
+
+      return firstValueFrom(observable$ as Observable<string>);
    }
 
    getAncestors() {

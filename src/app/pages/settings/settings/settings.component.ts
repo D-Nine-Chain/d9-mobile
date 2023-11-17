@@ -17,4 +17,9 @@ export class SettingsComponent implements OnInit {
       this.wallet.createNewWallet("test")
          .then(() => console.log("wallet saved"))
    }
+
+   resetEverything() {
+      this.wallet.resetEverything()
+         .then(() => console.log("nuke dropped"))
+   }
 }

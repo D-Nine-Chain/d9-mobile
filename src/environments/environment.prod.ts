@@ -4,7 +4,7 @@
 
 
 export const environment = {
-   production: true,
+   production: false,
    ws_endpoint: "wss://testnet.d9network.com:40300",
    storage_deposit_limit: null,
    secure_storage_keypair_aggregate: "d9_keyring",
@@ -14,11 +14,11 @@ export const environment = {
    preferences_assets_key: "d9_assets",
    contracts: {
       burn_manager: {
-         address: "zcoT4v6UgbzDrx2VV75VTV2SqpYnWv8ff54njr6ddhmLyRr",
+         address: "zJibRuottM52AmwWDJrAaowL9vzohwMuGjFCr8RZZ1mtcCc",
          name: "d9_burn_manager",
       },
       burn: {
-         address: "vsCSRPGbhAUsWxtxtAwaqex7QKYRpxd7mSKLz4LT6P1vwjg",
+         address: "zJafkSrNTzwocB3gUYkHQBXWvKk51GoHqrehASL8Nw5k7MV",
       },
       merchant: {
          address: "uXgbtFchEBq4frLX5HH55ZM5vPDmfbJb2NYFzpow19etiQD",

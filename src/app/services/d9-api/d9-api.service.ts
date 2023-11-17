@@ -2,21 +2,18 @@ import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { BN, BN_ONE } from "@polkadot/util";
 import type { WeightV2 } from '@polkadot/types/interfaces'
+import type { PalletMetadataLatest } from '@polkadot/types/interfaces/metadata'
 import { WsProvider, ApiRx } from '@polkadot/api';
 import { customRpc } from './customRPC';
 import { ContractUtils } from 'app/contracts/contract-utils/contract-utils';
 import { ContractRx } from 'app/utils/api-contract';
-import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { toPromiseMethod } from '@polkadot/api';
-import { burnContractABI } from 'app/contracts/burn-manager/burnManagerABI';
 import { GasLimits } from 'app/types';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 import { Observable, filter, first, firstValueFrom, from } from 'rxjs';
-import { env } from 'process';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { AmmManager } from 'app/contracts/amm-manager/amm-manager';
 import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';
-import { D9Contract } from 'app/contracts/contracts';
+import { BurnMiner } from 'app/contracts/burn-miner/burn-miner';
 export const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
 export const PROOFSIZE = new BN(119903836479112);
 export const STORAGE_DEPOSIT_LIMIT = null;
@@ -27,7 +24,7 @@ export const STORAGE_DEPOSIT_LIMIT = null;
 export class D9ApiService {
    d9: Observable<ApiRx>;
    wsProvider = new WsProvider(environment.ws_endpoint);
-
+   contractsModuleMetadata: PalletMetadataLatest | null = null;
 
    constructor() {
 
@@ -35,6 +32,23 @@ export class D9ApiService {
          provider: this.wsProvider,
          rpc: customRpc
       })
+      this.getMetadata()
+         .then((metadata) => {
+            console.log("metadata is ", metadata);
+            this.contractsModuleMetadata = metadata.asLatest.pallets[13];
+            console.log("contracts module metadata is ", this.contractsModuleMetadata)
+            console.log("contracts module metadata is ", this.contractsModuleMetadata.errors)
+         })
+   }
+   getError(index: string) {
+      if (this.contractsModuleMetadata) {
+         return this.contractsModuleMetadata.errors;
+      }
+      return null;
+   }
+   async getMetadata() {
+      const d9 = await this.getApi();
+      return firstValueFrom(d9.rpc.state.getMetadata());
    }
 
    getApi() {
@@ -43,8 +57,6 @@ export class D9ApiService {
          first()
       ))
    }
-
-
 
    async getContract(contractName: string): Promise<any> {
       const d9 = await this.getApi();
@@ -64,6 +76,8 @@ export class D9ApiService {
             return new AmmManager(contract, gasLimits);
          case environment.contracts.usdt.name:
             return new UsdtManager(contract, gasLimits);
+         case environment.contracts.burn_miner.name:
+            return new BurnMiner(contract, gasLimits);
          default:
             throw new Error("Contract not found");
       }

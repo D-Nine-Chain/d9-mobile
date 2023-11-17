@@ -39,6 +39,9 @@ const routes: Routes = [
    },
    {
       path: 'qr-scanner', component: QrScannerComponent
+   },
+   {
+      path: 'settings', component: SettingsComponent
    }
 ];
 

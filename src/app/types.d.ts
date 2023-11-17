@@ -46,6 +46,21 @@ export interface BurnPortfolio {
       contract: string;
    };
 }
+/**
+ * doesnt need to interact with front end directly
+ *  all times in milliseconds
+ */
+export interface BurnMinerAccount {
+   creationTimestamp: number;
+   amountBurned: number;
+   balanceDue: number;
+   balancePaid: number;
+   lastWithdrawal: number | null;
+   lastBurn: number;
+   referralBoostCoefficients: number[]
+   lastInteraction: number
+}
+
 export interface ContractErr {
    err: string;
 }

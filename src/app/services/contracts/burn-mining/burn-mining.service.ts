@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Account, BurnPortfolio, GasLimits } from 'app/types';
-import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, map, of, switchMap, tap } from 'rxjs';
+import { Account, BurnMinerAccount, BurnPortfolio } from 'app/types';
+import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, switchMap, tap } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
@@ -9,7 +9,6 @@ import { environment } from 'environments/environment';
 import { AccountService } from 'app/services/account/account.service';
 import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { TransactionsService } from 'app/services/transactions/transactions.service';
-
 @Injectable({
    providedIn: 'root'
 })
@@ -28,7 +27,7 @@ export class BurnMiningService {
       }
    });
    private burnManagerSubject: BehaviorSubject<BurnManager | null> = new BehaviorSubject<BurnManager | null>(null);
-   private burnManager: BurnManager | null = null;
+
    private userAccount: Account | null = null;
    private networkBurnedSubject = new BehaviorSubject<number>(0);
    private currentTransactionSub: Subscription | null = null;
@@ -42,6 +41,14 @@ export class BurnMiningService {
                })
          }
       })
+   }
+
+   public async getAccountOnBurnMiner(): Promise<BurnMinerAccount> {
+      const address = await firstValueFrom(this.wallet.getActiveAddressObservable());
+      const burnMiner = await this.d9.getContract(environment.contracts.burn_miner.name);
+      const contractCallOutcome = await burnMiner.getAccount(address)
+      const account = this.transaction.processReadOutcomes(contractCallOutcome, this.formatBurnMinerAccount)!;
+      return account;
    }
 
    public getPortfolioObservable() {
@@ -91,6 +98,60 @@ export class BurnMiningService {
       ).subscribe();
    }
 
+   public async calculateDividend(burnPortfolio: BurnPortfolio,): Promise<number> {
+      const baseExtraction = await this.calculateBaseExtraction(burnPortfolio);
+      const burnMinerAccount = await this.getAccountOnBurnMiner();
+      const referralBoost = await this.calculateReferralBoost(burnMinerAccount);
+      return baseExtraction + referralBoost;
+   }
+
+   private async calculateBaseExtraction(burnPortfolio: BurnPortfolio): Promise<number> {
+      console.info("calculating base extraction")
+      const lastInteraction = this.getLatestDate(burnPortfolio).getMilliseconds();
+      const now = new Date();
+      const millisecondDay = 600000
+      const daysSinceLastAction = Math.floor((now.getMilliseconds() - lastInteraction) / millisecondDay);
+      console.info(`days since last action ${daysSinceLastAction}`)
+      const dailyReturnPercent = await this.getReturnPercent();
+
+      const dailyAllowance = dailyReturnPercent * burnPortfolio.balanceDue;
+      console.info(`daily allowance ${dailyAllowance}`)
+      // Multiply the daily allowance by the number of days since the last withdrawal
+      const allowance = Math.max(0, dailyAllowance * daysSinceLastAction);
+      console.info(`total allowance ${allowance}`)
+      return allowance;
+   }
+
+   private async calculateReferralBoost(burnMinerAccount: BurnMinerAccount): Promise<number> {
+      return burnMinerAccount.referralBoostCoefficients[0] * 0.1 + burnMinerAccount.referralBoostCoefficients[1] * 0.01;
+   }
+
+   private getLatestDate(portfolio: BurnPortfolio): Date {
+      let latestTime = portfolio.lastBurn.time;
+      if (portfolio.lastWithdrawal && portfolio.lastWithdrawal.time > latestTime) {
+         latestTime = portfolio.lastWithdrawal.time;
+      }
+
+      return new Date(latestTime);
+   }
+
+   async getReturnPercent(): Promise<number> {
+      const totalAmountBurned = await firstValueFrom(this.getNetworkBurnObservable());
+      const firstThresholdAmount = 200000000; // Equivalent to 200_000_000_000_000_000_000 in Rust
+      let percentage = 8 / 1000; // Equivalent to Perbill::from_rational(8u32, 1000u32)
+
+      if (totalAmountBurned <= firstThresholdAmount) {
+         return percentage;
+      }
+      const excessAmount = Math.max(0, totalAmountBurned - firstThresholdAmount);
+      const reductions = Math.floor(excessAmount / 100000000) + 1;
+      for (let i = 0; i < reductions; i++) {
+         percentage /= 2; // Equivalent to saturating_div in Rust
+      }
+      return percentage;
+   }
+
+
    private getBurnManager() {
       console.log("getting burn manager")
       return firstValueFrom(this.burnManagerSubject.asObservable()
@@ -99,7 +160,19 @@ export class BurnMiningService {
             first()
          ))
    }
-
+   private formatBurnMinerAccount(data: any): BurnMinerAccount {
+      console.log("formatting burn miner account", data)
+      return {
+         creationTimestamp: data.creationTimestamp,
+         amountBurned: Utils.reduceByCurrencyDecimal(data.amountBurned, CurrencyTickerEnum.D9),
+         balanceDue: Utils.reduceByCurrencyDecimal(data.balanceDue, CurrencyTickerEnum.D9),
+         balancePaid: Utils.reduceByCurrencyDecimal(data.balancePaid, CurrencyTickerEnum.D9),
+         lastWithdrawal: data.lastWithdrawal,
+         lastBurn: data.lastBurn,
+         referralBoostCoefficients: data.referralBoostCoefficients,
+         lastInteraction: data.lastInteraction
+      }
+   }
    private async updateData() {
       await this.updatePortfolioFromChain(this.userAccount!.address);
       await this.updateNetworkBurnedFromChain(this.userAccount!.address);
@@ -120,7 +193,22 @@ export class BurnMiningService {
    private async updatePortfolioFromChain(address: string) {
       let bm = await this.getBurnManager();
       const { output, result } = await bm!.getBurnPortfolio(address)
-      if (result.isOk && output != null) {
+      if (result.isOk && (output?.toJSON() as any).ok == null) {
+         this.updateBurnPortfolio({
+            amountBurned: 0,
+            balanceDue: 0,
+            balancePaid: 0,
+            lastBurn: {
+               time: 0,
+               contract: ''
+            },
+            lastWithdrawal: {
+               time: 0,
+               contract: ''
+            }
+         });
+      }
+      else if (result.isOk && (output?.toJSON() as any).ok != null) {
          let burnPortfolio = (output!.toJSON()! as any).ok
          console.log(burnPortfolio)
          if (burnPortfolio) {

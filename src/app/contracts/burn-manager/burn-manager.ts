@@ -28,7 +28,7 @@ export class BurnManager {
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
          value: Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
-      }, environment.contracts.burn.address)
+      }, environment.contracts.burn_miner.address)
    }
 
 
@@ -37,7 +37,7 @@ export class BurnManager {
       return this.contract.tx['withdraw']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-      }, environment.contracts.burn.address)
+      }, environment.contracts.burn_miner.address)
    }
 
    getBurnPortfolio(address: string): Promise<ContractCallOutcome> {
