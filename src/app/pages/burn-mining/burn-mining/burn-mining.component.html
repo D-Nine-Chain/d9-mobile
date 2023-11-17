@@ -4,9 +4,12 @@
          <!-- <h1>Burn Mining</h1> -->
          <ion-card class="no-border-shadow">
             <ion-card-header>
-               <ion-card-subtitle>Burnable Assets: {{formatNumber(burnableD9? burnableD9 :0)}}</ion-card-subtitle>
-
+               <ion-card-subtitle>your balance: {{formatNumber(burnableD9? burnableD9 :0)}} Main Contract
+                  :{{formatNumber(burnManagerBalance)}}</ion-card-subtitle>
             </ion-card-header>
+            <ion-card-content>
+
+            </ion-card-content>
          </ion-card>
          <div id="burn-amount-container">
             <div>
@@ -23,33 +26,45 @@
             </div>
          </div>
          <ion-card id="portfolio-data" *ngIf="burnPortfolio">
-            <ion-card-header>
-               <ion-card-subtitle>My Burn Portfolio</ion-card-subtitle>
 
-               <div id="burn-amounts">
+            <ion-card-content>
+               <div class="burn-portfolio-row">
                   <div>
-                     <p>Dividends Due</p>
-                     <h2>{{burnPortfolio.balanceDue}}</h2>
+                     <p>🏦 {{burnPortfolio.balanceDue}}</p>
                   </div>
                   <div>
-                     <p>Amount Burned</p>
-                     <h2>{{burnPortfolio.amountBurned}}</h2>
+                     <p>🔥 {{burnPortfolio.amountBurned}}</p>
+                  </div>
+                  <div>
+                     <p>📲 {{burnPortfolio.balancePaid}}</p>
                   </div>
                </div>
-               <ion-card-subtitle>
-                  <p>Dividends Paid</p>
-                  <h2>{{burnPortfolio.balancePaid}}</h2>
-               </ion-card-subtitle>
-            </ion-card-header>
+
+            </ion-card-content>
+         </ion-card>
+         <ion-card *ngIf="burnPortfolio">
+
+            <ion-card-content>
+               <div class="burn-portfolio-row">
+                  <div>
+                     <p>🌱{{baseExtraction}}</p>
+                  </div>
+
+                  <div>
+                     <p>📈 {{referralBoost}}</p>
+                  </div>
+               </div>
+
+            </ion-card-content>
          </ion-card>
          <ion-card id="last-actions" *ngIf="burnPortfolio">
             <ion-card-header>
-               <ion-card-subtitle>History</ion-card-subtitle>
-               <p>Last Burn</p>
-               <ion-card-title>{{toHumanDate(burnPortfolio.lastBurn.time)}}</ion-card-title>
+               <div>
+                  <p>Last Burn {{toHumanDate(burnPortfolio.lastBurn.time)}}</p>
+
+               </div>
                <div *ngIf="burnPortfolio.lastWithdrawal">
-                  <p>Last Withdrawal</p>
-                  <ion-card-title>{{toHumanDate(burnPortfolio.lastWithdrawal.time)}}</ion-card-title>
+                  <p>Last Withdrawal {{toHumanDate(burnPortfolio.lastWithdrawal.time)}}</p>
                </div>
             </ion-card-header>
          </ion-card>
@@ -65,10 +80,9 @@
          </ion-card>
       </div>
       <ion-card>
-         <ion-card-header>
-            <ion-card-subtitle>My Referral Account</ion-card-subtitle>
-         </ion-card-header>
+
          <ion-card-content>
+            <p>My Referral Account</p>
             <p id="parent">{{parent}}</p>
          </ion-card-content>
       </ion-card>

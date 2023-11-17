@@ -4,7 +4,7 @@ import { burnContractABI } from "../burn-manager/burnManagerABI"
 import { merchantContractABI } from "../merchant-manager/merchantManagerABI"
 import { usdtContractABI } from "../usdt-manager/d9Usdt";
 import { ammContractABI } from "../amm-manager/market_maker";
-import { env } from "process";
+import { burnMinerABI } from "../burn-miner/burnMinerABI";
 
 const contracts: Record<string, any> = {
    [environment.contracts.burn_manager.name]: {
@@ -24,7 +24,7 @@ const contracts: Record<string, any> = {
       address: environment.contracts.amm.address,
    },
    [environment.contracts.burn_miner.name]: {
-      abi: burnContractABI,
+      abi: burnMinerABI,
       address: environment.contracts.burn_miner.address,
    }
 }

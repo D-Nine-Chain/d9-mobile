@@ -18,13 +18,15 @@ export class BurnMiningComponent implements OnInit {
    burnableD9: number = 0;
    burnAmount = new FormControl(100, [Validators.required, Validators.min(100), this.multipleOf100Validator()]);
    networkBurned: number = 0;
+   burnManagerBalance: number = 0;
    totalBurnedSub: Subscription | null = null;
    burnPortfolioSub: Subscription | null = null;
    dataSubs: Subscription | null = null;
    burnPortfolio: BurnPortfolio | null = null;
    parent: string = "";
    returnPercent: number = 0;
-   expectedDividends: number = 0;
+   baseExtraction: number = 0;
+   referralBoost: number = 0;
    subs: Subscription[] = []
    currencySymbol = Utils.currenciesRecord["D9"].symbol;
    constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController, private assets: AssetsService) {
@@ -89,15 +91,23 @@ export class BurnMiningComponent implements OnInit {
                loading.dismiss();
                if (portfolio.balanceDue > 0) {
                   this.burnPortfolio = portfolio;
-                  this.burnMiningService.calculateDividend(this.burnPortfolio)
-                     .then((dividends) => {
-                        this.expectedDividends = dividends;
-                        console.info(`expected dividends are ${dividends}`)
+                  this.burnMiningService.calculateBaseExtraction(this.burnPortfolio)
+                     .then((baseExtraction) => {
+                        this.baseExtraction = baseExtraction;
+                        console.info(`expected dividends are ${baseExtraction}`)
+                     })
+                  this.burnMiningService.calculateReferralBoost()
+                     .then((referralBoost) => {
+                        this.referralBoost = referralBoost;
+                        console.info(`referral boost is ${this.referralBoost}`)
                      })
                }
             }
          })
-
+      this.assets.getBurnManagerBalance()
+         .then((balance) => {
+            this.burnManagerBalance = balance.free as number
+         })
       this.subs.push(portfolioSub)
       this.returnPercent = await this.burnMiningService.getReturnPercent();
 
@@ -113,7 +123,27 @@ export class BurnMiningComponent implements OnInit {
    }
 
    toHumanDate(millisecondDate: number) {
-      return new Date(millisecondDate).toLocaleDateString();
+      const date = new Date(millisecondDate);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1; // getMonth() returns 0-11
+      const day = date.getDate();
+
+      // Get the time
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+
+      // Format the month, day, hours, minutes, seconds for display
+      const formattedMonth = month.toString().padStart(2, '0');
+      const formattedDay = day.toString().padStart(2, '0');
+      const formattedHours = hours.toString().padStart(2, '0');
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      const formattedSeconds = seconds.toString().padStart(2, '0');
+
+      // Construct the date-time string
+      const dateTimeString = `${year}-${formattedMonth}-${formattedDay} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+      return dateTimeString;
    }
 
    unsubscribeToAll() {

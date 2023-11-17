@@ -14,11 +14,11 @@ export const environment = {
    preferences_assets_key: "d9_assets",
    contracts: {
       burn_manager: {
-         address: "zJibRuottM52AmwWDJrAaowL9vzohwMuGjFCr8RZZ1mtcCc",
+         address: "uCimsxzmZqGE55svq3VSnVFMvvnhse6E58eHgukPbWFcf94",
          name: "d9_burn_manager",
       },
       burn_miner: {
-         address: "zJafkSrNTzwocB3gUYkHQBXWvKk51GoHqrehASL8Nw5k7MV",
+         address: "zFVCmsBi3U7k5Bv7jEkYmb8NNQKHPgpG1kqG7SvZF8iKsqa",
          name: "d9_burn_miner"
       },
       merchant: {

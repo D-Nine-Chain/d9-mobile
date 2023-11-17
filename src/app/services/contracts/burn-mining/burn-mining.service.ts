@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Account, BurnMinerAccount, BurnPortfolio } from 'app/types';
-import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, last, switchMap, tap } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
@@ -27,7 +27,7 @@ export class BurnMiningService {
       }
    });
    private burnManagerSubject: BehaviorSubject<BurnManager | null> = new BehaviorSubject<BurnManager | null>(null);
-
+   private burnManagerBalanceSubject = new BehaviorSubject<number>(0);
    private userAccount: Account | null = null;
    private networkBurnedSubject = new BehaviorSubject<number>(0);
    private currentTransactionSub: Subscription | null = null;
@@ -58,6 +58,8 @@ export class BurnMiningService {
    public getNetworkBurnObservable() {
       return this.networkBurnedSubject.asObservable();
    }
+
+
 
    public executeBurn(amount: number) {
       this.currentTransactionSub = from(this.getBurnManager()).pipe(
@@ -100,17 +102,19 @@ export class BurnMiningService {
 
    public async calculateDividend(burnPortfolio: BurnPortfolio,): Promise<number> {
       const baseExtraction = await this.calculateBaseExtraction(burnPortfolio);
-      const burnMinerAccount = await this.getAccountOnBurnMiner();
-      const referralBoost = await this.calculateReferralBoost(burnMinerAccount);
+
+      const referralBoost = await this.calculateReferralBoost();
       return baseExtraction + referralBoost;
    }
 
-   private async calculateBaseExtraction(burnPortfolio: BurnPortfolio): Promise<number> {
+   public async calculateBaseExtraction(burnPortfolio: BurnPortfolio): Promise<number> {
       console.info("calculating base extraction")
-      const lastInteraction = this.getLatestDate(burnPortfolio).getMilliseconds();
+      const lastInteraction = this.getLatestDate(burnPortfolio);
       const now = new Date();
       const millisecondDay = 600000
-      const daysSinceLastAction = Math.floor((now.getMilliseconds() - lastInteraction) / millisecondDay);
+      console.log("last interaction ", lastInteraction)
+      console.log("now ", now.getTime())
+      const daysSinceLastAction = Math.floor((now.getTime() - lastInteraction) / millisecondDay);
       console.info(`days since last action ${daysSinceLastAction}`)
       const dailyReturnPercent = await this.getReturnPercent();
 
@@ -122,17 +126,18 @@ export class BurnMiningService {
       return allowance;
    }
 
-   private async calculateReferralBoost(burnMinerAccount: BurnMinerAccount): Promise<number> {
+   public async calculateReferralBoost(): Promise<number> {
+      const burnMinerAccount = await this.getAccountOnBurnMiner();
       return burnMinerAccount.referralBoostCoefficients[0] * 0.1 + burnMinerAccount.referralBoostCoefficients[1] * 0.01;
    }
 
-   private getLatestDate(portfolio: BurnPortfolio): Date {
+   private getLatestDate(portfolio: BurnPortfolio): number {
       let latestTime = portfolio.lastBurn.time;
       if (portfolio.lastWithdrawal && portfolio.lastWithdrawal.time > latestTime) {
          latestTime = portfolio.lastWithdrawal.time;
       }
 
-      return new Date(latestTime);
+      return latestTime;
    }
 
    async getReturnPercent(): Promise<number> {

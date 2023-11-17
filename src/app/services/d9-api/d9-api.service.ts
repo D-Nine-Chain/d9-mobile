@@ -34,10 +34,7 @@ export class D9ApiService {
       })
       this.getMetadata()
          .then((metadata) => {
-            console.log("metadata is ", metadata);
             this.contractsModuleMetadata = metadata.asLatest.pallets[13];
-            console.log("contracts module metadata is ", this.contractsModuleMetadata)
-            console.log("contracts module metadata is ", this.contractsModuleMetadata.errors)
          })
    }
    getError(index: string) {

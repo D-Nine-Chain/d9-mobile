@@ -59,6 +59,12 @@ export class AssetsService {
       );
    }
 
+   public async getBurnManagerBalance() {
+      const d9 = await this.d9.getApi();
+      const burnManagerBalance = await firstValueFrom(d9.derive.balances.all(environment.contracts.burn_manager.address));
+      console.log("burn manager balance", burnManagerBalance)
+      return this.formatD9Balances(burnManagerBalance);
+   }
 
    private formatD9Balances(balanceInfo: any): D9Balances {
       let formattedBalances: Record<string, any> = {

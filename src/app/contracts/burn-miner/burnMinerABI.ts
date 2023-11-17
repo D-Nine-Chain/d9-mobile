@@ -1,6 +1,6 @@
-export const burnMiner = {
+export const burnMinerABI = {
    "source": {
-      "hash": "0xe0cdae8e58940546b89c724836b2b65bc1841ed2331abcd0724700f4b7faa7fc",
+      "hash": "0x1e8214fcbc1557ba5a3fe04225703542fa4b9392af39eaf4660f7d0be635f7cb",
       "language": "ink! 4.3.0",
       "compiler": "rustc 1.72.0",
       "build_info": {
