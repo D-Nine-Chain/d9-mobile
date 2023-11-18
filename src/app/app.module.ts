@@ -22,10 +22,11 @@ import { ReceiveComponent } from './pages/receive/receive/receive.component';
 import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.component';
 import { SwapComponent } from './pages/swap/swap/swap.component';
 import { QrScannerComponent } from './pages/qr-scanner/qr-scanner/qr-scanner.component';
+import { AccountManagementComponent } from './pages/account-management/account-management/account-management.component';
 
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot()],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],

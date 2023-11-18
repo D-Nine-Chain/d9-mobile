@@ -53,10 +53,15 @@ export class AppComponent {
             this._router.navigate(['/new-mnemonic']);
          }
          else {
-            this._router.navigate(['/burn-mining']);
+            this._router.navigate(['/home']);
          }
       });
    }
+
+   toAccountManagement() {
+      this._router.navigate(['/account-management']);
+   }
+
    toggleMenu() {
       console.log("toggling menu")
       this.menuController.toggle('main-menu')

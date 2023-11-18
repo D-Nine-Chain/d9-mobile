@@ -18,26 +18,28 @@ export class ReceiveComponent implements OnInit {
    }
    ngAfterViewInit() {
       console.log("qr code container", this.qrCodeContainer)
-      this.addressSub = this.wallet.getActiveAddressObservable().subscribe((address: string) => {
-         this.address = address
-         const d9QrCode: D9QrCode = {
-            type: 'Address',
-            data: address,
-            version: 1,
-            metadata: {
-               timestamp: new Date().getTime(),
-            }
-         };
-         this.qrcodeService.generateQRCodeToFile(d9QrCode)
-            .then((canvas) => {
-               if (canvas) {
-                  this.qrCodeContainer.nativeElement.innerHTML = '';
-                  this.qrCodeContainer.nativeElement.appendChild(canvas);
+      this.addressSub = this.wallet.getActiveAddressObservable().subscribe((address: string | null) => {
+         if (address) {
+            this.address = address
+            const d9QrCode: D9QrCode = {
+               type: 'Address',
+               data: address,
+               version: 1,
+               metadata: {
+                  timestamp: new Date().getTime(),
                }
-            })
-            .catch((err) => {
-               console.log("err is in creating QRcode caught in component ", err)
-            })
+            };
+            this.qrcodeService.generateQRCodeToFile(d9QrCode)
+               .then((canvas) => {
+                  if (canvas) {
+                     this.qrCodeContainer.nativeElement.innerHTML = '';
+                     this.qrCodeContainer.nativeElement.appendChild(canvas);
+                  }
+               })
+               .catch((err) => {
+                  console.log("err is in creating QRcode caught in component ", err)
+               })
+         }
       })
 
 

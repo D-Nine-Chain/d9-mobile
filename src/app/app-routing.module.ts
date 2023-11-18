@@ -11,6 +11,7 @@ import { ReceiveComponent } from './pages/receive/receive/receive.component';
 import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.component';
 import { SwapComponent } from './pages/swap/swap/swap.component';
 import { QrScannerComponent } from './pages/qr-scanner/qr-scanner/qr-scanner.component';
+import { AccountManagementComponent } from './pages/account-management/account-management/account-management.component';
 
 const routes: Routes = [
 
@@ -42,6 +43,9 @@ const routes: Routes = [
    },
    {
       path: 'settings', component: SettingsComponent
+   },
+   {
+      path: 'account-management', component: AccountManagementComponent
    }
 ];
 

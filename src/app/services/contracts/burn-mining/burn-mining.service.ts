@@ -141,10 +141,13 @@ export class BurnMiningService {
    }
 
    async getReturnPercent(): Promise<number> {
-      const totalAmountBurned = await firstValueFrom(this.getNetworkBurnObservable());
-      const firstThresholdAmount = 200000000; // Equivalent to 200_000_000_000_000_000_000 in Rust
+      console.log("return percent called")
+      const totalAmountBurned = await firstValueFrom(this.getNetworkBurnObservable()
+         .pipe(filter(num => num > 0))
+      );
+      const firstThresholdAmount = 200000000; // Equivalent to 200_000_000_000_000_000_000 in contract
       let percentage = 8 / 1000; // Equivalent to Perbill::from_rational(8u32, 1000u32)
-
+      console.log("percent total amount burned", totalAmountBurned)
       if (totalAmountBurned <= firstThresholdAmount) {
          return percentage;
       }
@@ -153,6 +156,7 @@ export class BurnMiningService {
       for (let i = 0; i < reductions; i++) {
          percentage /= 2; // Equivalent to saturating_div in Rust
       }
+      console.log("percentage is ", percentage)
       return percentage;
    }
 

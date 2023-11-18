@@ -62,6 +62,7 @@ export class BurnMiningComponent implements OnInit {
    formatNumber(number: number) {
       return Utils.formatNumberForUI(number as number)
    }
+
    async subscribeToLiveData() {
       const loading = await this.loadingController.create({
          message: 'Loading...',

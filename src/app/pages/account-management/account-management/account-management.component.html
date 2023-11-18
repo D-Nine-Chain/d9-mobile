@@ -1,3 +1,29 @@
-<p>
-  account-management works!
-</p>
+<ion-content>
+   <!-- <div id="ion-content"> -->
+   <div class="content-container">
+      <ion-list>
+         <ion-list-header>
+            <ion-label>Your Accounts</ion-label>
+         </ion-list-header>
+         <ion-item button *ngFor="let account of accounts" (click)="switchTo(account)">
+            <ion-label>{{account.name}}</ion-label>
+            <ion-label>{{account.address}}</ion-label>
+         </ion-item>
+      </ion-list>
+   </div>
+
+
+   <!-- </div> -->
+
+</ion-content>
+<ion-card>
+   <ion-card-header>
+      <ion-card-title>
+         Add Account
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content class="ion-padding">
+      <ion-input placeholder="enter account name" [formControl]="newAccountName"></ion-input>
+   </ion-card-content>
+   <ion-button expand="block" (click)="addAccount()" [disabled]="validName()">new account</ion-button>
+</ion-card>

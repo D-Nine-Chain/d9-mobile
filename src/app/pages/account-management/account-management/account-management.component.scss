@@ -1,0 +1,13 @@
+#ion-content {
+   display: flex;
+   flex-direction: column;
+
+   .content-container {
+      flex: 1; // This allows the container to expand to fill available space
+      overflow-y: auto; // Makes the container scrollable if its content overflows
+   }
+
+   ion-card {
+      // Styles for your ion-card (if needed)
+   }
+}

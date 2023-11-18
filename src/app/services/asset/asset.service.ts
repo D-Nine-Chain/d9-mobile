@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Asset, CurrencyInfo, D9Balances } from 'app/types';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable, firstValueFrom, from, map, pipe, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, firstValueFrom, from, map, pipe, switchMap, tap } from 'rxjs';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { D9ApiService } from '../d9-api/d9-api.service';
 import { TransactionsService } from '../transactions/transactions.service';
@@ -47,8 +47,9 @@ export class AssetsService {
       return d9.pipe(
          switchMap(api =>
             from(this.wallet.getActiveAddressObservable()).pipe(
+               filter(address => address != null),
                switchMap(address =>
-                  api.derive.balances.all(address)
+                  api.derive.balances.all(address!)
                ),
                map(balanceInfo => {
                   console.log("balance info is ", balanceInfo);
@@ -123,8 +124,8 @@ export class AssetsService {
    private async updateUsdtBalance() {
       console.log("getting usdt balance")
       const contract: UsdtManager = await this.d9.getContract(environment.contracts.usdt.name);
-      const address = await firstValueFrom(this.wallet.getActiveAddressObservable())
-      const contractOutcome = await contract.getBalance(address)
+      const address = await firstValueFrom(this.wallet.getActiveAddressObservable().pipe(filter((address) => address != null)))
+      const contractOutcome = await contract.getBalance(address!)
       const balance = this.transaction.processReadOutcomes(contractOutcome, this.formatUsdtBalance)
       if (balance) {
          this.usdtBalanceSource.next(balance)
@@ -160,7 +161,7 @@ export class AssetsService {
    }
 
    async loadAssetsFromPreferences() {
-      const result = await Preferences.get({ key: environment.preferences_assets_key })
+      const result = await Preferences.get({ key: environment.preferences_assets })
       if (result.value) {
          const assets = JSON.parse(result.value);
          this.assetsSource.next(assets);
@@ -184,7 +185,7 @@ export class AssetsService {
 
    public async saveAssetsToPreferences() {
       const assets = this.assetsSource.getValue();
-      await Preferences.set({ key: environment.preferences_assets_key, value: JSON.stringify(assets) });
+      await Preferences.set({ key: environment.preferences_assets, value: JSON.stringify(assets) });
    }
 
    addAsset(asset: Asset) {

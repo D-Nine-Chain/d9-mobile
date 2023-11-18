@@ -8,17 +8,18 @@ export const environment = {
    ws_endpoint: "wss://testnet.d9network.com:40300",
    storage_deposit_limit: null,
    secure_storage_keypair_aggregate: "d9_keyring",
-   preferences_default_address_key: "d9_default_address",
+   preferences_default_address: "d9_default_address",
    preferences_addresses: "d9_addresses",
-   preferences_d9_hard_derivation_counter_key: "d9_hard_derivation_counter",
-   preferences_assets_key: "d9_assets",
+   preferences_root_address: "d9_root_address",
+   preferences_d9_soft_derivation_counter: "d9_soft_derivation_counter",
+   preferences_assets: "d9_assets",
    contracts: {
       burn_manager: {
-         address: "zJibRuottM52AmwWDJrAaowL9vzohwMuGjFCr8RZZ1mtcCc",
+         address: "v4GeJMACGhNDr51pqii4rA6hDmXWgBzwVrVh4AGSBztSyAP",
          name: "d9_burn_manager",
       },
       burn_miner: {
-         address: "xXtPrHR6E6YJmRSqJ1S6wc9oKkvCn6UhTykSLdQMNJa1FTw",
+         address: "vmVC5JNeDj41ZufdvVnHP7c4hMcb8JZBkPnTvPiGibv6hxb",
          name: "d9_burn_miner"
       },
       merchant: {

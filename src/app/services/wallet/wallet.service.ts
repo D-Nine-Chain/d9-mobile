@@ -4,9 +4,9 @@ import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { Preferences } from '@capacitor/preferences';
 import { environment } from 'environments/environment';
 import { SubmittableExtrinsic } from '@polkadot/api/types/submittable';
-import { BehaviorSubject, Observable, firstValueFrom, from, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, first, firstValueFrom, from, switchMap } from 'rxjs';
 import { Keyring } from '@polkadot/api';
-import { KeyringPair, KeyringPair$Json } from '@polkadot/keyring/types';
+import { KeyringPair, KeyringPair$Json, KeyringPair$Meta } from '@polkadot/keyring/types';
 
 @Injectable({
    providedIn: 'root'
@@ -14,9 +14,10 @@ import { KeyringPair, KeyringPair$Json } from '@polkadot/keyring/types';
 export class WalletService {
    //todo add hard/soft derivatives
    private keyRing: Keyring | null = null;
-   private hardDerivationCounter = 0;
-   private activeAddressSubject = new BehaviorSubject<string>("");
-   private allAddressesSubject = new BehaviorSubject<string[]>([]);
+   private softDerivationCounter: number | null = 0;
+   private rootAddress: string | null = null;
+   private activeAddressSubject = new BehaviorSubject<string | null>(null);
+   private allAddressesSubject: BehaviorSubject<Set<string>> = new BehaviorSubject<Set<string>>(new Set());
    constructor() {
       cryptoWaitReady()
          .then(() => {
@@ -31,15 +32,30 @@ export class WalletService {
          })
 
    }
+   public async loadSoftDerivationCounter(): Promise<void> {
+      const softDerivationCounterResult = await Preferences.get({ key: environment.preferences_d9_soft_derivation_counter });
+      if (softDerivationCounterResult.value) {
+         this.softDerivationCounter = parseInt(softDerivationCounterResult.value);
+      } else {
+         this.softDerivationCounter = 0;
+      }
+   }
 
    public async loadAddresses(): Promise<void> {
       let allAddresses = [];
+      const softDerivationCounterResult = await Preferences.get({ key: environment.preferences_d9_soft_derivation_counter });
+      if (softDerivationCounterResult.value) {
+         this.softDerivationCounter = parseInt(softDerivationCounterResult.value);
+      } else {
+         this.softDerivationCounter = 0;
+      }
       console.log("loading addresses");
       const allAddressesResult = await Preferences.get({ key: environment.preferences_addresses });
-      const defaultAddressResult = await Preferences.get({ key: environment.preferences_default_address_key });
+      const defaultAddressResult = await Preferences.get({ key: environment.preferences_default_address });
+      const rootAddressResult = await Preferences.get({ key: environment.preferences_root_address });
       if (allAddressesResult.value) {
-
          allAddresses = JSON.parse(allAddressesResult.value);
+         this.updateAddressesList(allAddresses);
       }
       if (defaultAddressResult.value) {
          console.log("default address, ", defaultAddressResult.value);
@@ -48,9 +64,16 @@ export class WalletService {
       if (!defaultAddressResult.value && allAddresses.length > 0) {
          console.log("actived address set from all addresses array", allAddresses[0])
          this.activeAddressSubject.next(allAddresses[0]);
+         this.rootAddress = allAddresses[0];
       }
       if (allAddresses.length == 0 && !defaultAddressResult.value) {
          throw new Error("No addresses to load")
+      }
+      if (rootAddressResult.value) {
+         this.rootAddress = rootAddressResult.value;
+      }
+      if (!rootAddressResult.value && allAddresses.length > 0) {
+         this.rootAddress = allAddresses[0];
       }
    }
 
@@ -66,14 +89,17 @@ export class WalletService {
       }
       const keyPairs = JSON.parse(keypairAggregate as string);
       keyPairs.forEach((keyPair: KeyringPair$Json) => {
-         console.log("loaded keypair ", keyPair)
          this.keyRing!.addFromJson(keyPair);
       })
       console.log("keyring loaded")
    }
 
-   public getActiveAddressObservable(): Observable<string> {
+   public getActiveAddressObservable(): Observable<string | null> {
       return this.activeAddressSubject.asObservable();
+   }
+
+   public getAllAddressesObservable(): Observable<Set<string>> {
+      return this.allAddressesSubject.asObservable();
    }
 
    public updateActiveAddress(newAddress: string): void {
@@ -82,8 +108,12 @@ export class WalletService {
 
    public updateAddressesList(newAddresses: string[]): void {
       const currentAddresses = this.allAddressesSubject.getValue();
-      const updatedAddresses = [...currentAddresses, ...newAddresses];
-      this.allAddressesSubject.next(updatedAddresses);
+      newAddresses.forEach((address) => {
+         if (!currentAddresses.has(address)) {
+            currentAddresses.add(address)
+         }
+      })
+      this.allAddressesSubject.next(currentAddresses);
    }
 
    public createNewMnemonic(): string {
@@ -104,7 +134,6 @@ export class WalletService {
    }
 
    public async saveWallet(keyring: Keyring): Promise<void> {
-
       console.log("saving wallet")
       const keyPairs: KeyringPair[] = keyring.getPairs();
       const keyPairAddresses = keyPairs.map((keyPair) => { return keyPair.address })
@@ -116,11 +145,19 @@ export class WalletService {
       const keyPairsJsonString = JSON.stringify(keyPairJsonArr);
       console.log("key pair json ", keyPairsJsonString)
       console.info("wallet saved")
-      await Preferences.set({ key: environment.preferences_addresses, value: JSON.stringify(keyPairAddresses) });
-      await Preferences.set({ key: environment.preferences_d9_hard_derivation_counter_key, value: this.hardDerivationCounter.toString() });
-
+      if (this.softDerivationCounter == null) {
+         await this.loadSoftDerivationCounter();
+      }
+      try {
+         await Preferences.set({ key: environment.preferences_addresses, value: JSON.stringify(keyPairAddresses) });
+         await Preferences.set({ key: environment.preferences_d9_soft_derivation_counter, value: this.softDerivationCounter!.toString() });
+      } catch (err) {
+         console.log(err)
+      }
       this.updateAddressesList(keyPairAddresses);
-      this.updateActiveAddress(keyPairAddresses[0]);
+      if (this.activeAddressSubject.getValue() == "") {
+         this.updateActiveAddress(keyPairAddresses[0]);
+      }
       return await SecureStorage.set(environment.secure_storage_keypair_aggregate, keyPairsJsonString)
 
    }
@@ -131,15 +168,60 @@ export class WalletService {
       console.log("reset everything")
    }
 
-   public deriveAccountFromExisting() {
-
+   public async deriveNewKey(name: string): Promise<string> {
+      if (this.softDerivationCounter == null) {
+         try {
+            await this.loadSoftDerivationCounter();
+         } catch (error) {
+            console.log(error)
+         }
+      }
+      this.softDerivationCounter!++;
+      console.log("soft derivation counter ", this.softDerivationCounter)
+      const keyringPairMeta = {
+         name: name,
+         suri: `/${this.softDerivationCounter}}`
+      }
+      console.log("deriving new key")
+      let keyring = await this.getKeyring();
+      if (!this.rootAddress) {
+         await this.loadAddresses();
+      }
+      try {
+         const keyPair = keyring.getPair(this.rootAddress!);
+         if (keyPair.isLocked) {
+            keyPair.unlock();
+            console.log(keyPair.address, ' is unlocked');
+         }
+         const derived = keyPair.derive(`/${this.softDerivationCounter}`, keyringPairMeta);
+         keyring.addPair(derived);
+         this.updateAddressesList([derived.address]);
+         console.log("derived keypair ", derived)
+         await this.saveWallet(keyring);
+         return derived.address
+      } catch (err) {
+         console.log(err)
+         throw new Error("error deriving new key")
+      }
    }
+   public async getKeyMetadata(address: string): Promise<KeyringPair$Meta> {
+      let keyring = await this.getKeyring();
+      try {
+         console.log("getting key pair for address ", address)
+         const keyPair = keyring.getPair(address);
 
+         return keyPair.meta
+      } catch (err) {
+         console.log("getting keypair error", err)
+         throw err;
+      }
+   }
    public async signContractTransaction(transaction: SubmittableExtrinsic<'rxjs'>): Promise<SubmittableExtrinsic<'rxjs'>> {
       console.log("signing transaction")
       return firstValueFrom(
          this.getActiveAddressObservable().pipe(
-            switchMap(address => from(this.getKeyPair(address))
+            filter(address => address != null),
+            switchMap(address => from(this.getKeyPair(address!))
                .pipe(switchMap((keyPair) => {
                   if (keyPair.isLocked) {
                      keyPair.unlock();
@@ -151,7 +233,12 @@ export class WalletService {
 
       );
    }
-
+   private async getKeyring(): Promise<Keyring> {
+      if (!this.keyRing) {
+         await this.loadKeyring();
+      }
+      return this.keyRing!;
+   }
    //todo this function will change
    // todo will add password
    private async getKeyPair(address: string): Promise<KeyringPair> {
