@@ -42,15 +42,30 @@ export class AssetsService extends GenericContractService implements GenericCont
       await this.initObservables(ammManager)
       await this.updateUsdtBalance()
    }
-
+   /**
+    * @descirption get the Usdt balance of an account
+    * @returns Observable with formatted USDT balance
+    */
    public getUsdtBalanceObservable() {
       return this.usdtBalanceSource.asObservable();
    }
-
+   /**
+    * @description get the Usdt allowance of the AMM Contract
+    * @returns Promise<number|null>
+    */
+   public async getUsdtAllowance(): Promise<number | null> {
+      const usdtManager = await this.getManager<UsdtManager>(this.usdtManagerKey);
+      const callOutcome = await usdtManager.getAllowance(environment.contracts.amm.address);
+      const data = this.transaction.processReadOutcomes(callOutcome, this.formatUsdtBalance);
+      return data;
+   }
    public async transferUsdt(toAddress: string, amount: number) {
       const contract = this.d9.getContract(environment.contracts.usdt.name);
    }
-
+   /**
+    * 
+    * @returns should return a `D9Balances` object. the important values are `free`
+    */
    public d9BalancesObservable(): Observable<any> {
       console.log("getting d9 balance");
       const d9 = from(this.d9.getApi());
@@ -85,9 +100,6 @@ export class AssetsService extends GenericContractService implements GenericCont
       console.log("burn manager balance", burnManagerBalance)
       return this.formatD9Balances(burnManagerBalance);
    }
-
-
-
 
    public async transferD9(toAddress: string, amount: number) {
       const numberString = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9);
