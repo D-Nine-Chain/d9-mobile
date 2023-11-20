@@ -136,6 +136,10 @@ export class WalletService {
    public async saveWallet(keyring: Keyring): Promise<void> {
       console.log("saving wallet")
       const keyPairs: KeyringPair[] = keyring.getPairs();
+      const activeAddress = this.activeAddressSubject.getValue();
+      if (!activeAddress) {
+         this.updateActiveAddress(keyPairs[0].address);
+      }
       const keyPairAddresses = keyPairs.map((keyPair) => { return keyPair.address })
       const keyPairJsonArr = keyPairs.map((keyPair) => {
          // keyPair.lock();

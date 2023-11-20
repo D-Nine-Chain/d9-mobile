@@ -52,7 +52,7 @@ export class Utils {
    }
 
    static formatNumberForUI(number: number): string {
-      return number.toLocaleString('zh-CN', { compactDisplay: "short", maximumFractionDigits: 8, notation: "compact" })
+      return number.toLocaleString('zh-CN', { compactDisplay: "long", maximumFractionDigits: 2, notation: "standard" })
    }
 
    static reduceByCurrencyDecimal(number: string | number, currency: CurrencyTickerEnum): number {

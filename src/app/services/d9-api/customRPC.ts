@@ -29,6 +29,21 @@ export const customRpc = {
             }
          ],
          type: 'AccountId'
-      }
+      },
+      getDirectReferralsCount: {
+         description: 'get direct referrals count of a referral account',
+         params: [
+            {
+               name: 'account',
+               type: 'AccountId'
+            },
+            {
+               name: 'at',
+               type: 'Hash',
+               isOptional: true
+            }
+         ],
+         type: 'u32'
+      },
    }
 };

@@ -14,6 +14,8 @@ import { Subscription } from 'rxjs';
 })
 export class SwapComponent implements OnInit {
    swapAmount = new FormControl(1, [Validators.required, Validators.min(1), this.sufficientBalanceValidator()])
+   usdtLiquidity = new FormControl(1, [Validators.required, Validators.min(1)])
+   d9Liquidity = new FormControl(1, [Validators.required, Validators.min(1)])
    d9Balances: D9Balances = {
       available: '',
       free: 0,

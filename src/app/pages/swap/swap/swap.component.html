@@ -13,4 +13,21 @@
       </ion-card-content>
    </ion-card>
    <ion-button expand="full" (click)="swap()"> swap </ion-button>
+   <ion-card>
+      <ion-card-header>
+         <ion-card-title>
+            Add liquidity
+         </ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="ion-padding">
+
+         <ion-input type="number" fill="solid" label="Add D9" labelPlacement="floating"
+            helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="d9Input"
+            [formControl]="usdtLiquidity"></ion-input>
+         <ion-input type="number" fill="solid" label="Add USDT" labelPlacement="floating"
+            helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="d9Input"
+            [formControl]="d9Liquidity"></ion-input>
+      </ion-card-content>
+   </ion-card>
+   <ion-button expand="full" (click)="swap()"> add liquidity </ion-button>
 </ion-content>

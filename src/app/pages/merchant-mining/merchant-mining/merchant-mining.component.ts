@@ -88,6 +88,7 @@ export class MerchantMiningComponent implements OnInit {
 
    isExpired() {
       if (this.expiry) {
+         console.log
          return this.expiry.getTime() < Date.now()
       }
       return false;

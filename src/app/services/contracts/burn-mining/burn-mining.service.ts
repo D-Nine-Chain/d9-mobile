@@ -118,7 +118,7 @@ export class BurnMiningService {
       console.info(`days since last action ${daysSinceLastAction}`)
       const dailyReturnPercent = await this.getReturnPercent();
 
-      const dailyAllowance = dailyReturnPercent * burnPortfolio.balanceDue;
+      const dailyAllowance = dailyReturnPercent * burnPortfolio.amountBurned;
       console.info(`daily allowance ${dailyAllowance}`)
       // Multiply the daily allowance by the number of days since the last withdrawal
       const allowance = Math.max(0, dailyAllowance * daysSinceLastAction);
@@ -171,6 +171,9 @@ export class BurnMiningService {
    }
    private formatBurnMinerAccount(data: any): BurnMinerAccount {
       console.log("formatting burn miner account", data)
+      const newReferralBoost = data.referralBoostCoefficients.map((coefficient: any) => {
+         return Utils.reduceByCurrencyDecimal(coefficient, CurrencyTickerEnum.D9)
+      })
       return {
          creationTimestamp: data.creationTimestamp,
          amountBurned: Utils.reduceByCurrencyDecimal(data.amountBurned, CurrencyTickerEnum.D9),
@@ -178,7 +181,7 @@ export class BurnMiningService {
          balancePaid: Utils.reduceByCurrencyDecimal(data.balancePaid, CurrencyTickerEnum.D9),
          lastWithdrawal: data.lastWithdrawal,
          lastBurn: data.lastBurn,
-         referralBoostCoefficients: data.referralBoostCoefficients,
+         referralBoostCoefficients: newReferralBoost,
          lastInteraction: data.lastInteraction
       }
    }

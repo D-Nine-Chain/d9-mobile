@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AssetsService } from 'app/services/asset/asset.service';
-
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { firstValueFrom } from 'rxjs';
 @Component({
    selector: 'app-ancestors',
    templateUrl: './ancestors.component.html',
@@ -11,10 +12,19 @@ export class AncestorsComponent implements OnInit {
    parent: string = ""
    subs: any[] = [];
    constructor(private assets: AssetsService) {
+      // firstValueFrom(this.assets.getDirectReferralsCount())
+      //    .then((count) => {
+      //       console.log("count of sons", count)
+      //    })
       this.assets.getParent().then((parent) => {
          console.log("parentt", parent)
          if (parent) {
-            this.parent = parent
+            console.log("parentt", parent)
+            let decoded = decodeAddress(parent)
+            console.log("decoded", decoded)
+            let encoded = encodeAddress(decoded)
+            console.log("encoded", encoded)
+            this.parent = encoded
          }
       })
       const sub2 = this.assets.getAncestors().subscribe((ancestors) => {

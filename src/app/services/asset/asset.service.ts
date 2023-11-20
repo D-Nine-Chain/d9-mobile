@@ -12,6 +12,7 @@ import { AmmManager } from 'app/contracts/amm-manager/amm-manager';
 import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';
 import { VoidFn } from '@polkadot/api/types';
 import { ISubmittableResult } from '@polkadot/types/types';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 // import { D9BalancesService } from '../assets/d9-balances/d9-balances.service';
 @Injectable({
    providedIn: 'root'
@@ -141,11 +142,28 @@ export class AssetsService {
          switchMap(account =>
             from(this.d9.getApi()).pipe(
                switchMap(d9 => from((d9.rpc as any).referral.getParent(account)))
+
+            ).pipe(
+
+
             )
-         )
+         ),
       );
 
       return firstValueFrom(observable$ as Observable<string>);
+   }
+
+   public getDirectReferralsCount() {
+      return this.wallet.getActiveAddressObservable()
+         .pipe(
+            switchMap(address =>
+               from(this.d9.getApi()).pipe(
+                  switchMap(d9 =>
+                     from((d9.rpc as any).referral.getDirectReferralsCount(address))
+                  )
+               )
+            )
+         );
    }
 
    getAncestors() {

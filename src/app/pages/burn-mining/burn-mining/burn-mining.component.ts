@@ -7,6 +7,8 @@ import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/
 import { AccountService } from 'app/services/account/account.service';
 import { LoadingController } from '@ionic/angular';
 import { AssetsService } from 'app/services/asset/asset.service';
+import { decode } from 'querystring';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 
 @Component({
@@ -33,7 +35,9 @@ export class BurnMiningComponent implements OnInit {
       this.subscribeToLiveData()
       this.assets.getParent()
          .then((parent) => {
-            this.parent = parent;
+            let decode = decodeAddress(parent);
+            let encode = encodeAddress(decode);
+            this.parent = encode;
          })
    }
 
