@@ -42,17 +42,19 @@ export class GenericContractService {
     * @param updatePromises data to pull from chain to update after successful run of contract
     */
    protected async executeWriteTransaction(managerKey: string, methodName: string, args: any[], updatePromises?: Promise<any>[]): Promise<void> {
+      console.log("executing write transaction called")
       this.currentTransactionSub = from(this.getManager<any>(managerKey)).pipe(
          switchMap(manager => {
+            console.log(`manager found for ${managerKey}: ${manager}`)
             const tx = manager[methodName](...args);
-            return from(this.wallet.signContractTransaction(tx)).pipe(
+            return from(this.wallet.signTransaction(tx)).pipe(
                switchMap(signedTx => {
                   return from(this.transaction.sendSignedTransaction(signedTx)).pipe(
                      tap(async (result) => {
                         if (result.status.isFinalized) {
                            if (updatePromises) {
                               console.log("executing update promises")
-                              // await Promise.all(updatePromises);
+                              await Promise.all(updatePromises);
                            }
                         }
                      })
@@ -103,6 +105,9 @@ export class GenericContractService {
     * @description initializes the manager for the contract
     */
    protected async initManager<T>(managerKey: string, contractName: string): Promise<any> {
+      if (!this.managerSubject[managerKey]) {
+         this.managerSubject[managerKey] = new BehaviorSubject<T | null>(null);
+      }
       let manager: any = await this.d9.getContract(contractName);
       this.updateManager(managerKey, manager)
       return manager;
@@ -136,9 +141,7 @@ export class GenericContractService {
    }
 
    private updateManager<T>(managerKey: string, manager: T) {
-      if (!this.managerSubject[managerKey]) {
-         this.managerSubject[managerKey] = new BehaviorSubject<T>(manager);
-      }
+
       this.managerSubject[managerKey].next(manager);
    }
 

@@ -52,9 +52,10 @@ export class AmmManager implements D9Contract {
    }
 
    addLiquidity(d9Amount: number, usdtAmount: number): SubmittableExtrinsic<'rxjs'> {
+      console.log("adding liquidity called in usdt manager")
       const usdt = Utils.toBigNumberString(usdtAmount, CurrencyTickerEnum.USDT);
       const d9 = Utils.toBigNumberString(d9Amount, CurrencyTickerEnum.D9);
-      return this.contract.tx['getD9']({
+      return this.contract.tx['addLiquidity']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
          value: d9

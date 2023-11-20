@@ -1,0 +1,16 @@
+<ion-content>
+
+
+</ion-content>
+<ion-card>
+   <ion-card-header>
+      <ion-card-title>Bond tokens</ion-card-title>
+   </ion-card-header>
+   <ion-card-content>
+      <p>enter an amount to bond. bond permits voting and other things.</p>
+      <ion-input type="number" fill="solid" label="Bond D9" labelPlacement="floating"
+         helperText="enter an amount you would like to bond" errorText="something went wrong" id="bondInput"
+         [formControl]="bondAmount"></ion-input>
+      <ion-button (click)="bondTokens()">bond</ion-button>
+   </ion-card-content>
+</ion-card>

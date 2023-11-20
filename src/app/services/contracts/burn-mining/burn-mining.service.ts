@@ -65,7 +65,7 @@ export class BurnMiningService {
       this.currentTransactionSub = from(this.getBurnManager()).pipe(
          switchMap((bm) => {
             const burnTx = bm!.makeBurnTx(amount);
-            return from(this.wallet.signContractTransaction(burnTx))
+            return from(this.wallet.signTransaction(burnTx))
                .pipe(switchMap(signedTx => {
                   return from(this.transaction.sendSignedTransaction(signedTx))
                      .pipe(
@@ -84,7 +84,7 @@ export class BurnMiningService {
       this.currentTransactionSub = from(this.getBurnManager()).pipe(
          switchMap(bm => {
             const burnTx = bm!.makeWithdrawTx();
-            return from(this.wallet.signContractTransaction(burnTx))
+            return from(this.wallet.signTransaction(burnTx))
                .pipe(switchMap(signedTx => {
                   return from(this.transaction.sendSignedTransaction(signedTx))
                      .pipe(

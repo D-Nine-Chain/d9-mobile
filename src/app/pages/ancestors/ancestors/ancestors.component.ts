@@ -11,6 +11,7 @@ export class AncestorsComponent implements OnInit {
    ancestors: string[] = []
    parent: string = ""
    subs: any[] = [];
+   childCount: number | string = 0;
    constructor(private assets: AssetsService) {
       // firstValueFrom(this.assets.getDirectReferralsCount())
       //    .then((count) => {
@@ -27,12 +28,27 @@ export class AncestorsComponent implements OnInit {
             this.parent = encoded
          }
       })
+      const sub5 = this.assets.getDirectReferrals()
+         .subscribe((count) => {
+            console.log("child coundt count", count)
+            if (count) {
+               this.childCount = typeof count === 'number' || typeof count === 'string' ? count : 0
+            }
+         })
+      this.subs.push(sub5)
       const sub2 = this.assets.getAncestors().subscribe((ancestors) => {
          console.log("parentt", ancestors)
          if (ancestors) {
             let sub4 = ancestors.subscribe((ancestors: any) => {
                console.log("ancestors", ancestors.toHuman())
-               this.ancestors = ancestors
+               let ancestorsArr = ancestors.toJSON()
+               let decoded = ancestorsArr.map((ancestor: any) => {
+                  return decodeAddress(ancestor)
+               })
+               let encoded = decoded.map((ancestor: any) => {
+                  return encodeAddress(ancestor)
+               })
+               this.ancestors = encoded
             })
 
             this.subs.push(sub4)

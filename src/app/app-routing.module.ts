@@ -12,6 +12,9 @@ import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.compon
 import { SwapComponent } from './pages/swap/swap/swap.component';
 import { QrScannerComponent } from './pages/qr-scanner/qr-scanner/qr-scanner.component';
 import { AccountManagementComponent } from './pages/account-management/account-management/account-management.component';
+import { NodesComponent } from './pages/nodes/nodes/nodes.component';
+import { BondComponent } from './pages/bond/bond/bond.component';
+import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
 
 const routes: Routes = [
 
@@ -46,7 +49,12 @@ const routes: Routes = [
    },
    {
       path: 'account-management', component: AccountManagementComponent
-   }
+   },
+   {
+      path: 'nodes', component: NodesComponent
+   },
+   { path: 'bond', component: BondComponent },
+   { path: 'liquidity', component: LiquidityComponent },
 ];
 
 @NgModule({

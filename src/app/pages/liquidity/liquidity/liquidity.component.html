@@ -1,0 +1,70 @@
+<ion-card>
+   <ion-card-header>
+      <ion-card-title>
+         Current Reserves
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content>
+      <div id="spaced">
+         <p>d9 {{formatNumber(d9Reserves)}}</p>
+         <p>usdt {{formatNumber(usdtReserves)}}</p>
+      </div>
+      <div>
+
+      </div>
+   </ion-card-content>
+</ion-card>
+<ion-card *ngIf="haveNoAllowance()">
+   <ion-card-header>
+      <ion-card-title>
+         No Allowance
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content>
+      <p>you must approve the contract to spend your tokens to add liquidity</p>
+      <p>current USDT balance:{{usdtBalance}}</p>
+      <p>current USDT allowance:{{currentAllowance}}</p>
+      <ion-input [formControl]="allowance"></ion-input>
+
+      <ion-button expand="full" (click)="addAllowance()"> approve </ion-button>
+   </ion-card-content>
+</ion-card>
+<ion-card *ngIf="!haveNoAllowance()">
+   <ion-card-header>
+      <ion-card-title>
+         Liquidity Provider Account
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content class="ion-padding">
+      <div id="lp-provider">
+         <div>
+            <p>provided usdt {{liquidityProvider?.usdt}}</p>
+            <p>provided d9 {{liquidityProvider?.d9}}</p>
+            <!-- <p>current lp tokens {{liquidityProvider?.lpTokens}}</p> -->
+            <p>usdt allowance{{currentAllowance}}</p>
+         </div>
+         <div>
+            <p> current d9 balance:{{d9Balance}}</p>
+         </div>
+      </div>
+   </ion-card-content>
+</ion-card>
+<ion-card *ngIf="!haveNoAllowance()">
+   <ion-card-header>
+      <ion-card-title>
+         Add liquidity
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content class="ion-padding">
+
+      <ion-input type="number" fill="solid" label="Add D9" labelPlacement="floating"
+         helperText="how much D9 would you like to add" errorText="Insufficient amount" id="d9Input"
+         [formControl]="usdtLiquidity"></ion-input>
+      <ion-input type="number" fill="solid" label="Add USDT" labelPlacement="floating"
+         helperText="how much USDT would you like to add" errorText="Insufficient amount" id="d9Input"
+         [formControl]="d9Liquidity"></ion-input>
+   </ion-card-content>
+   <ion-button expand="full" (click)="addLiquidity()" [disabled]="conditionsNotMet()"> add liquidity </ion-button>
+
+</ion-card>
+<ion-button expand="full" (click)="removeLiquidity()"> remove liquidity </ion-button>

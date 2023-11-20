@@ -27,7 +27,7 @@ export const environment = {
          name: "d9_merchant_mining"
       },
       amm: {
-         address: "v2k7m1yzFCW9F5CQSZEorokP2tumG7YV5S6yL3wxTwGDeWd",
+         address: "wTL3mVzULnrnxVMdcvyCrQ3Xv5NpG6vhFmaqpgAu2NYahot",
          name: "d9_amm"
       },
       usdt: {

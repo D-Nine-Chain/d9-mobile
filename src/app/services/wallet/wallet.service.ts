@@ -222,7 +222,7 @@ export class WalletService {
          throw err;
       }
    }
-   public async signContractTransaction(transaction: SubmittableExtrinsic<'rxjs'>): Promise<SubmittableExtrinsic<'rxjs'>> {
+   public async signTransaction(transaction: SubmittableExtrinsic<'rxjs'>): Promise<SubmittableExtrinsic<'rxjs'>> {
       console.log("signing transaction")
       return firstValueFrom(
          this.getActiveAddressObservable().pipe(

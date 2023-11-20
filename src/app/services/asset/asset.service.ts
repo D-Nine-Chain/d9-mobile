@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Asset, CurrencyInfo, D9Balances, LiquidityProvider } from 'app/types';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable, filter, first, firstValueFrom, from, map, pipe, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, first, firstValueFrom, from, lastValueFrom, map, pipe, switchMap, tap } from 'rxjs';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { D9ApiService } from '../d9-api/d9-api.service';
 import { TransactionsService } from '../transactions/transactions.service';
@@ -24,6 +24,7 @@ export class AssetsService extends GenericContractService implements GenericCont
    private assetsSource = new BehaviorSubject<Asset[]>([]);
    private ammManagerKey = "amm_manager";
    private usdtManagerKey = "usdt_manager";
+   private usdtAllowanceKey = "usdt_allowance";
    liquidityProviderKey = "liquidity_provider";
    currencyReservesKey = "currency_reserves";
    private transactionSub: any;
@@ -37,10 +38,14 @@ export class AssetsService extends GenericContractService implements GenericCont
    }
 
    public async init() {
+      const usdtManager = await this.initManager(this.usdtManagerKey, environment.contracts.usdt.name)
       const ammManager = await this.initManager(this.ammManagerKey, environment.contracts.amm.name)
-      const _ = await this.initManager(this.usdtManagerKey, environment.contracts.usdt.name)
+
       await this.initObservables(ammManager)
       await this.updateUsdtBalance()
+      const api = await this.d9.getApi();
+      console.log("query is ", api.query);
+      console.log("transaction is ", api.tx)
    }
    /**
     * @descirption get the Usdt balance of an account
@@ -49,13 +54,25 @@ export class AssetsService extends GenericContractService implements GenericCont
    public getUsdtBalanceObservable() {
       return this.usdtBalanceSource.asObservable();
    }
+
+   public approveUsdt(amount: number) {
+
+      return this.executeWriteTransaction(this.usdtManagerKey, 'approve', [environment.contracts.amm.address, amount], [this.updateAllowance()])
+   }
+   async updateAllowance() {
+      const userAddress = await firstValueFrom(this.wallet.getActiveAddressObservable().pipe(filter(address => address != null)));
+      const usdtManager = await this.initManager(this.usdtManagerKey, environment.contracts.usdt.name)
+      const getUsdtAllowancePromise = usdtManager.getAllowance(userAddress);
+      await this.updateDataFromChain<number>(this.usdtAllowanceKey, getUsdtAllowancePromise, this.formatUsdtBalance)
+   }
    /**
     * @description get the Usdt allowance of the AMM Contract
     * @returns Promise<number|null>
     */
    public async getUsdtAllowance(): Promise<number | null> {
       const usdtManager = await this.getManager<UsdtManager>(this.usdtManagerKey);
-      const callOutcome = await usdtManager.getAllowance(environment.contracts.amm.address);
+      const userAddress = await firstValueFrom(this.wallet.getActiveAddressObservable().pipe(filter(address => address != null)));
+      const callOutcome = await usdtManager.getAllowance(userAddress!);
       const data = this.transaction.processReadOutcomes(callOutcome, this.formatUsdtBalance);
       return data;
    }
@@ -86,12 +103,14 @@ export class AssetsService extends GenericContractService implements GenericCont
    }
 
    public getCurrencyReservesObservable() {
+      console.log("getting currency reserves observable")
       return this.getObservable<any>(this.currencyReservesKey);
    }
 
    public updateCurrencyReservesFromChain() {
+      console.log("updating currency reserves from chain")
       return firstValueFrom(this.wallet.getActiveAddressObservable().pipe(
-         switchMap(async (address) => this.updateDataFromChain<Date>(this.currencyReservesKey, (await this.getManager<AmmManager>(this.ammManagerKey)).getReserves(address!), this.formatCurrencyReserves))
+         switchMap(async (address) => this.updateDataFromChain<any>(this.currencyReservesKey, (await this.getManager<AmmManager>(this.ammManagerKey)).getReserves(address!), this.formatCurrencyReserves))
       ))
    }
    public async getBurnManagerBalance() {
@@ -100,12 +119,11 @@ export class AssetsService extends GenericContractService implements GenericCont
       console.log("burn manager balance", burnManagerBalance)
       return this.formatD9Balances(burnManagerBalance);
    }
-
    public async transferD9(toAddress: string, amount: number) {
       const numberString = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9);
       const api = await this.d9.getApi();
       const transferTx = api.tx.balances.transfer(toAddress, numberString)
-      const signedTransaction = await this.wallet.signContractTransaction(transferTx)
+      const signedTransaction = await this.wallet.signTransaction(transferTx)
       this.transactionSub = this.transaction.sendSignedTransaction(signedTransaction)
          .pipe(
             tap(
@@ -124,7 +142,7 @@ export class AssetsService extends GenericContractService implements GenericCont
       return from(this.d9.getContract(environment.contracts.amm.name)).pipe(
          switchMap((contract: AmmManager) => {
             const tx = contract.makeD9ToUsdtTx(amount);
-            return from(this.wallet.signContractTransaction(tx));
+            return from(this.wallet.signTransaction(tx));
          }),
          switchMap((signedTx) => {
             return this.transaction.sendSignedTransaction(signedTx);
@@ -141,7 +159,7 @@ export class AssetsService extends GenericContractService implements GenericCont
       return from(this.d9.getContract(environment.contracts.amm.name)).pipe(
          switchMap((contract: AmmManager) => {
             const tx = contract.makeUsdtToD9Tx(amount);
-            return from(this.wallet.signContractTransaction(tx));
+            return from(this.wallet.signTransaction(tx));
          }),
          switchMap((signedTx) => {
             return this.transaction.sendSignedTransaction(signedTx);
@@ -165,6 +183,20 @@ export class AssetsService extends GenericContractService implements GenericCont
       }
    }
 
+   getDirectReferrals() {
+      return this.wallet.getActiveAddressObservable()
+         .pipe(
+            switchMap(address =>
+               from(this.d9.getApi()).pipe(
+                  switchMap(d9 =>
+                     d9.query['d9Referral']['directReferralsCount'](address)
+                  ),
+                  map((count) => {
+                     return count.toJSON()
+                  })
+               ))
+         );
+   }
 
    getParent(): Promise<string> {
       const observable$ = this.wallet.getActiveAddressObservable().pipe(
@@ -283,13 +315,13 @@ export class AssetsService extends GenericContractService implements GenericCont
       if (!isLiquiditySufficient) {
          throw new Error("Insufficient liquidity")
       }
+
       const updatePromises = [
          this.updateLiquidityProviderFromChain(),
+         this.updateCurrencyReservesFromChain(),
+
       ]
-      this.currentTransactionSub = this.wallet.getActiveAddressObservable()
-         .pipe(switchMap(address => {
-            return this.executeWriteTransaction(this.ammManagerKey, 'addLiquidity', [d9Amount, usdtAmount], updatePromises)
-         })).subscribe();
+      await this.executeWriteTransaction(this.ammManagerKey, 'addLiquidity', [d9Amount, usdtAmount], updatePromises)
    }
 
    public getLiquidityProviderObservable() {
@@ -310,7 +342,8 @@ export class AssetsService extends GenericContractService implements GenericCont
 
    private async checkUsdtAllowance(amount: number): Promise<boolean> {
       const usdtManager = await this.getManager<UsdtManager>(this.usdtManagerKey);
-      const callOutcome = await usdtManager.getAllowance(environment.contracts.amm.address);
+      const userAddress = await firstValueFrom(this.wallet.getActiveAddressObservable().pipe(filter(address => address != null)));
+      const callOutcome = await usdtManager.getAllowance(userAddress!);
       const data = this.transaction.processReadOutcomes(callOutcome, this.formatUsdtBalance);
 
       return data ? (data as number >= amount) : false;
@@ -324,10 +357,12 @@ export class AssetsService extends GenericContractService implements GenericCont
    private async checkLiquidity(d9: number, usdt: number): Promise<boolean> {
       console.log("checking liquidity")
       const threshold = 0.1;
-      const reserves = await firstValueFrom(this.getCurrencyReservesObservable());
-      if (reserves[0] == 0 || reserves[1] == 0) {
-         return true;
-      }
+      await this.updateCurrencyReservesFromChain();
+      const manager = await this.getManager<AmmManager>(this.ammManagerKey);
+      const userAddress = await firstValueFrom(this.wallet.getActiveAddressObservable().pipe(filter(address => address != null)));
+      const outcome = await manager.getReserves(userAddress!);
+      const reserves = await this.transaction.processReadOutcomes(outcome, this.formatCurrencyReserves);
+
       console.log("reserves are ", reserves)
       const d9Reserve = reserves[0];
       const usdtReserve = reserves[1];
@@ -335,6 +370,10 @@ export class AssetsService extends GenericContractService implements GenericCont
       const newLiquidityPrice = d9 / usdt;
       const difference = Math.abs(price - newLiquidityPrice);
       console.log(`difference is ${difference}`)
+      if (reserves[0] == 0 || reserves[1] == 0) {
+         return true;
+      }
+
       return difference < threshold;
    }
    private formatLiquidityProvider(liquidityProvider: any): LiquidityProvider | null {
@@ -375,13 +414,14 @@ export class AssetsService extends GenericContractService implements GenericCont
       return [d9, usdt]
    }
    private async initObservables(ammManager: AmmManager) {
-
+      const usdtManager = await this.initManager(this.usdtManagerKey, environment.contracts.usdt.name)
       this.initObservable<LiquidityProvider | null>(this.liquidityProviderKey,
          null
       );
       this.initObservable<any | null>(this.currencyReservesKey,
          [0, 0]
       );
+      this.initObservable<number>(this.usdtAllowanceKey, 0);
       this.wallet.getActiveAddressObservable()
          .subscribe(async (address) => {
             if (address) {
@@ -389,6 +429,8 @@ export class AssetsService extends GenericContractService implements GenericCont
                await this.updateDataFromChain<LiquidityProvider>(this.liquidityProviderKey, getLiquidityAccountPromise, this.formatLiquidityProvider);
                const getCurrencyReservesPromise = ammManager.getReserves(address);
                await this.updateDataFromChain<any>(this.currencyReservesKey, getCurrencyReservesPromise, this.formatCurrencyReserves)
+               const getUsdtAllowancePromise = usdtManager.getAllowance(address);
+               await this.updateDataFromChain<number>(this.usdtAllowanceKey, getUsdtAllowancePromise, this.formatUsdtBalance)
             }
          })
 

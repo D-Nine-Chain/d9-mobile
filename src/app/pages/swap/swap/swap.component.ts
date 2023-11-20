@@ -14,8 +14,7 @@ import { Subscription } from 'rxjs';
 })
 export class SwapComponent implements OnInit {
    swapAmount = new FormControl(1, [Validators.required, Validators.min(1), this.sufficientBalanceValidator()])
-   usdtLiquidity = new FormControl(1, [Validators.required, Validators.min(1)])
-   d9Liquidity = new FormControl(1, [Validators.required, Validators.min(1)])
+
    d9Balances: D9Balances = {
       available: '',
       free: 0,
@@ -24,7 +23,7 @@ export class SwapComponent implements OnInit {
       vested: '',
       voting: ''
    }
-   liquidityProvider: LiquidityProvider | null = null;
+
 
    swapSub: Subscription | null = null;
    constructor(private assets: AssetsService, private router: Router) {
@@ -33,19 +32,10 @@ export class SwapComponent implements OnInit {
          this.d9Balances = d9Balances
 
       })
-      this.assets.getLiquidityProviderObservable().subscribe((liquidityProvider) => {
-         console.log("liquidity provider", liquidityProvider)
-      })
+
       this.assets.getCurrencyReservesObservable().subscribe((reserves) => {
          console.log("reserves", reserves)
       });
-      this.assets.addLiquidity(100, 100)
-         .then((result) => {
-            console.log("add liquidity result", result)
-         })
-         .catch((err) => {
-            console.log("add liquidity error", err)
-         })
    }
 
    ngOnInit() { }
@@ -78,7 +68,9 @@ export class SwapComponent implements OnInit {
          return this.isBalanceSufficient() ? null : { 'insufficient D9 Balance': { value: control.value } };
       }
    }
-
+   navigateTo(path: string) {
+      this.router.navigate([path])
+   }
    isBalanceSufficient(): boolean {
       if (this.swapAmount) {
          if (this.swapAmount.value !== null) {

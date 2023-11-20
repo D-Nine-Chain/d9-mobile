@@ -1,33 +1,32 @@
-<ion-content class="ion-padding">
-   <ion-card>
-      <ion-card-header>
-         <ion-card-title>
-            Swap
-         </ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="ion-padding">
-         <p>Your current D9 balance: {{formatNumber(d9Balances.free)}}</p>
-         <ion-input type="number" fill="solid" label="Swap USDT" labelPlacement="floating"
-            helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="swapInput"
-            [formControl]="swapAmount"></ion-input>
-      </ion-card-content>
-   </ion-card>
-   <ion-button expand="full" (click)="swap()"> swap </ion-button>
-   <ion-card>
-      <ion-card-header>
-         <ion-card-title>
-            Add liquidity
-         </ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="ion-padding">
+<ion-card>
+   <ion-card-header>
+      <ion-card-title>
+         Reserves
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content class="ion-padding">
 
-         <ion-input type="number" fill="solid" label="Add D9" labelPlacement="floating"
-            helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="d9Input"
-            [formControl]="usdtLiquidity"></ion-input>
-         <ion-input type="number" fill="solid" label="Add USDT" labelPlacement="floating"
-            helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="d9Input"
-            [formControl]="d9Liquidity"></ion-input>
-      </ion-card-content>
-   </ion-card>
-   <ion-button expand="full" (click)="swap()"> add liquidity </ion-button>
-</ion-content>
+      <div id="reserves-container">
+         <p>d9 {{""}}</p>
+         <p>usdt {{""}}</p>
+      </div>
+   </ion-card-content>
+</ion-card>
+<ion-card>
+   <ion-card-header>
+      <ion-card-title>
+         Swap
+      </ion-card-title>
+   </ion-card-header>
+   <ion-card-content class="ion-padding">
+      <p>Your current D9 balance: {{formatNumber(d9Balances.free)}}</p>
+      <ion-input type="number" fill="solid" label="Swap USDT" labelPlacement="floating"
+         helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="swapInput"
+         [formControl]="swapAmount"></ion-input>
+   </ion-card-content>
+   <ion-button expand="full" (click)="swap()"> swap </ion-button>
+</ion-card>
+
+
+<ion-button expand="full" (click)="navigateTo('/liquidity')"> add liquidity </ion-button>
+<!-- </ion-content> -->
