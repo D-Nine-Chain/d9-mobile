@@ -3,7 +3,7 @@ import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/
 import { Router } from '@angular/router';
 
 import { AssetsService } from 'app/services/asset/asset.service';
-import { D9Balances } from 'app/types';
+import { D9Balances, LiquidityProvider } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
 
@@ -24,12 +24,28 @@ export class SwapComponent implements OnInit {
       vested: '',
       voting: ''
    }
+   liquidityProvider: LiquidityProvider | null = null;
+
    swapSub: Subscription | null = null;
    constructor(private assets: AssetsService, private router: Router) {
       this.assets.d9BalancesObservable().subscribe((d9Balances) => {
          console.log("balances in swap", d9Balances)
          this.d9Balances = d9Balances
+
       })
+      this.assets.getLiquidityProviderObservable().subscribe((liquidityProvider) => {
+         console.log("liquidity provider", liquidityProvider)
+      })
+      this.assets.getCurrencyReservesObservable().subscribe((reserves) => {
+         console.log("reserves", reserves)
+      });
+      this.assets.addLiquidity(100, 100)
+         .then((result) => {
+            console.log("add liquidity result", result)
+         })
+         .catch((err) => {
+            console.log("add liquidity error", err)
+         })
    }
 
    ngOnInit() { }

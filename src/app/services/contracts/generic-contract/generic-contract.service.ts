@@ -15,7 +15,7 @@ import { ContractCallOutcome } from 'app/utils/api-contract/types';
 })
 export class GenericContractService {
 
-   private managerSubject: BehaviorSubject<any> = new BehaviorSubject<any | null>(null);
+   private managerSubject: { [key: string]: BehaviorSubject<any> } = {};
    protected onChainData: { [key: string]: BehaviorSubject<any> } = {};
    protected currentTransactionSub: Subscription | null = null;
    protected observablesInitializedSubject = new Subject<boolean>();
@@ -41,8 +41,8 @@ export class GenericContractService {
     * @param args contract method arguments
     * @param updatePromises data to pull from chain to update after successful run of contract
     */
-   protected async executeWriteTransaction(methodName: string, args: any[], updatePromises?: Promise<any>[]): Promise<void> {
-      this.currentTransactionSub = from(this.getManager<any>()).pipe(
+   protected async executeWriteTransaction(managerKey: string, methodName: string, args: any[], updatePromises?: Promise<any>[]): Promise<void> {
+      this.currentTransactionSub = from(this.getManager<any>(managerKey)).pipe(
          switchMap(manager => {
             const tx = manager[methodName](...args);
             return from(this.wallet.signContractTransaction(tx)).pipe(
@@ -68,16 +68,30 @@ export class GenericContractService {
     * @param fetchMethod the function of the manager to call to get said data
     * @param formatData a method used to format data for the subscribers
     */
-   protected async updateDataFromChain<T>(key: string, fetchMethod: Promise<ContractCallOutcome>, formatData?: (data: any) => T) {
-      let manager = await this.getManager<MerchantManager>();
+   protected async updateDataFromChain<T>(key: string, fetchMethod: Promise<ContractCallOutcome>, formatData?: (data: any) => T | null) {
+      // let manager = await this.getManager<MerchantManager>();
       const { output, result } = await fetchMethod;
-      if (result.isOk && output != null) {
-         let data = (output.toJSON() as any).ok;
 
-         if (data.ok && formatData) {
-            data = formatData(data.ok);
+      if (result.isOk && output === null) {
+         this.updateObservable(key, null);
+      }
+      if (result.isOk && output != null) {
+
+         let data = (output.toJSON() as any).ok;
+         console.log(`data for ${key}`, data)
+         if (!data) {
+            this.updateObservable(key, null);
+         } else if (data && !data.ok && formatData) {//for data that is not a Result type
+            data = formatData(data);
+            console.log(`formatted data for ${key}`, data)
             this.updateObservable<T>(key, data);
          }
+         else if (data.ok && formatData) { //Result type data
+            data = formatData(data.ok);
+            console.log(`formatted data for ${key}`, data)
+            this.updateObservable<T>(key, data);
+         }
+
          else if (data.err) {
             this.updateObservable(key, data);
          }
@@ -88,9 +102,9 @@ export class GenericContractService {
    /**
     * @description initializes the manager for the contract
     */
-   protected async initManager<T>(contractName: string): Promise<any> {
-      let manager = await this.d9.getContract(contractName);
-      this.updateManager(manager)
+   protected async initManager<T>(managerKey: string, contractName: string): Promise<any> {
+      let manager: any = await this.d9.getContract(contractName);
+      this.updateManager(managerKey, manager)
       return manager;
    }
    /**
@@ -114,19 +128,19 @@ export class GenericContractService {
    }
 
 
-   protected async getManager<T>(): Promise<T> {
-      return firstValueFrom(this.managerSubject.asObservable().pipe(
+   protected async getManager<T>(managerKey: string): Promise<T> {
+      return firstValueFrom(this.managerSubject[managerKey].asObservable().pipe(
          filter(manager => manager !== null),
          first()
       ));
    }
 
-   private updateManager<T>(manager: T) {
-      this.managerSubject.next(manager);
+   private updateManager<T>(managerKey: string, manager: T) {
+      if (!this.managerSubject[managerKey]) {
+         this.managerSubject[managerKey] = new BehaviorSubject<T>(manager);
+      }
+      this.managerSubject[managerKey].next(manager);
    }
-
-
-
 
 
 }

@@ -23,6 +23,12 @@ export class UsdtManager implements D9Contract {
       }, address))
    }
 
+   getAllowance(address: string): Promise<ContractCallOutcome> {
+      return firstValueFrom(this.contract.query['psp22::balanceOf'](address, {
+         gasLimit: this.gasLimits.readLimit,
+         storageDepositLimit: environment.storage_deposit_limit,
+      }, address))
+   }
    makeUsdtTransferTx(to: string, amount: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['psp22::transfer']({
          gasLimit: this.gasLimits.writeLimit,

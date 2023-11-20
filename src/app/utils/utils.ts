@@ -5,7 +5,8 @@ export enum CurrencyTickerEnum {
    D9 = "D9",
    USDT = "USDT",
    GREEN_POINTS = "GP",
-   RMB = "RMB"
+   RMB = "RMB",
+   LP_TOKEN = "LP_TOKEN"
 }
 
 // Enum for standardized messages
@@ -44,7 +45,14 @@ export class Utils {
          ticker: CurrencyTickerEnum.RMB,
          symbol: CurrencySymbol.RMB,
          decimals: 2
-      }
+      },
+      [CurrencyTickerEnum.LP_TOKEN]: {
+         name: "LP Token",
+         ticker: CurrencyTickerEnum.LP_TOKEN,
+         symbol: CurrencySymbol.D9,
+         decimals: 6
+      },
+
    }
    static toBigNumberString(number: number | string, currency: CurrencyTickerEnum): string {
       const numberString = new BN(number).mul(new BN(10).pow(new BN(this.currenciesRecord[currency].decimals))).toString()

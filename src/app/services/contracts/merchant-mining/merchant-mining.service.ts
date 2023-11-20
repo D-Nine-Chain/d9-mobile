@@ -12,6 +12,7 @@ import { firstValueFrom, switchMap } from 'rxjs';
    providedIn: 'root'
 })
 export class MerchantMiningService extends GenericContractService implements GenericContractService {
+   merchantManagerKey = "merchant_manager";
    merchantAccountKey = "merchant_account";
    merchantExpiryKey = "merchant_expiry";
    userAddress: string | null = null;
@@ -22,7 +23,7 @@ export class MerchantMiningService extends GenericContractService implements Gen
       })
    }
    async init() {
-      const manager = await this.initManager(environment.contracts.merchant.name)
+      const manager = await this.initManager(this.merchantManagerKey, environment.contracts.merchant.name)
       await this.initObservables(manager)
 
    }
@@ -32,14 +33,14 @@ export class MerchantMiningService extends GenericContractService implements Gen
       ]
       this.currentTransactionSub = this.wallet.getActiveAddressObservable()
          .pipe(switchMap(address => {
-            return this.executeWriteTransaction('redeemD9', [address], updatePromises)
+            return this.executeWriteTransaction(this.merchantManagerKey, 'redeemD9', [address], updatePromises)
          })).subscribe();
    }
 
    public async subscribe(months: number) {
       this.currentTransactionSub = this.wallet.getActiveAddressObservable()
          .pipe(switchMap(address => {
-            return this.executeWriteTransaction('d9Subscribe', [months])
+            return this.executeWriteTransaction(this.merchantManagerKey, 'd9Subscribe', [months])
          })).subscribe();
    }
 
@@ -47,7 +48,7 @@ export class MerchantMiningService extends GenericContractService implements Gen
       const updatePromises = [
          this.updateAccountFromChain(),
       ]
-      return this.executeWriteTransaction('giveGreenPoints', [toAddress, amount], updatePromises)
+      return this.executeWriteTransaction(this.merchantManagerKey, 'giveGreenPoints', [toAddress, amount], updatePromises)
    }
 
    public getMerchantExpiryObservable() {
@@ -59,7 +60,7 @@ export class MerchantMiningService extends GenericContractService implements Gen
    }
 
    public async updateData(): Promise<void> {
-      const merchantManager = await this.getManager<MerchantManager>();
+      const merchantManager = await this.getManager<MerchantManager>(this.merchantManagerKey);
       await this.initObservables(merchantManager);
 
    }
@@ -67,14 +68,13 @@ export class MerchantMiningService extends GenericContractService implements Gen
    private async updateAccountFromChain(): Promise<void> {
       console.log("updating account from chain")
       return firstValueFrom(this.wallet.getActiveAddressObservable().pipe(
-         switchMap(async (account) => this.updateDataFromChain<MerchantAccount>(this.merchantAccountKey, (await this.getManager<MerchantManager>()).getMerchantAccount(this.userAddress!), this.formatMerchantAccount))
+         switchMap(async (account) => this.updateDataFromChain<MerchantAccount>(this.merchantAccountKey, (await this.getManager<MerchantManager>(this.merchantManagerKey)).getMerchantAccount(this.userAddress!), this.formatMerchantAccount))
       ))
-
    }
 
    private async updateExpiryFromChain(): Promise<void> {
       return firstValueFrom(this.wallet.getActiveAddressObservable().pipe(
-         switchMap(async (account) => this.updateDataFromChain<Date>(this.merchantExpiryKey, (await this.getManager<MerchantManager>()).getMerchantExpiry(this.userAddress!), this.formatExpiry))
+         switchMap(async (account) => this.updateDataFromChain<Date>(this.merchantExpiryKey, (await this.getManager<MerchantManager>(this.merchantManagerKey)).getMerchantExpiry(this.userAddress!), this.formatExpiry))
       ))
    }
 

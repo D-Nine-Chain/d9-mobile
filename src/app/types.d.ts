@@ -73,6 +73,12 @@ export interface MerchantAccount {
    //locale date string
    expiry?: any;
 }
+export interface LiquidityProvider {
+   accountId: string;
+   usdt: number;
+   d9: number;
+   lpTokens: number;
+}
 
 export interface Notification {
    message: NotificationMessage;

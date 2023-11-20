@@ -95,7 +95,9 @@ export class WalletService {
    }
 
    public getActiveAddressObservable(): Observable<string | null> {
-      return this.activeAddressSubject.asObservable();
+      return this.activeAddressSubject.asObservable().pipe(
+         filter(address => address != null),
+      );
    }
 
    public getAllAddressesObservable(): Observable<Set<string>> {
