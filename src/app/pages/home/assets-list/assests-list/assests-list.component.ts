@@ -13,9 +13,9 @@ export class AssestsListComponent implements OnInit {
    assetsSub: Subscription | null = null;
    currencySymbol: string = this.assetService.appBaseCurrencyInfo.symbol;
    constructor(private assetService: AssetsService) {
-      this.assetsSub = this.assetService.getAssetsObservable().subscribe((assets) => {
-         this.assets = assets;
-      })
+      // this.assetsSub = this.assetService.getAssetsObservable().subscribe((assets) => {
+      //    this.assets = assets;
+      // })
    }
 
    ngOnInit() { }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/forms';
+import { AmmService } from 'app/services/amm/amm.service';
 import { AssetsService } from 'app/services/asset/asset.service';
+import { UsdtService } from 'app/services/usdt/usdt.service';
 import { LiquidityProvider } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
@@ -21,51 +23,54 @@ export class LiquidityComponent implements OnInit {
    d9Balance: number = 0;
    usdtBalance: number = 0;
    subs: Subscription[] = []
-   constructor(private assets: AssetsService) {
-      this.assets.getLiquidityProviderObservable().subscribe((liquidityProvider) => {
-         console.log("liquidity provider", liquidityProvider)
-      })
-      this.assets.getUsdtAllowance
-   }
-
-   ngOnInit() {
-      let lpSub = this.assets.getLiquidityProviderObservable()
+   constructor(private assets: AssetsService, private amm: AmmService, private usdt: UsdtService) {
+      let lpSub = this.amm.liquidityProviderObservable()
          .subscribe((liquidityProvider) => {
-            if (liquidityProvider) {
+            console.info("liquidity provider in liquidity component", liquidityProvider)
+            if (liquidityProvider != null) {
                this.liquidityProvider = liquidityProvider
             }
          })
       this.subs.push(lpSub)
-      let reservesSub = this.assets.getCurrencyReservesObservable()
+
+      this.amm.currencyReservesObservable()
          .subscribe((reserves) => {
-            console.log("reserves", reserves)
-            if (reserves && reserves.length > 0) {
+            console.log("reserves in liquidity component", reserves)
+            if (reserves) {
                this.d9Reserves = reserves[0]
                this.usdtReserves = reserves[1]
             }
          })
-      this.subs.push(reservesSub)
-      let usdtBalanceSub = this.assets.getUsdtBalanceObservable()
+
+      // this.subs.push(reservesSub)
+
+      let usdtBalanceSub = this.usdt.getUsdtBalanceObservable()
          .subscribe((usdtBalance) => {
-            this.usdtBalance = usdtBalance
-         })
-      this.subs.push(usdtBalanceSub)
-      this.assets.getUsdtAllowance()
-         .then((allowance) => {
-            console.log(`usdt allowance is ${allowance}`);
-            if (allowance) {
-               this.currentAllowance = allowance
+            console.log(`usdt balance in liquidity component is ${usdtBalance}`)
+            if (usdtBalance) {
+               this.usdtBalance = usdtBalance
             }
          })
-         .catch((err) => {
-            console.log("error getting usdt allowance", err)
-         })
+      this.subs.push(usdtBalanceSub)
+
+      const allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
+         console.log("allwoance in liquidity component", allowance)
+         if (allowance != null) {
+            console.log(`allowances is ${allowance}`)
+            this.currentAllowance = allowance
+         }
+      })
+      this.subs.push(allowanceSub)
 
       let d9sub = this.assets.d9BalancesObservable()
          .subscribe((d9Balances) => {
-            console.log("d9 balances", d9Balances)
             this.d9Balance = d9Balances.free
          })
+      this.subs.push(d9sub)
+   }
+
+   ngOnInit() {
+
    }
    haveNoAllowance() {
       return this.currentAllowance == 0
@@ -79,7 +84,7 @@ export class LiquidityComponent implements OnInit {
       if (this.usdtLiquidity.valid && this.d9Liquidity.valid) {
          const usdtAmount = this.usdtLiquidity.value;
          const d9Amount = this.d9Liquidity.value;
-         this.assets.addLiquidity(usdtAmount!, d9Amount!)
+         this.amm.addLiquidity(usdtAmount!, d9Amount!)
             .then((result) => {
                console.log("add liquidity result", result)
             })
@@ -91,13 +96,8 @@ export class LiquidityComponent implements OnInit {
    async addAllowance() {
       if (this.allowance.valid) {
          const amount = this.allowance.value;
-         await this.assets.approveUsdt(amount!)
-         this.assets.getUsdtAllowance()
-            .then((allowance) => {
-               if (allowance) {
-                  this.currentAllowance = allowance
-               }
-            })
+         await this.usdt.approveUsdt(amount!)
+
       }
    }
    formatNumber(number: string | number) {

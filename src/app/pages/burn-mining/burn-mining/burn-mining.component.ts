@@ -9,6 +9,7 @@ import { LoadingController } from '@ionic/angular';
 import { AssetsService } from 'app/services/asset/asset.service';
 import { decode } from 'querystring';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { ReferralService } from 'app/services/referral/referral.service';
 
 
 @Component({
@@ -31,9 +32,9 @@ export class BurnMiningComponent implements OnInit {
    referralBoost: number = 0;
    subs: Subscription[] = []
    currencySymbol = Utils.currenciesRecord["D9"].symbol;
-   constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController, private assets: AssetsService) {
+   constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController, private assets: AssetsService, private referral: ReferralService) {
       this.subscribeToLiveData()
-      this.assets.getParent()
+      this.referral.getParent()
          .then((parent) => {
             let decode = decodeAddress(parent);
             let encode = encodeAddress(decode);

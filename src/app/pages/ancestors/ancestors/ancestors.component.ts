@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AssetsService } from 'app/services/asset/asset.service';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { firstValueFrom } from 'rxjs';
+import { ReferralService } from 'app/services/referral/referral.service';
 @Component({
    selector: 'app-ancestors',
    templateUrl: './ancestors.component.html',
@@ -12,12 +13,12 @@ export class AncestorsComponent implements OnInit {
    parent: string = ""
    subs: any[] = [];
    childCount: number | string = 0;
-   constructor(private assets: AssetsService) {
+   constructor(private referral: ReferralService) {
       // firstValueFrom(this.assets.getDirectReferralsCount())
       //    .then((count) => {
       //       console.log("count of sons", count)
       //    })
-      this.assets.getParent().then((parent) => {
+      this.referral.getParent().then((parent) => {
          console.log("parentt", parent)
          if (parent) {
             console.log("parentt", parent)
@@ -28,7 +29,7 @@ export class AncestorsComponent implements OnInit {
             this.parent = encoded
          }
       })
-      const sub5 = this.assets.getDirectReferrals()
+      const sub5 = this.referral.getDirectReferrals()
          .subscribe((count) => {
             console.log("child coundt count", count)
             if (count) {
@@ -36,7 +37,7 @@ export class AncestorsComponent implements OnInit {
             }
          })
       this.subs.push(sub5)
-      const sub2 = this.assets.getAncestors().subscribe((ancestors) => {
+      const sub2 = this.referral.getAncestors().subscribe((ancestors) => {
          console.log("parentt", ancestors)
          if (ancestors) {
             let sub4 = ancestors.subscribe((ancestors: any) => {

@@ -52,8 +52,12 @@ export class Utils {
          symbol: CurrencySymbol.D9,
          decimals: 6
       },
-
    }
+
+   static getCurrencyInfo(currency: CurrencyTickerEnum) {
+      return this.currenciesRecord[currency]
+   }
+
    static toBigNumberString(number: number | string, currency: CurrencyTickerEnum): string {
       const numberString = new BN(number).mul(new BN(10).pow(new BN(this.currenciesRecord[currency].decimals))).toString()
       return numberString

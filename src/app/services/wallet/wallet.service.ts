@@ -93,7 +93,12 @@ export class WalletService {
       })
       console.log("keyring loaded")
    }
-
+   public getAddressPromise(): Promise<string | null> {
+      return firstValueFrom(this.getActiveAddressObservable().pipe(
+         filter(address => address !== null),
+         first()
+      ));
+   }
    public getActiveAddressObservable(): Observable<string | null> {
       return this.activeAddressSubject.asObservable().pipe(
          filter(address => address != null),

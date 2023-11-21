@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GenericContractService } from './generic-contract.service';
+import { GenericContractServiceBase } from './generic-contract.service';
 
 describe('GenericContractService', () => {
-  let service: GenericContractService;
+   let service: GenericContractServiceBase;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(GenericContractService);
-  });
+   beforeEach(() => {
+      TestBed.configureTestingModule({});
+      service = TestBed.inject(GenericContractServiceBase);
+   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+   it('should be created', () => {
+      expect(service).toBeTruthy();
+   });
 });

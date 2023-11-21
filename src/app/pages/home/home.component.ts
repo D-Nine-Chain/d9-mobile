@@ -7,6 +7,7 @@ import { CurrencySymbol, CurrencyTickerEnum } from 'app/utils/utils';
 import { Utils } from 'app/utils/utils';
 import { Router } from '@angular/router';
 import { AssetsService } from 'app/services/asset/asset.service';
+import { UsdtService } from 'app/services/usdt/usdt.service';
 @Component({
    selector: 'app-home',
    templateUrl: './home.component.html',
@@ -39,7 +40,7 @@ export class HomeComponent implements OnInit {
    accountSub: Subscription | null = null;
    balancesSub: Subscription | null = null;
    usdtBalanceSub: Subscription | null = null;
-   constructor(private accountService: AccountService, private router: Router, private assetsService: AssetsService) {
+   constructor(private accountService: AccountService, private router: Router, private assetsService: AssetsService, private usdtService: UsdtService) {
 
       this.accountSub = this.accountService.getAccountObservable().subscribe((account) => {
          this.account = account
@@ -52,11 +53,13 @@ export class HomeComponent implements OnInit {
          }
       })
 
-      this.assetsService
+      this.usdtService
          .getUsdtBalanceObservable()
          .subscribe((usdtBalance) => {
             console.log("usdt balance in home component is ", usdtBalance)
-            this.usdtBalance = usdtBalance
+            if (usdtBalance) {
+               this.usdtBalance = usdtBalance
+            }
          })
 
    }

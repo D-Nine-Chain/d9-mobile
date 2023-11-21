@@ -30,16 +30,16 @@ export class MerchantMiningComponent implements OnInit {
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, Validators.min(47), substrateAddressValidator()]);
    constructor(private merchantMining: MerchantMiningService, private loadingController: LoadingController) {
-      this.merchantSub = this.merchantMining.getMerchantObservable().subscribe((merchantAccount) => {
+      this.merchantSub = this.merchantMining.merchantAccountObservable().subscribe((merchantAccount) => {
          if (merchantAccount) {
             this.merchantAccount = merchantAccount
             console.log("merchant account", merchantAccount)
             this.loading?.dismiss();
          }
       })
-      this.expirySub = this.merchantMining.getMerchantExpiryObservable().subscribe((expiry) => {
+      this.expirySub = this.merchantMining.merchantExpiryObservable().subscribe((expiry) => {
          if (expiry) {
-            this.expiry = expiry
+            this.expiry = new Date(expiry)
          }
       })
    }

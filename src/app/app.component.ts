@@ -36,7 +36,7 @@ export class AppComponent {
    prepPlatformFunctions() {
       this.platform.ready().then(() => {
          this.platform.pause.subscribe(async () => {
-            await this.assets.saveAssetsToPreferences();
+            // await this.assets.saveAssetsToPreferences();
          });
       })
    }

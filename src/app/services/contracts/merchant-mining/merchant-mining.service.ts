@@ -1,107 +1,105 @@
 import { Injectable } from '@angular/core';
 import { D9ApiService } from 'app/services/d9-api/d9-api.service';
-import { GenericContractService } from 'app/services/contracts/generic-contract/generic-contract.service';
 import { TransactionsService } from 'app/services/transactions/transactions.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
 import { environment } from 'environments/environment';
 import { MerchantAccount } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { firstValueFrom, switchMap } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, switchMap } from 'rxjs';
+
 @Injectable({
    providedIn: 'root'
 })
-export class MerchantMiningService extends GenericContractService implements GenericContractService {
-   merchantManagerKey = "merchant_manager";
-   merchantAccountKey = "merchant_account";
-   merchantExpiryKey = "merchant_expiry";
-   userAddress: string | null = null;
-   constructor(wallet: WalletService, transaction: TransactionsService, d9: D9ApiService) {
-      super(wallet, transaction, d9);
+export class MerchantMiningService {
+
+   merchantManager: MerchantManager | null = null;
+   merchantExpirySubject = new BehaviorSubject<number>(new Date().getTime());
+   merchantAccountSubject = new BehaviorSubject<MerchantAccount | null>(null);
+
+   constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService) {
+
       this.init().catch((err) => {
          console.log(err)
       })
    }
    async init() {
-      const manager = await this.initManager(this.merchantManagerKey, environment.contracts.merchant.name)
-      await this.initObservables(manager)
-
+      this.merchantManager = await this.d9.getContract(environment.contracts.merchant.name)
    }
+
+   public merchantExpiryObservable() {
+      return this.merchantExpirySubject.asObservable()
+   }
+
+   public merchantAccountObservable() {
+      return this.merchantAccountSubject.asObservable()
+   }
+
    public async withdrawD9(amount: number) {
-      const updatePromises = [
-         this.updateAccountFromChain(),
-      ]
-      this.currentTransactionSub = this.wallet.getActiveAddressObservable()
-         .pipe(switchMap(address => {
-            return this.executeWriteTransaction(this.merchantManagerKey, 'redeemD9', [address], updatePromises)
-         })).subscribe();
+      const address = await this.wallet.getAddressPromise();
+      if (!address) {
+         throw new Error("no address")
+      }
+      const extrinsic = this.merchantManager?.redeemD9(address)
+      if (!extrinsic) {
+         throw new Error("could not create tx")
+      }
+      const signedTx = await this.wallet.signTransaction(extrinsic)
+      const sub = this.transaction.sendSignedTransaction(signedTx)
+         .subscribe((result) => {
+            console.log("result is ", result)
+            if (result.status.isFinalized) {
+               sub.unsubscribe()
+            }
+         })
    }
 
    public async subscribe(months: number) {
-      this.currentTransactionSub = this.wallet.getActiveAddressObservable()
-         .pipe(switchMap(address => {
-            return this.executeWriteTransaction(this.merchantManagerKey, 'd9Subscribe', [months])
-         })).subscribe();
+      const tx = this.merchantManager?.d9Subscribe(months)
+      if (!tx) throw new Error("could not create tx");
+      const signedTx = await this.wallet.signTransaction(tx)
+      const sub = this.transaction.sendSignedTransaction(signedTx)
+         .subscribe(async (result) => {
+            if (result.status.isFinalized) {
+               sub.unsubscribe()
+               await this.updateExpiry();
+            }
+         })
+   }
+
+   public async updateExpiry() {
+      const userAddress = await this.wallet.getAddressPromise();
+      if (!userAddress) throw new Error("no address")
+      const outcome = await this.merchantManager?.getMerchantExpiry(userAddress)
+      if (!outcome) throw new Error("could not get expiry")
+      const expiry = this.transaction.processReadOutcomes(outcome, this.formatExpiry)
+      if (expiry) this.merchantExpirySubject.next(expiry.getTime())
+
    }
 
    public async sendGreenPoints(toAddress: string, amount: number) {
-      const updatePromises = [
-         this.updateAccountFromChain(),
-      ]
-      return this.executeWriteTransaction(this.merchantManagerKey, 'giveGreenPoints', [toAddress, amount], updatePromises)
-   }
-
-   public getMerchantExpiryObservable() {
-      return this.getObservable<Date>(this.merchantExpiryKey);
-   }
-
-   public getMerchantObservable() {
-      return this.getObservable<MerchantAccount>(this.merchantAccountKey);
-   }
-
-   public async updateData(): Promise<void> {
-      const merchantManager = await this.getManager<MerchantManager>(this.merchantManagerKey);
-      await this.initObservables(merchantManager);
-
-   }
-
-   private async updateAccountFromChain(): Promise<void> {
-      console.log("updating account from chain")
-      return firstValueFrom(this.wallet.getActiveAddressObservable().pipe(
-         switchMap(async (account) => this.updateDataFromChain<MerchantAccount>(this.merchantAccountKey, (await this.getManager<MerchantManager>(this.merchantManagerKey)).getMerchantAccount(this.userAddress!), this.formatMerchantAccount))
-      ))
-   }
-
-   private async updateExpiryFromChain(): Promise<void> {
-      return firstValueFrom(this.wallet.getActiveAddressObservable().pipe(
-         switchMap(async (account) => this.updateDataFromChain<Date>(this.merchantExpiryKey, (await this.getManager<MerchantManager>(this.merchantManagerKey)).getMerchantExpiry(this.userAddress!), this.formatExpiry))
-      ))
-   }
-
-   private async initObservables(merchantManager: MerchantManager) {
-
-      this.initObservable<MerchantAccount>(this.merchantAccountKey, {
-         greenPoints: Utils.reduceByCurrencyDecimal(0, CurrencyTickerEnum.D9),
-         lastConversion: 0,
-         redeemedUsdt: Utils.reduceByCurrencyDecimal(0, CurrencyTickerEnum.USDT),
-         redeemedD9: Utils.reduceByCurrencyDecimal(0, CurrencyTickerEnum.D9),
-         createdAt: 0,
-         expiry: 0,
-      });
-
-      this.initObservable<Date>(this.merchantExpiryKey, new Date(0));
-
-      this.wallet.getActiveAddressObservable()
-         .subscribe(async (address) => {
-            if (address) {
-               const getMerchantAccountPromise = merchantManager.getMerchantAccount(address)
-               await this.updateDataFromChain<MerchantAccount>(this.merchantAccountKey, getMerchantAccountPromise, this.formatMerchantAccount);
-               const getExpiryPromise = merchantManager.getMerchantExpiry(address)
-               await this.updateDataFromChain<Date>(this.merchantExpiryKey, getExpiryPromise, this.formatExpiry);
+      const tx = this.merchantManager?.giveGreenPoints(toAddress, amount)
+      if (!tx) throw new Error("could not create tx");
+      const signedTx = await this.wallet.signTransaction(tx)
+      const sub = this.transaction.sendSignedTransaction(signedTx)
+         .subscribe(async (result) => {
+            if (result.status.isFinalized) {
+               sub.unsubscribe()
+               await this.updateMerchantAccount()
             }
          })
-      this.observablesInitializedSubject.next(true);
    }
+
+   public async updateMerchantAccount() {
+      const userAddress = await this.wallet.getAddressPromise();
+      if (!userAddress) throw new Error("no address")
+      const outcome = await this.merchantManager?.getMerchantAccount(userAddress)
+      if (!outcome) throw new Error("could not get merchant account")
+      const merchantAccount = this.transaction.processReadOutcomes(outcome, this.formatMerchantAccount)
+      if (merchantAccount) this.merchantAccountSubject.next(merchantAccount)
+   }
+
+
 
    private formatExpiry(expiry: number): Date {
       return new Date(expiry)
