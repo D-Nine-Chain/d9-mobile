@@ -15,12 +15,12 @@ import { AccountManagementComponent } from './pages/account-management/account-m
 import { NodesComponent } from './pages/nodes/nodes/nodes.component';
 import { BondComponent } from './pages/bond/bond/bond.component';
 import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
+import { PayMerchantComponent } from './pages/merchant-mining/pay-merchant/pay-merchant/pay-merchant.component';
+import { MerchantQrComponent } from './pages/merchant-mining/merchant-qr/merchant-qr.component';
 
 const routes: Routes = [
-
    {
       path: 'first-run', component: FirstRunComponent
-
    },
    { path: 'new-mnemonic', component: NewMnemonicComponent },
    { path: 'home', component: HomeComponent },
@@ -31,7 +31,7 @@ const routes: Routes = [
       ]
    },
    {
-      path: 'merchant-mining', component: MerchantMiningComponent
+      path: 'merchant-mining', component: MerchantMiningComponent,
    },
    { path: 'send', component: SendComponent },
    { path: 'receive', component: ReceiveComponent },
@@ -55,6 +55,8 @@ const routes: Routes = [
    },
    { path: 'bond', component: BondComponent },
    { path: 'liquidity', component: LiquidityComponent },
+   { path: 'pay-merchant', component: PayMerchantComponent },
+   { path: 'merchant-qr', component: MerchantQrComponent }
 ];
 
 @NgModule({

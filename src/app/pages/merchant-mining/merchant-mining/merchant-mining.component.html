@@ -1,16 +1,18 @@
-<ion-card>
-   <ion-card-header>
-      <ion-card-subtitle>Merchant Countdown</ion-card-subtitle>
-   </ion-card-header>
-
-   <ion-card-content>
-      <div id="countdown">
-         <h3>{{countdown}}</h3>
-      </div>
-   </ion-card-content>
-</ion-card>
-
 <ion-content class="ion-padding">
+   <ion-card *ngIf="isMerchantAccount()">
+      <ion-card-header>
+         <ion-card-subtitle>Merchant Countdown</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+         <div id="countdown">
+            <h3>{{countdown}}</h3>
+         </div>
+      </ion-card-content>
+   </ion-card>
+
+
+
    <ion-title>Green Points Account</ion-title>
    <ion-card id="">
       <ion-card-header id="green-points-card">
@@ -53,5 +55,17 @@
          </ion-card-content>
       </ion-card-header>
    </ion-card>
-   <h1>1 month = 10 D9</h1>
+
+   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+      <ion-fab-button>
+         <ion-icon name="chevron-up-circle"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-list side="top" *ngIf="isMerchantAccount()">
+         <ion-fab-button>
+            <ion-icon name="qr-code-outline" (click)="openModal()"></ion-icon>
+         </ion-fab-button>
+
+      </ion-fab-list>
+   </ion-fab>
 </ion-content>
+<ion-button (click)="openModal()">merchant qr code </ion-button>

@@ -27,9 +27,11 @@ import { NodesComponent } from './pages/nodes/nodes/nodes.component';
 import { BondComponent } from './pages/bond/bond/bond.component';
 import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
 import { CountdownModule } from 'ngx-countdown';
+import { PayMerchantComponent } from './pages/merchant-mining/pay-merchant/pay-merchant/pay-merchant.component';
+import { MerchantQrComponent } from './pages/merchant-mining/merchant-qr/merchant-qr.component';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot(), CountdownModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],

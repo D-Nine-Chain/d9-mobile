@@ -46,12 +46,9 @@ export class QrScannerComponent implements OnInit {
                   document
                      .querySelector('body')
                      ?.classList.remove('barcode-scanner-active');
-                  const param = {
-                     address: data.data
-                  }
-                  this.router.navigate(['/send'], { queryParams: param });
 
 
+                  this.qrCodeService.processCode(barcodeDataAsString);
                }
                // resolve(result.barcode);
             },

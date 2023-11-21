@@ -43,7 +43,7 @@ export class AssetsService {
     * 
     * @returns should return a `D9Balances` object. the important values are `free`
     */
-   public d9BalancesObservable(): Observable<any> {
+   public d9BalancesObservable(): Observable<D9Balances> {
       console.log("getting d9 balance");
       const d9 = from(this.d9.getApi());
       return d9.pipe(

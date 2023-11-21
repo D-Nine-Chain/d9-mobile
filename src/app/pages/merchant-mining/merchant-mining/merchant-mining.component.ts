@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 import { MerchantMiningService } from 'app/services/contracts/merchant-mining/merchant-mining.service';
 import { MerchantAccount } from 'app/types';
 import { substrateAddressValidator } from 'app/utils/Validators';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
+import { MerchantQrComponent } from '../merchant-qr/merchant-qr.component';
 
 @Component({
    selector: 'app-merchant-mining',
@@ -13,6 +14,7 @@ import { Subscription } from 'rxjs';
    styleUrls: ['./merchant-mining.component.scss'],
 })
 export class MerchantMiningComponent implements OnInit {
+
    merchantAccount: MerchantAccount = {
       greenPoints: 0,
       lastConversion: 0,
@@ -33,7 +35,7 @@ export class MerchantMiningComponent implements OnInit {
    numberOfMonths = new FormControl(1, [Validators.required, Validators.min(1)]);
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, Validators.min(47), substrateAddressValidator()]);
-   constructor(private merchantMining: MerchantMiningService, private loadingController: LoadingController) {
+   constructor(private merchantMining: MerchantMiningService, private loadingController: LoadingController, public modalController: ModalController) {
       this.merchantSub = this.merchantMining.merchantAccountObservable().subscribe((merchantAccount) => {
          if (merchantAccount) {
             this.merchantAccount = merchantAccount
@@ -79,7 +81,13 @@ export class MerchantMiningComponent implements OnInit {
          this.merchantMining.subscribe(months)
       }
    }
-
+   async openModal() {
+      const modal = await this.modalController.create({
+         component: MerchantQrComponent,
+         // other modal options
+      });
+      return await modal.present();
+   }
    sendGreenPoints() {
       console.log("sending green points")
       if (this.amountToGreenPoints.valid && this.toAddress.valid) {
@@ -103,6 +111,10 @@ export class MerchantMiningComponent implements OnInit {
          return new Date(this.expiry).getTime() > Date.now()
       }
       return false;
+   }
+
+   generateMerchantCode() {
+
    }
 
    countdownToFutureDate(futureDate: number) {

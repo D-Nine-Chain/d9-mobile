@@ -93,6 +93,8 @@ export class MerchantMiningService {
          })
    }
 
+
+
    public async updateMerchantAccount() {
       const userAddress = await this.wallet.getAddressPromise();
       if (!userAddress) throw new Error("no address")

@@ -70,7 +70,7 @@ export class LiquidityComponent implements OnInit {
 
       let d9sub = this.assets.d9BalancesObservable()
          .subscribe((d9Balances) => {
-            this.d9Balance = d9Balances.free
+            this.d9Balance = d9Balances.free as number
          })
       this.subs.push(d9sub)
    }

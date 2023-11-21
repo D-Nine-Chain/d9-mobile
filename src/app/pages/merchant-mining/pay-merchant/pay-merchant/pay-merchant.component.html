@@ -1,0 +1,37 @@
+<ion-card *ngIf="!validMerchant()" id="invalid-merchant">
+   <ion-header>
+      <ion-title>Invalid Merchant Account</ion-title>
+   </ion-header>
+</ion-card>
+<div>
+   <ion-card *ngIf="validMerchant()">
+      <ion-card-header>
+         valid until: {{countdown}}
+      </ion-card-header>
+   </ion-card>
+
+</div>
+<ion-card *ngIf="validMerchant()">
+   <ion-list>
+      <ion-item>
+         your D9 balance {{d9Balance}}
+      </ion-item>
+      <ion-item>
+         your USDT balance {{usdtBalance}}
+      </ion-item>
+   </ion-list>
+</ion-card>
+<ion-card>
+   <ion-card-header *ngIf="validMerchant()">
+
+      <ion-card-title>
+         Pay Merchant
+      </ion-card-title>
+      <ion-card-subtitle>{{merchantAddress}}</ion-card-subtitle>
+      <ion-card-content>
+         <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
+            errorText="must be greater than zero" id="burnInput" [formControl]="amountToSend"></ion-input>
+         <ion-button (click)="send()">send</ion-button>
+      </ion-card-content>
+   </ion-card-header>
+</ion-card>

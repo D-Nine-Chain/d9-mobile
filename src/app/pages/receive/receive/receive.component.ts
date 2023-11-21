@@ -41,8 +41,6 @@ export class ReceiveComponent implements OnInit {
                })
          }
       })
-
-
    }
 
    address: string = '';

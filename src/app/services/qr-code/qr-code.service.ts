@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { decodeAddress } from '@polkadot/util-crypto';
-import { D9QrCode } from 'app/types';
-import { resolve } from 'dns';
+import { D9QrCode, MerchantQrCode } from 'app/types';
 import QRCode from 'qrcode';
 
-export const QrCodeDataType = ['Address']
+export const QrCodeDataType = ['Address', 'Merchant']
 @Injectable({
    providedIn: 'root'
 })
@@ -17,6 +16,9 @@ export class QrCodeService {
       if (data.type === 'Address') {
          console.log("processing address")
          return this.processAddress(data.data);
+      } else if (data.type === 'Merchant') {
+         console.log("processing merchant")
+         return this.processMerchantCode(data.data);
       }
       else {
          return null;
@@ -52,6 +54,18 @@ export class QrCodeService {
 
    }
 
+   encodeMerchantQrCode(merchantCode: MerchantQrCode): string {
+      let qrCode: D9QrCode = {
+         type: 'Merchant',
+         data: merchantCode,
+         version: 1,
+         metadata: {
+            timestamp: new Date().getTime(),
+         }
+      };
+      return this.encodeQrCodeString(qrCode);
+   }
+
    encodeAddressQrCodeString(address: string): string {
       const qrCode: D9QrCode = {
          type: 'Address',
@@ -80,36 +94,51 @@ export class QrCodeService {
          console.log("checking address")
          return this.checkAddress(qrCode.data);
       } else if (typeof qrCode.data === 'object' && qrCode.data !== null) {
-         // If data is an object, validate its structure
-         if (typeof qrCode.data.greenPoints !== 'number' || qrCode.data.greenPoints <= 0) {
-            console.error('Invalid data field: invalid QRGreenPoints object');
-            return false;
+         switch (qrCode.type) {
+            case 'Merchant':
+               return this.isValidMerchantCode(qrCode.data);
+            default:
+               return false;
          }
       } else {
          // Data is neither a string nor a valid object
          console.error('Invalid data field: unknown type');
          return false;
       }
+   }
 
-      // Validate 'version' field (assuming version should be a positive number)
-      if (typeof qrCode.version !== 'number' || qrCode.version <= 0) {
-         console.error('Invalid version field');
+   private processAddress(address: string): void {
+      const param = {
+         address: address
+      }
+      this.router.navigate(['/send'], { queryParams: param });
+   }
+
+   private processMerchantCode(merchantCode: MerchantQrCode): void {
+      const param = {
+         merchantAddress: merchantCode.accountId,
+         validUntil: merchantCode.validUntil
+      }
+      this.router.navigate(['/pay-merchant'], { queryParams: param });
+   }
+
+   isValidMerchantCode(data: any) {
+      if (typeof data.accountId !== 'string' || data.accountId.trim() === '') {
+         console.error('Invalid data field: accountId is not a string or is empty');
          return false;
       }
-
-      // Validate 'metadata' field (more complex validation can be added based on the expected structure)
-      // As an example, checking if metadata is an object
-      if (typeof qrCode.metadata !== 'object' || qrCode.metadata === null) {
-         console.error('Invalid metadata field');
+      if (!this.checkAddress(data.accountId)) {
+         console.error('Invalid accountId');
+         return false;
+      }
+      if (typeof data.validUntil !== 'number' || !Number.isInteger(data.validUntil) || data.validUntil <= 0) {
+         console.error('Invalid data field: validUntil is not a positive integer');
          return false;
       }
 
       return true;
    }
 
-   private processAddress(address: string): string {
-      return "";
-   }
 
    private checkAddress(address: string): boolean {
       // If data is a string, ensure it's not empty

@@ -126,12 +126,15 @@ export type AppError = {
 
 export type D9QrCode = {
    type: string,
-   data: string | QRGreenPoints;
+   data: string | MerchantQrCode,
    version: number;
    metadata: any;
 }
 
-
+export interface MerchantQrCode {
+   accountId: string;
+   validUntil: number;
+}
 
 export type QRGreenPoints = {
    greenPoints: number,

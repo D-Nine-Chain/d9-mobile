@@ -77,7 +77,7 @@ export class BurnMiningComponent implements OnInit {
          .subscribe((d9Balances) => {
             if (d9Balances) {
                console.log("d9 balances in component at subscription", d9Balances)
-               this.burnableD9 = d9Balances.free;
+               this.burnableD9 = d9Balances.free as number;
             }
          })
       this.subs.push(d9sub)
