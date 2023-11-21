@@ -97,7 +97,7 @@ export class WalletService {
       return firstValueFrom(this.getActiveAddressObservable().pipe(
          filter(address => address !== null),
          first()
-      ));
+      ))
    }
    public getActiveAddressObservable(): Observable<string | null> {
       return this.activeAddressSubject.asObservable().pipe(

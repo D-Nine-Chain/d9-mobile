@@ -45,10 +45,10 @@ export class AmmService {
 
    public async swap(swap: Swap) {
       let tx: SubmittableExtrinsic<'rxjs'> | undefined = undefined;
-      if (swap.from.ticker == CurrencyTickerEnum.USDT) {
+      if (swap.from == CurrencyTickerEnum.USDT) {
          tx = this.ammManager?.getD9(swap.fromAmount)
       }
-      else if (swap.from.ticker == CurrencyTickerEnum.D9) {
+      else if (swap.from == CurrencyTickerEnum.D9) {
          tx = this.ammManager?.getUsdt(swap.fromAmount)
       }
       else {
@@ -63,9 +63,45 @@ export class AmmService {
             console.log("result is ", result)
             if (result.status.isFinalized) {
                await this.usdtService.updateBalance();
+               await this.updateReserves();
+               sub.unsubscribe()
+            }
+            if (result.isError) {
+               console.log("result ", result.toHuman())
+               throw new Error("swap failed")
+            }
+         })
+   }
+
+   public async removeLiquidity(): Promise<void> {
+      const tx = this.ammManager?.removeLiquidity();
+      if (!tx) {
+         throw new Error("could not create tx")
+      }
+      const signedTransaction = await this.wallet.signTransaction(tx);
+      const sub = this.transaction.sendSignedTransaction(signedTransaction)
+         .subscribe(async (result) => {
+            console.log("result is ", result)
+            if (result.status.isFinalized) {
+               await this.updateLiquidityProvider();
+               await this.updateReserves();
+               await this.usdtService.updateBalance();
                sub.unsubscribe()
             }
          })
+   }
+
+   public getPrice(from: Asset, to: Asset): number {
+      const reserves = this.reservesSubject.getValue();
+      if (from.ticker == CurrencyTickerEnum.D9 && to.ticker == CurrencyTickerEnum.USDT) {
+         return reserves[0] / reserves[1];
+      }
+      else if (from.ticker == CurrencyTickerEnum.USDT && to.ticker == CurrencyTickerEnum.D9) {
+         return reserves[1] / reserves[0];
+      }
+      else {
+         return 0;
+      }
    }
 
    public async addLiquidity(d9Amount: number, usdtAmount: number): Promise<void> {
@@ -131,7 +167,7 @@ export class AmmService {
 
    private async checkUsdtAllowance(amount: number): Promise<boolean> {
       console.log("checking usdt allowance")
-      const allowance = await this.usdtService.getUsdtAllowancePromise();
+      const allowance = await this.usdtService.usdtAllowancePromise();
       return allowance ? allowance >= amount : false;
    }
 
@@ -155,6 +191,7 @@ export class AmmService {
    }
 
    async updateReserves(): Promise<void> {
+      console.log("updating reserves")
       const userAddress = await this.wallet.getAddressPromise();
       if (!userAddress) throw new Error("no address")
       const rx = await this.ammManager?.getReserves(userAddress)
@@ -189,8 +226,7 @@ export class AmmService {
 }
 
 export interface Swap {
-   from: Asset,
-   to: Asset,
+   from: CurrencyTickerEnum,
+   to: CurrencyTickerEnum,
    fromAmount: number,
-   toAmount: number
 }

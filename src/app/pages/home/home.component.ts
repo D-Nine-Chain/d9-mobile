@@ -54,10 +54,10 @@ export class HomeComponent implements OnInit {
       })
 
       this.usdtService
-         .getUsdtBalanceObservable()
+         .usdtBalanceObservable()
          .subscribe((usdtBalance) => {
             console.log("usdt balance in home component is ", usdtBalance)
-            if (usdtBalance) {
+            if (usdtBalance != null) {
                this.usdtBalance = usdtBalance
             }
          })

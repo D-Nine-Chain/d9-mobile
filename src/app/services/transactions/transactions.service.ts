@@ -40,7 +40,7 @@ export class TransactionsService {
       if (callOutcome.result.isOk) {
          const contractResponse = (callOutcome.output!.toJSON()! as any).ok
          console.log("contract response is ", contractResponse)
-         if (contractResponse) {
+         if (contractResponse != null) {
             return dataFormatter(contractResponse);
          }
       }

@@ -53,7 +53,7 @@ export class AppComponent {
             this._router.navigate(['/new-mnemonic']);
          }
          else {
-            this._router.navigate(['/liquidity']);
+            this._router.navigate(['/swap']);
          }
       });
    }

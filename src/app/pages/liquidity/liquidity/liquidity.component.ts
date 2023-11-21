@@ -44,7 +44,7 @@ export class LiquidityComponent implements OnInit {
 
       // this.subs.push(reservesSub)
 
-      let usdtBalanceSub = this.usdt.getUsdtBalanceObservable()
+      let usdtBalanceSub = this.usdt.usdtBalanceObservable()
          .subscribe((usdtBalance) => {
             console.log(`usdt balance in liquidity component is ${usdtBalance}`)
             if (usdtBalance) {
@@ -93,6 +93,7 @@ export class LiquidityComponent implements OnInit {
          // })
       }
    }
+
    async addAllowance() {
       if (this.allowance.valid) {
          const amount = this.allowance.value;
@@ -106,7 +107,13 @@ export class LiquidityComponent implements OnInit {
    conditionsNotMet(): boolean {
       return !(this.usdtLiquidity.valid && this.d9Liquidity.valid)
    }
-   removeLiquidity() { }
+   removeLiquidity() {
+      if (this.liquidityProvider) {
+         if (this.liquidityProvider.d9 != 0 && this.liquidityProvider.usdt != 0) {
+            this.amm.removeLiquidity()
+         }
+      }
+   }
    balanceValidator(): ValidatorFn {
       return (control: AbstractControl): { [key: string]: any } | null => {
          return this.d9Balance > control.value ? null : { 'insufficientFunds': { value: control.value } };

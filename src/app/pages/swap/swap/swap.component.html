@@ -4,29 +4,45 @@
          Reserves
       </ion-card-title>
    </ion-card-header>
+
    <ion-card-content class="ion-padding">
 
       <div id="reserves-container">
-         <p>d9 {{""}}</p>
-         <p>usdt {{""}}</p>
+         <p>d9 {{d9Reserves}}</p>
+         <p>usdt {{usdtReserves}}</p>
+      </div>
+      <div>
+
       </div>
    </ion-card-content>
+</ion-card>
+<ion-list>
+   <ion-item>
+      <ion-select [value]="selectedSwap" placeholder="Select a swap" (ionChange)="onSelectChange($event)">
+         <div slot="label">Select Swap </div>
+         <ion-select-option value="USDT_D9">USDT to D9</ion-select-option>
+         <ion-select-option value="D9_USDT">D9 to USDT</ion-select-option>
+      </ion-select>
+   </ion-item>
+</ion-list>
+<ion-card>
+   <ion-card-header>
+      <ion-card-subtitle>{{toCurrency.symbol}}{{formatNumber( calculatePrice())}} /
+         {{fromCurrency.name}}</ion-card-subtitle>
+   </ion-card-header>
 </ion-card>
 <ion-card>
    <ion-card-header>
       <ion-card-title>
          Swap
       </ion-card-title>
+      <ion-card-subtitle>you get: ≈ {{formatNumber(calcToAmount())}} {{toCurrency.name}}</ion-card-subtitle>
    </ion-card-header>
    <ion-card-content class="ion-padding">
-      <p>Your current D9 balance: {{formatNumber(d9Balances.free)}}</p>
-      <ion-input type="number" fill="solid" label="Swap USDT" labelPlacement="floating"
-         helperText="how much D9 would you like to swap" errorText="Insufficient amount" id="swapInput"
-         [formControl]="swapAmount"></ion-input>
+
+      <p>your current {{fromCurrency.name}} balance is {{fromBalance}}</p>
+      <ion-input type="number" fill="solid" label="Swap {{fromCurrency.name}}" labelPlacement="floating"
+         errorText="Insufficient amount" id="swapInput" [formControl]="swapAmount"></ion-input>
    </ion-card-content>
    <ion-button expand="full" (click)="swap()"> swap </ion-button>
 </ion-card>
-
-
-<ion-button expand="full" (click)="navigateTo('/liquidity')"> add liquidity </ion-button>
-<!-- </ion-content> -->

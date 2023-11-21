@@ -35,6 +35,8 @@ export class AmmManager implements D9Contract {
       }));
    }
 
+
+
    getUsdt(amount: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['getUsdt']({
          gasLimit: this.gasLimits.writeLimit,
@@ -47,8 +49,7 @@ export class AmmManager implements D9Contract {
       return this.contract.tx['getD9']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-         value: Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT)
-      })
+      }, Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT))
    }
 
    makeUsdtToD9Tx(amount: number): SubmittableExtrinsic<'rxjs'> {
@@ -68,5 +69,12 @@ export class AmmManager implements D9Contract {
          storageDepositLimit: environment.storage_deposit_limit,
          value: d9
       }, usdt)
+   }
+
+   removeLiquidity(): SubmittableExtrinsic<'rxjs'> {
+      return this.contract.tx['removeLiquidity']({
+         gasLimit: this.gasLimits.writeLimit,
+         storageDepositLimit: environment.storage_deposit_limit,
+      })
    }
 }

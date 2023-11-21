@@ -3,7 +3,7 @@ import { WalletService } from '../wallet/wallet.service';
 import { D9ApiService } from '../d9-api/d9-api.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, catchError, filter, firstValueFrom, lastValueFrom, take, tap } from 'rxjs';
+import { BehaviorSubject, Subscription, catchError, filter, firstValueFrom, lastValueFrom, take, tap } from 'rxjs';
 import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 
@@ -14,6 +14,7 @@ export class UsdtService {
    private usdtManager: UsdtManager | null = null;
    private usdtAllowanceSubject = new BehaviorSubject<number>(0);
    private usdtBalanceSubject = new BehaviorSubject<number>(0);
+   private addressSub: Subscription | null = null;
    constructor(private d9: D9ApiService, private transaction: TransactionsService, private wallet: WalletService) {
       this.init().catch((err) => {
          console.log(err)
@@ -24,10 +25,17 @@ export class UsdtService {
       this.usdtManager = await this.d9.getContract(environment.contracts.usdt.name)
       await this.updateBalance()
       await this.updateAllowance()
+      this.addressSub = this.wallet.getActiveAddressObservable().subscribe((address) => {
+         if (address) {
+            console.log("address in usdt service is ", address)
+            this.updateBalance().catch((err) => { })
+            this.updateAllowance().catch((err) => { })
+         }
+      })
    }
 
    getUsdtBalancePromise() {
-      return lastValueFrom(this.getUsdtBalanceObservable().pipe(
+      return lastValueFrom(this.usdtBalanceObservable().pipe(
          catchError(err => {
             console.log('Error in stream', err);
             throw err;
@@ -38,10 +46,12 @@ export class UsdtService {
       ))
    }
 
-   getUsdtBalanceObservable() {
+   usdtBalanceObservable() {
+
       return this.usdtBalanceSubject.asObservable()
    }
-   getUsdtAllowancePromise() {
+
+   usdtAllowancePromise() {
       return firstValueFrom(this.allowanceObservable())
    }
 
@@ -74,7 +84,8 @@ export class UsdtService {
          throw new Error("could not get balance")
       }
       const balance = this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
-      if (balance) this.usdtBalanceSubject.next(balance)
+      console.log("updating balance with ", balance)
+      if (balance != null) this.usdtBalanceSubject.next(balance)
    }
 
    async updateAllowance() {
