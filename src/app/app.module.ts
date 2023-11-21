@@ -26,10 +26,11 @@ import { AccountManagementComponent } from './pages/account-management/account-m
 import { NodesComponent } from './pages/nodes/nodes/nodes.component';
 import { BondComponent } from './pages/bond/bond/bond.component';
 import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
+import { CountdownModule } from 'ngx-countdown';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
    declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent],
-   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot()],
+   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot(), CountdownModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],
 })

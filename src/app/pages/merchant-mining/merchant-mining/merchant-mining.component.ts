@@ -7,7 +7,6 @@ import { substrateAddressValidator } from 'app/utils/Validators';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
 
-
 @Component({
    selector: 'app-merchant-mining',
    templateUrl: './merchant-mining.component.html',
@@ -22,10 +21,15 @@ export class MerchantMiningComponent implements OnInit {
       createdAt: 0,
       expiry: 0,
    };
-   expiry: Date | null = null;
+   expiry: number | null = null;
+   countDownConfig = {
+      format: 'HH:mm:ss',
+      leftime: 100,
+   }
    merchantSub: Subscription | null = null;
    expirySub: Subscription | null = null;
    loading: any;
+   countdown = "";
    numberOfMonths = new FormControl(1, [Validators.required, Validators.min(1)]);
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, Validators.min(47), substrateAddressValidator()]);
@@ -38,17 +42,25 @@ export class MerchantMiningComponent implements OnInit {
          }
       })
       this.expirySub = this.merchantMining.merchantExpiryObservable().subscribe((expiry) => {
-         if (expiry) {
-            this.expiry = new Date(expiry)
+
+         console.info("expiry is ", expiry)
+         if (expiry != null) {
+            this.expiry = expiry
+            console.log("expiry is past the null part", expiry)
+            console.log("expiry is ", new Date(expiry).toDateString())
+            this.countdownToFutureDate(this.expiry)
          }
       })
+
+
+
    }
 
    async ngOnInit() {
       this.loading = await this.loadingController.create({
          message: "Loading..."
       })
-      this.loading.present();
+      // this.loading.present();
    }
    ngOnDestroy() {
       this.merchantSub?.unsubscribe();
@@ -86,13 +98,33 @@ export class MerchantMiningComponent implements OnInit {
       }
    }
 
-   isExpired() {
-      if (this.expiry) {
-         console.log
-         return this.expiry.getTime() < Date.now()
+   isMerchantAccount() {
+      if (this.expiry != null) {
+         return new Date(this.expiry).getTime() > Date.now()
       }
       return false;
    }
 
+   countdownToFutureDate(futureDate: number) {
 
+
+      const interval = setInterval(() => {
+         const currentTime = new Date().getTime();
+         const timeDifference = futureDate - currentTime;
+
+         if (timeDifference <= 0) {
+            clearInterval(interval);
+            console.log('Countdown finished!');
+            return;
+         }
+
+         // Calculate days, hours, minutes, and seconds
+         const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+         this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+      }, 1000);
+   }
 }

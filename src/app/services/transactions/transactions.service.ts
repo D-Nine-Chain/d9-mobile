@@ -40,14 +40,19 @@ export class TransactionsService {
       if (callOutcome.result.isOk) {
          const contractResponse = (callOutcome.output!.toJSON()! as any).ok
          console.log("contract response is ", contractResponse)
-         if (contractResponse != null) {
-            return dataFormatter(contractResponse);
+         if (contractResponse != null) {// ok is the rust okay, some contracts response with Result others give raw data 
+            if (contractResponse.ok) {
+               return dataFormatter(contractResponse.ok);
+            } else {
+               return dataFormatter(contractResponse)
+            }
          }
       }
       return null;
    }
 
-   private processWriteOutcomes(result: ISubmittableResult): void {
+   private processWriteOutcomes<T>(result: ISubmittableResult, dataHandler?: (data: any) => void): void {
+      console.log("full result ", result.toHuman())
       console.log("processing result", result.status)
       this.notification.transactionNotification(result);
       console.log("processing result")
@@ -66,7 +71,13 @@ export class TransactionsService {
       } else if (result.status.isFuture) {
          console.log('Transaction is scheduled for a future block');
       }
-
+      if (result.status.isFinalized && !result.dispatchError) {
+         console.log("transaction result is ", result.toHuman())
+         if (dataHandler) {
+            const data = dataHandler(result);
+            console.log("data is ", data)
+         }
+      }
       // Check for dispatch error
       if (result.dispatchError) {
          // sendNotification("error", "", `${JSON.stringify(result.dispatchError.toHuman())}`)

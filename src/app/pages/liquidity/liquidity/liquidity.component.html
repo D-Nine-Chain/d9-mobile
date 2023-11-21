@@ -5,9 +5,13 @@
       </ion-card-title>
    </ion-card-header>
    <ion-card-content>
-      <div id="spaced">
+      <div class="spaced">
          <p>d9 {{formatNumber(d9Reserves)}}</p>
          <p>usdt {{formatNumber(usdtReserves)}}</p>
+      </div>
+      <div class="spaced">
+         <p>d9/usdt {{formatNumber( usdtToD9Price)}}</p>
+         <p>usdt/d9 {{formatNumber(d9toUsdtPrice)}}</p>
       </div>
       <div>
 

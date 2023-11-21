@@ -6,7 +6,7 @@ import { environment } from 'environments/environment';
 import { MerchantAccount } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { BehaviorSubject, firstValueFrom, switchMap } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
    providedIn: 'root'
@@ -14,7 +14,7 @@ import { BehaviorSubject, firstValueFrom, switchMap } from 'rxjs';
 export class MerchantMiningService {
 
    merchantManager: MerchantManager | null = null;
-   merchantExpirySubject = new BehaviorSubject<number>(new Date().getTime());
+   merchantExpirySubject = new BehaviorSubject<number | null>(null);
    merchantAccountSubject = new BehaviorSubject<MerchantAccount | null>(null);
 
    constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService) {
@@ -25,6 +25,7 @@ export class MerchantMiningService {
    }
    async init() {
       this.merchantManager = await this.d9.getContract(environment.contracts.merchant.name)
+      this.updateExpiry().catch((err) => { })
    }
 
    public merchantExpiryObservable() {
@@ -62,9 +63,11 @@ export class MerchantMiningService {
          .subscribe(async (result) => {
             if (result.status.isFinalized) {
                sub.unsubscribe()
+
                await this.updateExpiry();
             }
          })
+
    }
 
    public async updateExpiry() {
@@ -73,7 +76,7 @@ export class MerchantMiningService {
       const outcome = await this.merchantManager?.getMerchantExpiry(userAddress)
       if (!outcome) throw new Error("could not get expiry")
       const expiry = this.transaction.processReadOutcomes(outcome, this.formatExpiry)
-      if (expiry) this.merchantExpirySubject.next(expiry.getTime())
+      if (expiry) this.merchantExpirySubject.next(expiry)
 
    }
 
@@ -101,8 +104,8 @@ export class MerchantMiningService {
 
 
 
-   private formatExpiry(expiry: number): Date {
-      return new Date(expiry)
+   private formatExpiry(expiry: number): number {
+      return expiry as number
    }
 
    private formatMerchantAccount(merchantAccount: any): MerchantAccount {

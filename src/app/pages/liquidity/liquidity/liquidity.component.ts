@@ -22,6 +22,8 @@ export class LiquidityComponent implements OnInit {
    currentAllowance: number = 0;
    d9Balance: number = 0;
    usdtBalance: number = 0;
+   d9toUsdtPrice = 0;
+   usdtToD9Price = 0;
    subs: Subscription[] = []
    constructor(private assets: AssetsService, private amm: AmmService, private usdt: UsdtService) {
       let lpSub = this.amm.liquidityProviderObservable()
@@ -39,6 +41,10 @@ export class LiquidityComponent implements OnInit {
             if (reserves) {
                this.d9Reserves = reserves[0]
                this.usdtReserves = reserves[1]
+               this.d9toUsdtPrice = this.d9Reserves / this.usdtReserves
+               if (isNaN(this.d9toUsdtPrice)) { this.d9toUsdtPrice = 0 }
+               this.usdtToD9Price = this.usdtReserves / this.d9Reserves
+               if (isNaN(this.usdtToD9Price)) { this.usdtToD9Price = 0 }
             }
          })
 

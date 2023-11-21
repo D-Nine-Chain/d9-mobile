@@ -1,7 +1,11 @@
 #green-points-card {
    background-color: #2af598;
 }
-
+#countdown {
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+}
 #merchant-account-card {
    background-color: #eb0808;
    ion-card-subtitle {
