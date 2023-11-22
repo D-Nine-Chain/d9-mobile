@@ -1,5 +1,12 @@
+ion-title {
+    text-align: left;
+    padding: 10px;
+}
 #green-points-card {
    background-color: #2af598;
+   p {
+      margin: 10px 0px;
+   }
 }
 #countdown {
    display: flex;
@@ -13,9 +20,13 @@
    }
    ion-card-title {
       color: white;
-   }
+    }
    p {
       color: white;
       margin: 0;
    }
+   ion-select {
+      color: white;
+   }
+
 }
