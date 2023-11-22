@@ -17,6 +17,7 @@ import { BondComponent } from './pages/bond/bond/bond.component';
 import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
 import { PayMerchantComponent } from './pages/merchant-mining/pay-merchant/pay-merchant/pay-merchant.component';
 import { MerchantQrComponent } from './pages/merchant-mining/merchant-qr/merchant-qr.component';
+import { AllowanceRequestComponent } from './modals/allowance-request/allowance-request/allowance-request.component';
 
 const routes: Routes = [
    {
@@ -56,7 +57,8 @@ const routes: Routes = [
    { path: 'bond', component: BondComponent },
    { path: 'liquidity', component: LiquidityComponent },
    { path: 'pay-merchant', component: PayMerchantComponent },
-   { path: 'merchant-qr', component: MerchantQrComponent }
+   { path: 'merchant-qr', component: MerchantQrComponent },
+   { path: 'allowance', component: AllowanceRequestComponent },
 ];
 
 @NgModule({

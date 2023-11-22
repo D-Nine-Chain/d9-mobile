@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/forms';
+import { Component, ComponentRef, OnInit } from '@angular/core';
+import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
+import { AllowanceRequestComponent } from 'app/modals/allowance-request/allowance-request/allowance-request.component';
 import { AmmService } from 'app/services/amm/amm.service';
 
 import { AssetsService } from 'app/services/asset/asset.service';
@@ -15,6 +17,8 @@ import { Subscription } from 'rxjs';
    styleUrls: ['./swap.component.scss'],
 })
 export class SwapComponent implements OnInit {
+   currentModal: any = null;;
+   usdtAllowance: number = 0;
    d9Reserves: number = 0;
    usdtReserves: number = 0;
    fromBalance: number | string = 0;
@@ -22,9 +26,10 @@ export class SwapComponent implements OnInit {
    swapToValue: number = 0;
    fromAmount: number = 0;
    toAmount: number = 0;
+   errorText: string | null = null;;
    fromCurrency: CurrencyInfo = Utils.getCurrencyInfo(CurrencyTickerEnum.D9);
    toCurrency: CurrencyInfo = Utils.getCurrencyInfo(CurrencyTickerEnum.USDT);
-   swapAmount = new FormControl(1, [Validators.required, Validators.min(1)])
+   swapAmount = new FormControl(1, [Validators.required, Validators.min(1), this.swapValidator()]);
    swapFrom = new FormControl('D9', [Validators.required])
    d9Balances: D9Balances = {
       available: '',
@@ -36,30 +41,67 @@ export class SwapComponent implements OnInit {
    }
    usdtBalance: number = 0;
    swapSub: Subscription | null = null;
-   constructor(private assets: AssetsService, private amm: AmmService, private router: Router, private usdt: UsdtService) {
-      this.assets.d9BalancesObservable().subscribe((d9Balances) => {
+   subs: Subscription[] = []
+   constructor(private assets: AssetsService, private amm: AmmService, private router: Router, private usdt: UsdtService, public modalController: ModalController) {
+      let d9Sub = this.assets.d9BalancesObservable().subscribe((d9Balances) => {
          console.log("balances in swap", d9Balances)
          this.d9Balances = d9Balances
          this.fromBalance = d9Balances.free
 
       })
-      this.usdt.usdtBalanceObservable().subscribe((usdtBalance) => {
+      this.subs.push(d9Sub)
+      let usdtSub = this.usdt.usdtBalanceObservable().subscribe((usdtBalance) => {
          this.usdtBalance = usdtBalance
       })
-
-      this.amm.currencyReservesObservable().subscribe((reserves) => {
+      this.subs.push(usdtSub)
+      let reservesSub = this.amm.currencyReservesObservable().subscribe((reserves) => {
          if (reserves) {
             console.log("getting new reserves ")
             this.d9Reserves = reserves[0]
             this.usdtReserves = reserves[1]
          }
       });
+      this.subs.push(reservesSub)
+
+      let allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
+         if (allowance != null) {
+            this.usdtAllowance = allowance
+
+            if (this.usdtAllowance > 0) {
+               this.modalController.getTop().then((top) => {
+                  if (top) {
+                     this.modalController.dismiss()
+                  }
+               })
+            }
+         }
+
+      })
+      this.subs.push(allowanceSub)
    }
 
-   ngOnInit() {
+   async ngOnInit() {
       this.fromCurrency = Utils.getCurrencyInfo(CurrencyTickerEnum.D9);
       this.toCurrency = Utils.getCurrencyInfo(CurrencyTickerEnum.USDT);
       this.fromBalance = this.d9Balances.free;
+      if (this.usdtAllowance == 0) {
+         await this.openModal(AllowanceRequestComponent)
+      }
+   }
+
+   navigateTo(path: string) {
+      this.router.navigate([path])
+   }
+
+   async openAllowanceModal() {
+      await this.openModal(AllowanceRequestComponent)
+   }
+
+   async openModal(component: any) {
+      this.currentModal = await this.modalController.create({
+         component: component,
+      });
+      return await this.currentModal.present();
    }
 
    async swap() {
@@ -86,15 +128,69 @@ export class SwapComponent implements OnInit {
       }
    }
 
+   disableSwap() {
+      if (!this.swapAmount.valid) {
+         return true;
+      }
+      if (this.fromCurrency.ticker === CurrencyTickerEnum.D9) {
+         return this.disableD9Swap();
+      }
+      else if (this.fromCurrency.ticker === CurrencyTickerEnum.USDT) {
+         return this.disableUSDTSwap();
+      } else {
+         return true;
+      }
+   }
+
+   disableD9Swap() {
+      return false;
+   }
+
+   disableUSDTSwap() {
+      return false;
+   }
+
    sufficientBalanceValidator(): ValidatorFn {
       return (control: AbstractControl): { [key: string]: any } | null => {
          console.log("is sufficient balance", this.isBalanceSufficient())
          return this.isBalanceSufficient() ? null : { 'insufficient D9 Balance': { value: control.value } };
       }
    }
-   navigateTo(path: string) {
-      this.router.navigate([path])
+
+   swapValidator(): ValidatorFn {
+      return (control: AbstractControl): { [key: string]: any } | null => {
+         return this.isInvalidSwap(control);
+      }
    }
+
+   isInvalidSwap(control: AbstractControl): ValidationErrors | null {
+
+      if (this.fromCurrency.ticker === CurrencyTickerEnum.D9) {
+         const insufficientBalance = control.value > (this.fromBalance as number);
+         if (insufficientBalance) {
+            return this.constructError('Insufficient D9 balance', control);
+         }
+      }
+      else if (this.fromCurrency.ticker === CurrencyTickerEnum.USDT) {
+         const insufficientBalance = control.value > (this.usdtBalance as number);
+         const insufficientReserves = control.value > (this.usdtReserves as number);
+         const insufficientAllowance = control.value > (this.usdtAllowance as number);
+
+         if (insufficientBalance) {
+            return this.constructError('Insufficient USDT balance', control);
+         } else if (insufficientReserves) {
+            return this.constructError('Insufficient USDT reserves', control);
+         } else if (insufficientAllowance) {
+            return this.constructError('Insufficient USDT allowance', control);
+         }
+      }
+      return null;
+   }
+
+   constructError(errorMessage: string, control: AbstractControl): ValidationErrors {
+      return { [errorMessage]: { value: control.value } };
+   }
+
    isBalanceSufficient(): boolean {
       if (this.swapAmount) {
          if (this.swapAmount.value !== null) {
@@ -109,6 +205,8 @@ export class SwapComponent implements OnInit {
          return false;
       }
    }
+
+
 
    getCurrentBalanceString() {
       console.log("this from balance is ", this.fromBalance)

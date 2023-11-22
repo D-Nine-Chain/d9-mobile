@@ -31,7 +31,7 @@
          {{fromCurrency.name}}</ion-card-subtitle>
    </ion-card-header>
 </ion-card>
-<ion-card>
+<ion-card class="ion-padding">
    <ion-card-header>
       <ion-card-title>
          Swap
@@ -41,8 +41,12 @@
    <ion-card-content class="ion-padding">
 
       <p>your current {{fromCurrency.name}} balance is {{fromBalance}}</p>
-      <ion-input type="number" fill="solid" label="Swap {{fromCurrency.name}}" labelPlacement="floating"
-         errorText="Insufficient amount" id="swapInput" [formControl]="swapAmount"></ion-input>
+      <ion-input type="number" fill="solid" label="Swap {{fromCurrency.name}}" labelPlacement="floating" errorText=""
+         id="swapInput" errorText="" [formControl]="swapAmount"></ion-input>
    </ion-card-content>
-   <ion-button expand="full" (click)="swap()"> swap </ion-button>
+   <p> your current USDT allowance is {{usdtAllowance}}</p>
+   <div>
+      <ion-button (click)="swap()" [disabled]="swapAmount.valid"> swap </ion-button>
+      <ion-button *ngIf="fromCurrency.ticker==='USDT'" (click)="openAllowanceModal()">+ USDT allowance</ion-button>
+   </div>
 </ion-card>

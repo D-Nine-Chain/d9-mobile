@@ -1,0 +1,32 @@
+<ion-card>
+   <ion-card-header>
+      <ion-card-title>USDT Info</ion-card-title>
+   </ion-card-header>
+   <ion-card-content>
+      <div id="balance-row">
+         <div class="balance-container">
+            <p>USDT Balance</p>
+            <h2>$ {{usdtBalance}}</h2>
+         </div>
+         <div class="balance-container">
+            <p>Contract's current allowance</p>
+            <h2>$ {{currentAllowance}}</h2>
+         </div>
+      </div>
+   </ion-card-content>
+</ion-card>
+
+<ion-card>
+   <ion-card-header>
+      <ion-card-subtitle>Allowance Request</ion-card-subtitle>
+   </ion-card-header>
+   <ion-card-content>
+      <p> to do decentralized swaps you need to permit the contract to process coins on your behalf.</p>
+      <p>this will not change your balance.</p>
+      <ion-card-subtitle>current allowance is: {{currentAllowance}}</ion-card-subtitle>
+      <ion-input type="number" fill="solid" label="Increase USDT allowance" labelPlacement="floating"
+         helperText="how much allowance would you like to add" errorText="error" id="allowanceInput"
+         [formControl]="allowanceToAdd"></ion-input>
+      <ion-button [disabled]="insufficietBalance()" (click)="increaseAllowance()">increase allowance</ion-button>
+   </ion-card-content>
+</ion-card>

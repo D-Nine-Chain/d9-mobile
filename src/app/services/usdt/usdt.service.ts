@@ -60,6 +60,23 @@ export class UsdtService {
       return this.usdtAllowanceSubject.asObservable()
    }
 
+   async increaseAllowance(amount: number) {
+      console.log('increase allowance called')
+      const tx = this.usdtManager?.increaseAllowance(environment.contracts.amm.address, amount)
+      if (!tx) {
+         throw new Error("could not create tx")
+      }
+      const signedTransaction = await this.wallet.signTransaction(tx);
+      const sub = this.transaction.sendSignedTransaction(signedTransaction)
+         .subscribe((result) => {
+            console.log("result is ", result)
+            if (result.status.isFinalized) {
+               this.updateAllowance()
+               sub.unsubscribe()
+            }
+         })
+   }
+
    public async approveUsdt(amount: number) {
       const tx = this.usdtManager?.approve(environment.contracts.amm.address, amount)
       if (!tx) {
