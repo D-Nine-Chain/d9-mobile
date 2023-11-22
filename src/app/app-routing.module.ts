@@ -18,6 +18,9 @@ import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.compon
 import { PayMerchantComponent } from './pages/merchant-mining/pay-merchant/pay-merchant/pay-merchant.component';
 import { MerchantQrComponent } from './pages/merchant-mining/merchant-qr/merchant-qr.component';
 import { AllowanceRequestComponent } from './modals/allowance-request/allowance-request/allowance-request.component';
+import { NodeVotingComponent } from './pages/nodes/node-voting/node-voting/node-voting.component';
+import { SessionOverviewComponent } from './pages/nodes/session-overview/session-overview/session-overview.component';
+import { ValidatorInfoComponent } from './nodes/validator-info/validator-info/validator-info.component';
 
 const routes: Routes = [
    {
@@ -52,7 +55,11 @@ const routes: Routes = [
       path: 'account-management', component: AccountManagementComponent
    },
    {
-      path: 'nodes', component: NodesComponent
+      path: 'nodes', component: NodesComponent, children: [
+         { path: 'node-voting', component: NodeVotingComponent },
+         { path: '', component: SessionOverviewComponent },
+         { path: 'validator', component: ValidatorInfoComponent }
+      ]
    },
    { path: 'bond', component: BondComponent },
    { path: 'liquidity', component: LiquidityComponent },

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { D9ApiService } from '../d9-api/d9-api.service';
-import { BehaviorSubject, filter, firstValueFrom, from, map, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, forkJoin, from, map, switchMap, tap } from 'rxjs';
 import { WalletService } from '../wallet/wallet.service';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { TransactionsService } from '../transactions/transactions.service';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { SessionOverview } from 'app/types';
 
 @Injectable({
    providedIn: 'root'
@@ -32,6 +34,109 @@ export class NodesService {
                   validators: result[0].toJSON()
                }
             })
+         )
+   }
+
+
+
+   public getHealth() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.rpc.system.health()
+            )
+         )
+   }
+   public test() {
+      this.getNominators().subscribe((result) => {
+         console.log("nominators ", result)
+      })
+      this.getHealth().subscribe((result) => {
+         console.log("health is ", result.toHuman())
+      })
+
+      // this.getValidatorsInfo().subscribe((result) => {
+      //    console.log("validator info ", result)
+      // })
+      this.getSessionValidators().subscribe((result) => {
+         console.log("session validators ", result)
+      })
+   }
+
+   public getNominators() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.query.staking.nominators.keys()
+            )
+         )
+   }
+
+   public validatorInfo() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.query.staking.validators('ytBPqMwQPfbs9ugGHadMUjQk6VBRNWe9cRBtqPSX4eEdQR8')
+            )
+         )
+   }
+
+   public getEpochInfo() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.derive.session.info()
+            )
+         )
+   }
+
+
+   public getValidatorsInfo() {
+      this.getSessionValidators()
+         .pipe(
+            tap((result) => console.log("session validators ", result)),
+            switchMap(
+               (result: any) => {
+                  const validators = result.validators.map((validator: any) => {
+
+                  });
+                  return result
+               }
+            ),
+         )
+
+   }
+
+
+   public getValidatorsAddresses() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.query.staking.validators.keys()
+            )
+         )
+   }
+
+   public getOverview() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.derive.staking.overview()
+                  .pipe(
+                     map(result => {
+                        const overView = {
+                           activeEra: result.activeEra.toJSON(),
+                           activeEraStart: result.activeEraStart.toJSON(),
+                           currentEra: result.currentEra.toJSON(),
+                           currentIndex: result.currentIndex.toJSON(),
+                           nextElected: result.nextElected.map((validator) => { return encodeAddress(decodeAddress(validator)) }),
+                           validatorCount: result.validatorCount.toJSON(),
+                           validators: result.validators.map((validator) => { return encodeAddress(decodeAddress(validator)) })
+                        } as SessionOverview
+                        return overView;
+                     })
+                  )
+            )
          )
    }
    // public 

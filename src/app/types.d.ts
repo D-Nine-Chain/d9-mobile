@@ -139,3 +139,13 @@ export interface MerchantQrCode {
 export type QRGreenPoints = {
    greenPoints: number,
 }
+
+export interface SessionOverview {
+   activeEra: number,
+   currentIndex: number,
+   activeEraStart: number,
+   currentEra: number,
+   nextElected: string[],
+   validatorCount: number,
+   validators: string[]
+}

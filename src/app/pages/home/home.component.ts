@@ -8,6 +8,7 @@ import { Utils } from 'app/utils/utils';
 import { Router } from '@angular/router';
 import { AssetsService } from 'app/services/asset/asset.service';
 import { UsdtService } from 'app/services/usdt/usdt.service';
+import { NodesService } from 'app/services/nodes/nodes.service';
 @Component({
    selector: 'app-home',
    templateUrl: './home.component.html',
@@ -40,8 +41,8 @@ export class HomeComponent implements OnInit {
    accountSub: Subscription | null = null;
    balancesSub: Subscription | null = null;
    usdtBalanceSub: Subscription | null = null;
-   constructor(private accountService: AccountService, private router: Router, private assetsService: AssetsService, private usdtService: UsdtService) {
-
+   constructor(private accountService: AccountService, private router: Router, private assetsService: AssetsService, private usdtService: UsdtService, private node: NodesService) {
+      this.node.test()
       this.accountSub = this.accountService.getAccountObservable().subscribe((account) => {
          this.account = account
          console.log("account is ", account);

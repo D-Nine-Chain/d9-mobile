@@ -1,0 +1,14 @@
+<ion-card *ngIf="overview">
+   <ion-card-header>
+      <ion-card-title>Session Info</ion-card-title>
+      <p>activeEra:{{overview.activeEra}} </p>
+   </ion-card-header>
+</ion-card>
+<ion-list *ngIf="overview">
+   <ion-list-header>
+      <ion-label>Active Validators</ion-label>
+   </ion-list-header>
+   <ion-item button *ngFor="let validator of overview.validators" (click)="navigateTo(validator)">
+      {{validator}}
+   </ion-item>
+</ion-list>
