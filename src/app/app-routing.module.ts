@@ -21,6 +21,7 @@ import { AllowanceRequestComponent } from './modals/allowance-request/allowance-
 import { NodeVotingComponent } from './pages/nodes/node-voting/node-voting/node-voting.component';
 import { SessionOverviewComponent } from './pages/nodes/session-overview/session-overview/session-overview.component';
 import { ValidatorInfoComponent } from './nodes/validator-info/validator-info/validator-info.component';
+import { GreenAccountComponent } from './pages/green-account/green-account.component';
 
 const routes: Routes = [
    {
@@ -66,6 +67,7 @@ const routes: Routes = [
    { path: 'pay-merchant', component: PayMerchantComponent },
    { path: 'merchant-qr', component: MerchantQrComponent },
    { path: 'allowance', component: AllowanceRequestComponent },
+   { path: 'green-account', component: GreenAccountComponent },
 ];
 
 @NgModule({

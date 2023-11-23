@@ -11,28 +11,6 @@
       </ion-card-content>
    </ion-card>
 
-
-   <ion-header padding>
-      <ion-title>Green Points Account</ion-title>
-   </ion-header>
-   <ion-card id="green-points-card">
-      <ion-card-header>
-         <ion-card-title>{{formatNumber(merchantAccount.greenPoints)}}</ion-card-title>
-         <ion-card-subtitle>My Green Points</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-         <p>redeemed D9: {{merchantAccount.redeemedD9}}</p>
-         <p>redeemed USDT: {{merchantAccount.redeemedUsdt}}</p>
-         <p> Red Points: {{redPoints}}</p>
-         <p>Accelerate Red Points: {{accelerateRedPoints}}</p>
-         <ion-button expand="full" (click)="withdraw()">redeem</ion-button>
-      </ion-card-content>
-   </ion-card>
-   <!-- <ion-card>
-      <ion-card-header id="green-points-card">
-          <ion-card-subtitle>My Green Points</ion-card-subtitle>
-      </ion-card-header>
-   </ion-card> -->
    <ion-card *ngIf="isMerchantAccount()" id="merchant-account-card">
       <ion-card-header>
          <ion-card-subtitle>Merchant Account</ion-card-subtitle>
@@ -50,29 +28,6 @@
          </div>
       </ion-card-header>
    </ion-card>
-   <ion-card *ngIf="!isMerchantAccount()" id="merchant-account-card">
-      <ion-card-header>
-         <ion-card-subtitle>Subscribe</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-         <form>
-
-            <!-- <ion-input type="number" fill="solid" label="input number of months" labelPlacement="floating"
-                  errorText="must be greater than zero" id="monthsInput" [formControl]="numberOfMonths"></ion-input> -->
-            <ion-select placeholder="Select month" label="Number of months" label-placement="stacked"
-               [formControl]="numberOfMonths">
-               <ion-select-option value="1">1 month</ion-select-option>
-               <ion-select-option value="3">3 months</ion-select-option>
-               <ion-select-option value="6">6 months</ion-select-option>
-               <ion-select-option value="12">12 months</ion-select-option>
-               <ion-select-option value="24">24 months</ion-select-option>
-            </ion-select>
-         </form>
-         <ion-button (click)="subscribe()">subscribe</ion-button>
-      </ion-card-content>
-
-   </ion-card>
-
    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
       <ion-fab-button>
          <ion-icon name="chevron-up-circle"></ion-icon>

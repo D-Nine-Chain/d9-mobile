@@ -33,7 +33,7 @@ export class MerchantMiningComponent implements OnInit {
    expirySub: Subscription | null = null;
    loading: any;
    countdown = "";
-   numberOfMonths = new FormControl(1, [Validators.required, Validators.min(1)]);
+   numberOfMonths = new FormControl(0, [Validators.required, Validators.min(1)]);
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, substrateAddressValidator()]);
    accelerateRedPoints = 0;
@@ -71,20 +71,9 @@ export class MerchantMiningComponent implements OnInit {
    ngOnDestroy() {
       this.merchantSub?.unsubscribe();
    }
-   withdraw() {
-      console.log('withdraw started')
-      if (this.amountToGreenPoints.valid) {
-         const amount = this.amountToGreenPoints.value!;
-         this.merchantMining.withdrawD9(amount)
-      }
-   }
 
-   subscribe() {
-      if (this.numberOfMonths.valid) {
-         const months = this.numberOfMonths.value!;
-         this.merchantMining.subscribe(months)
-      }
-   }
+
+
    async openModal() {
       const modal = await this.modalController.create({
          component: MerchantQrComponent,
@@ -98,15 +87,6 @@ export class MerchantMiningComponent implements OnInit {
          const amount = this.amountToGreenPoints.value!;
          const address = this.toAddress.value!;
          this.merchantMining.sendGreenPoints(address, amount)
-      }
-   }
-
-   formatNumber(number: number) {
-      if (number) {
-         return Utils.formatNumberForUI(number as number)
-      }
-      else {
-         return 0;
       }
    }
 

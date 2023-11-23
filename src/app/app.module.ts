@@ -33,9 +33,11 @@ import { AllowanceRequestComponent } from './modals/allowance-request/allowance-
 import { NodeVotingComponent } from './pages/nodes/node-voting/node-voting/node-voting.component';
 import { SessionOverviewComponent } from './pages/nodes/session-overview/session-overview/session-overview.component';
 import { ValidatorInfoComponent } from './nodes/validator-info/validator-info/validator-info.component';
+import { NumberFormatPipe } from './pipes/number-format.pipe';
+import { GreenAccountComponent } from './pages/green-account/green-account.component';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, ValidatorInfoComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, ValidatorInfoComponent, NumberFormatPipe, GreenAccountComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot(), CountdownModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],
