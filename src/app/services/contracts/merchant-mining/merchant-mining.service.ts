@@ -3,7 +3,7 @@ import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { TransactionsService } from 'app/services/transactions/transactions.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
 import { environment } from 'environments/environment';
-import { MerchantAccount } from 'app/types';
+import { GreenPointsAccount } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { BehaviorSubject } from 'rxjs';
@@ -15,7 +15,7 @@ export class MerchantMiningService {
 
    merchantManager: MerchantManager | null = null;
    merchantExpirySubject = new BehaviorSubject<number | null>(null);
-   merchantAccountSubject = new BehaviorSubject<MerchantAccount | null>(null);
+   merchantAccountSubject = new BehaviorSubject<GreenPointsAccount | null>(null);
 
    constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService) {
 
@@ -26,6 +26,7 @@ export class MerchantMiningService {
    async init() {
       this.merchantManager = await this.d9.getContract(environment.contracts.merchant.name)
       this.updateExpiry().catch((err) => { })
+      this.updateMerchantAccount().catch((err) => { })
    }
 
    public merchantExpiryObservable() {
@@ -34,6 +35,31 @@ export class MerchantMiningService {
 
    public merchantAccountObservable() {
       return this.merchantAccountSubject.asObservable()
+   }
+
+   public calcTimeFactor(account: GreenPointsAccount): number {
+      const transmutationRate = 1 / 2000;
+      console.log("merchant account in time factor", account)
+      const day = environment.constants.milliseconds_per_day;
+      console.log("day is ", day)
+      const lastInteraction = account.lastConversion ?? account.createdAt;
+      console.log("last interaction", lastInteraction)
+      const now = Date.now();
+      const daysSinceLastInteraction = (now - lastInteraction) / day;
+      console.log("days since last interaction", daysSinceLastInteraction)
+      const timeFactor = account.greenPoints * transmutationRate * daysSinceLastInteraction;
+      console.log("time factor ", timeFactor)
+
+      return timeFactor;
+   }
+
+   public calcRelationshipFactor(account: GreenPointsAccount) {
+      const transmutationRate = 1 / 2000;
+      console.log("merchant account in relationship factor", account)
+      const sonsFactor = account.relationshipFactors[0] * account.greenPoints * transmutationRate * 0.10;
+      const grandsonFactor = account.relationshipFactors[1] * account.greenPoints * transmutationRate * 0.01;
+
+      return sonsFactor + grandsonFactor;
    }
 
    public async withdrawD9(amount: number) {
@@ -100,7 +126,7 @@ export class MerchantMiningService {
       if (!userAddress) throw new Error("no address")
       const outcome = await this.merchantManager?.getMerchantAccount(userAddress)
       if (!outcome) throw new Error("could not get merchant account")
-      const merchantAccount = this.transaction.processReadOutcomes(outcome, this.formatMerchantAccount)
+      const merchantAccount = this.transaction.processReadOutcomes(outcome, this.formatGreenPointsAccount)
       if (merchantAccount) this.merchantAccountSubject.next(merchantAccount)
    }
 
@@ -110,13 +136,15 @@ export class MerchantMiningService {
       return expiry as number
    }
 
-   private formatMerchantAccount(merchantAccount: any): MerchantAccount {
-      const formattedMerchantAccount: MerchantAccount = {
+   private formatGreenPointsAccount(merchantAccount: any): GreenPointsAccount {
+      console.log("merchant account is ", merchantAccount)
+      const formattedMerchantAccount: GreenPointsAccount = {
          greenPoints: Utils.reduceByCurrencyDecimal(merchantAccount.greenPoints, CurrencyTickerEnum.D9),
+         relationshipFactors: merchantAccount.relationshipFactors,
          lastConversion: merchantAccount.lastConversion,
          redeemedUsdt: Utils.reduceByCurrencyDecimal(merchantAccount.redeemedUsdt, CurrencyTickerEnum.USDT),
          redeemedD9: Utils.reduceByCurrencyDecimal(merchantAccount.redeemedD9, CurrencyTickerEnum.D9),
-         createdAt: merchantAccount,
+         createdAt: merchantAccount.createdAt,
          expiry: merchantAccount.expiry,
       }
       return formattedMerchantAccount;

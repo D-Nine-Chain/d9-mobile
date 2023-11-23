@@ -43,7 +43,12 @@ export class TransactionsService {
          if (contractResponse != null) {// ok is the rust okay, some contracts response with Result others give raw data 
             if (contractResponse.ok) {
                return dataFormatter(contractResponse.ok);
-            } else {
+            } else if (contractResponse.err) {
+               console.log("contract response error is ", contractResponse.err)
+               console.log("handling err later")
+               return null;
+            }
+            else {
                return dataFormatter(contractResponse)
             }
          }

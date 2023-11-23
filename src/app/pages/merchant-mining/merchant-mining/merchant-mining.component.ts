@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { MerchantMiningService } from 'app/services/contracts/merchant-mining/merchant-mining.service';
-import { MerchantAccount } from 'app/types';
+import { GreenPointsAccount } from 'app/types';
 import { substrateAddressValidator } from 'app/utils/Validators';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
@@ -15,8 +15,9 @@ import { MerchantQrComponent } from '../merchant-qr/merchant-qr.component';
 })
 export class MerchantMiningComponent implements OnInit {
 
-   merchantAccount: MerchantAccount = {
+   merchantAccount: GreenPointsAccount = {
       greenPoints: 0,
+      relationshipFactors: [0, 0],
       lastConversion: 0,
       redeemedUsdt: 0,
       redeemedD9: 0,
@@ -34,12 +35,16 @@ export class MerchantMiningComponent implements OnInit {
    countdown = "";
    numberOfMonths = new FormControl(1, [Validators.required, Validators.min(1)]);
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
-   toAddress = new FormControl('', [Validators.required, Validators.min(47), substrateAddressValidator()]);
+   toAddress = new FormControl('', [Validators.required, substrateAddressValidator()]);
+   accelerateRedPoints = 0;
+   redPoints = 0;
    constructor(private merchantMining: MerchantMiningService, private loadingController: LoadingController, public modalController: ModalController) {
       this.merchantSub = this.merchantMining.merchantAccountObservable().subscribe((merchantAccount) => {
          if (merchantAccount) {
             this.merchantAccount = merchantAccount
+            this.redPoints = this.merchantMining.calcTimeFactor(merchantAccount)
             console.log("merchant account", merchantAccount)
+            this.accelerateRedPoints = this.merchantMining.calcRelationshipFactor(merchantAccount)
             this.loading?.dismiss();
          }
       })
@@ -48,9 +53,8 @@ export class MerchantMiningComponent implements OnInit {
          console.info("expiry is ", expiry)
          if (expiry != null) {
             this.expiry = expiry
-            console.log("expiry is past the null part", expiry)
-            console.log("expiry is ", new Date(expiry).toDateString())
             this.countdownToFutureDate(this.expiry)
+
          }
       })
 
@@ -117,9 +121,8 @@ export class MerchantMiningComponent implements OnInit {
 
    }
 
+
    countdownToFutureDate(futureDate: number) {
-
-
       const interval = setInterval(() => {
          const currentTime = new Date().getTime();
          const timeDifference = futureDate - currentTime;

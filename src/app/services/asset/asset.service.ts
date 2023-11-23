@@ -31,8 +31,6 @@ export class AssetsService {
    private async init() {
 
       const api = await this.d9.getApi();
-      console.log("query is ", api.query);
-      console.log("transaction is ", api.tx)
    }
 
    public async d9BalancesPromise(): Promise<D9Balances> {

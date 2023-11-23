@@ -13,6 +13,9 @@ export const environment = {
    preferences_root_address: "d9_root_address",
    preferences_d9_soft_derivation_counter: "d9_soft_derivation_counter",
    preferences_assets: "d9_assets",
+   constants: {
+      milliseconds_per_day: 600000,
+   },
    contracts: {
       burn_manager: {
          address: "v4GeJMACGhNDr51pqii4rA6hDmXWgBzwVrVh4AGSBztSyAP",
@@ -23,7 +26,7 @@ export const environment = {
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "uXgbtFchEBq4frLX5HH55ZM5vPDmfbJb2NYFzpow19etiQD",
+         address: "xmmC5bcLix36extBt59kdDpqGETud1Nvgk1UnNkcx6kjvhY",
          name: "d9_merchant_mining"
       },
       amm: {

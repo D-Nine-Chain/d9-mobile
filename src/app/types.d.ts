@@ -64,8 +64,9 @@ export interface BurnMinerAccount {
 export interface ContractErr {
    err: string;
 }
-export interface MerchantAccount {
+export interface GreenPointsAccount {
    greenPoints: number;
+   relationshipFactors: [number, number]
    lastConversion: any;
    redeemedUsdt: number;
    redeemedD9: number;
