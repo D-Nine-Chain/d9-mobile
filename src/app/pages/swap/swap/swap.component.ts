@@ -169,9 +169,9 @@ export class SwapComponent implements OnInit {
          const insufficientAllowance = control.value > (this.usdtAllowance as number);
 
          if (insufficientBalance) {
-            return this.constructError('Insufficient USDT balance', control);
+                        return this.constructError('Insufficient USDT balance', control);
          } else if (insufficientReserves) {
-            return this.constructError('Insufficient USDT reserves', control);
+                      return this.constructError('Insufficient USDT reserves', control);
          } else if (insufficientAllowance) {
 
             return this.constructError('Insufficient USDT allowance', control);
@@ -181,7 +181,7 @@ export class SwapComponent implements OnInit {
    }
 
    constructError(errorMessage: string, control: AbstractControl): ValidationErrors {
-      return { [errorMessage]: { value: control.value } };
+      return { ['customError']: { message: errorMessage, value: control.value } };
    }
 
    isBalanceSufficient(): boolean {
@@ -241,7 +241,7 @@ export class SwapComponent implements OnInit {
    }
 
    onSelectChange(event: any) {
-      // const selection = 
+      // const selection =
       this.selectedSwap = event.target.value;
       if (this.selectedSwap.startsWith('USDT')) {
          this.setCurrenciesForSwap(CurrencyTickerEnum.USDT, CurrencyTickerEnum.D9)
