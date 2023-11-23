@@ -10,6 +10,7 @@ import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { CurrencyInfo, D9Balances, LiquidityProvider } from 'app/types';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
+import { ConfirmationComponent } from 'app/modals/swap/confirmation/confirmation.component';
 
 @Component({
    selector: 'app-swap',
@@ -109,6 +110,15 @@ export class SwapComponent implements OnInit {
          await this.amm.swap(swap)
          // this.router.navigate(['/home'])
       }
+
+      // not using openModal is custom modal
+      this.currentModal = await this.modalController.create({
+        component: ConfirmationComponent,
+        breakpoints: [0, 2],
+        initialBreakpoint: 1,
+        handle: false,
+      });
+      return await this.currentModal.present();
    }
 
    formatNumber(number: number | string) {

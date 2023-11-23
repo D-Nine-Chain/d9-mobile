@@ -22,6 +22,7 @@ import { NodeVotingComponent } from './pages/nodes/node-voting/node-voting/node-
 import { SessionOverviewComponent } from './pages/nodes/session-overview/session-overview/session-overview.component';
 import { ValidatorInfoComponent } from './nodes/validator-info/validator-info/validator-info.component';
 import { GreenAccountComponent } from './pages/green-account/green-account.component';
+import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.component';
 
 const routes: Routes = [
    {
@@ -67,6 +68,7 @@ const routes: Routes = [
    { path: 'pay-merchant', component: PayMerchantComponent },
    { path: 'merchant-qr', component: MerchantQrComponent },
    { path: 'allowance', component: AllowanceRequestComponent },
+   { path: 'swap-confirmation', component: ConfirmationComponent },
    { path: 'green-account', component: GreenAccountComponent },
 ];
 
