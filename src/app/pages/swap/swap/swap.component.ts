@@ -1,4 +1,4 @@
-import { Component, ComponentRef, OnInit } from '@angular/core';
+import { Component, ComponentRef, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
@@ -27,7 +27,7 @@ export class SwapComponent implements OnInit {
    fromAmount: number = 0;
    toAmount: number = 0;
    errorText: string | null = null;;
-   fromCurrency: CurrencyInfo = Utils.getCurrencyInfo(CurrencyTickerEnum.D9);
+   @Input() fromCurrency: CurrencyInfo = Utils.getCurrencyInfo(CurrencyTickerEnum.D9);
    toCurrency: CurrencyInfo = Utils.getCurrencyInfo(CurrencyTickerEnum.USDT);
    swapAmount = new FormControl(1, [Validators.required, Validators.min(1), this.swapValidator()]);
    swapFrom = new FormControl('D9', [Validators.required])
@@ -66,27 +66,19 @@ export class SwapComponent implements OnInit {
       let allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
          if (allowance != null) {
             this.usdtAllowance = allowance
-
-            if (this.usdtAllowance > 0) {
-               this.modalController.getTop().then((top) => {
-                  if (top) {
-                     this.modalController.dismiss()
-                  }
-               })
-            }
+            console.log(`allowance in swap component is ${allowance}`)
          }
 
       })
       this.subs.push(allowanceSub)
    }
 
+
    async ngOnInit() {
       this.fromCurrency = Utils.getCurrencyInfo(CurrencyTickerEnum.D9);
       this.toCurrency = Utils.getCurrencyInfo(CurrencyTickerEnum.USDT);
       this.fromBalance = this.d9Balances.free;
-      if (this.usdtAllowance == 0) {
-         await this.openModal(AllowanceRequestComponent)
-      }
+
    }
 
    navigateTo(path: string) {
@@ -181,6 +173,7 @@ export class SwapComponent implements OnInit {
          } else if (insufficientReserves) {
             return this.constructError('Insufficient USDT reserves', control);
          } else if (insufficientAllowance) {
+
             return this.constructError('Insufficient USDT allowance', control);
          }
       }
