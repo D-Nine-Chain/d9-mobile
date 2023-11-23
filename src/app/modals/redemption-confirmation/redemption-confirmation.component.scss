@@ -1,0 +1,17 @@
+#balance-row {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+}
+
+#currency-symbol {
+   font-size: 2.5rem;
+}
+
+.balance-container {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+
+}

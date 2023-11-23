@@ -36,10 +36,10 @@ import { ValidatorInfoComponent } from './nodes/validator-info/validator-info/va
 import { NumberFormatPipe } from './pipes/number-format.pipe';
 import { GreenAccountComponent } from './pages/green-account/green-account.component';
 import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.component';
-
+import { RedemptionConfirmationComponent } from './modals/redemption-confirmation/redemption-confirmation.component';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantAccountComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, ValidatorInfoComponent, NumberFormatPipe, GreenAccountComponent, ConfirmationComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantAccountComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, ValidatorInfoComponent, NumberFormatPipe, GreenAccountComponent, ConfirmationComponent, RedemptionConfirmationComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot(), CountdownModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],
