@@ -16,7 +16,9 @@ export class MerchantManager implements D9Contract {
       this.gasLimits = gasLimits;
    }
 
+
    getMerchantExpiry(address: string): Promise<ContractCallOutcome> {
+      console.log(`getting merchant expiry for ${address}`)
       return firstValueFrom(this.contract.query['getExpiry'](address, {
          gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit,

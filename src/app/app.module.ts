@@ -16,7 +16,7 @@ import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining
 import { SettingsComponent } from './pages/settings/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { MerchantMiningComponent } from './pages/merchant-mining/merchant-mining/merchant-mining.component';
+import { MerchantAccountComponent } from './pages/merchant-account/merchant-account/merchant-account.component';
 import { SendComponent } from './pages/send/send/send.component';
 import { ReceiveComponent } from './pages/receive/receive/receive.component';
 import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.component';
@@ -27,8 +27,8 @@ import { NodesComponent } from './pages/nodes/nodes/nodes.component';
 import { BondComponent } from './pages/bond/bond/bond.component';
 import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
 import { CountdownModule } from 'ngx-countdown';
-import { PayMerchantComponent } from './pages/merchant-mining/pay-merchant/pay-merchant/pay-merchant.component';
-import { MerchantQrComponent } from './pages/merchant-mining/merchant-qr/merchant-qr.component';
+import { PayMerchantComponent } from './pages/merchant-account/pay-merchant/pay-merchant/pay-merchant.component';
+import { MerchantQrComponent } from './pages/merchant-account/merchant-qr/merchant-qr.component';
 import { AllowanceRequestComponent } from './modals/allowance-request/allowance-request/allowance-request.component';
 import { NodeVotingComponent } from './pages/nodes/node-voting/node-voting/node-voting.component';
 import { SessionOverviewComponent } from './pages/nodes/session-overview/session-overview/session-overview.component';
@@ -37,7 +37,7 @@ import { NumberFormatPipe } from './pipes/number-format.pipe';
 import { GreenAccountComponent } from './pages/green-account/green-account.component';
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantMiningComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, ValidatorInfoComponent, NumberFormatPipe, GreenAccountComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnMiningComponent, SettingsComponent, MerchantAccountComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, ValidatorInfoComponent, NumberFormatPipe, GreenAccountComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot(), CountdownModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],

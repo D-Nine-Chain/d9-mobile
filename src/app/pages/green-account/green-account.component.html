@@ -1,51 +1,27 @@
 <ion-content class="ion-padding">
-  <div *ngIf="!isGreenAccount">You don't have a green account.</div>
+   <div *ngIf="!isGreenAccount">You don't have a green account.</div>
 
-  <div *ngIf="isGreenAccount">
-    <ion-header>
-      <ion-title>Green Points Account</ion-title>
-    </ion-header>
-    <ion-card id="green-points-card">
-      <ion-card-header>
-        <ion-card-title>{{
-          merchantAccount.greenPoints | numberFormat
-        }}</ion-card-title>
-        <ion-card-subtitle>My Green Points</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <p>redeemed D9: {{ merchantAccount.redeemedD9 }}</p>
-        <p>redeemed USDT: {{ merchantAccount.redeemedUsdt }}</p>
-        <p>Red Points: {{ redPoints }}</p>
-        <p>Accelerate Red Points: {{ accelerateRedPoints }}</p>
-        <ion-button expand="full" (click)="withdraw()">redeem</ion-button>
-      </ion-card-content>
-    </ion-card>
+   <div *ngIf="isGreenAccount">
+      <ion-header>
+         <ion-title>Green Points Account</ion-title>
+      </ion-header>
+      <ion-card id="green-points-card" *ngIf="greenPointsAccount">
+         <ion-card-header>
+            <ion-card-title>{{
+               greenPointsAccount.greenPoints-redPoints-accelerateRedPoints | numberFormat
+               }}</ion-card-title>
+            <ion-card-subtitle>My Green Points</ion-card-subtitle>
+         </ion-card-header>
+         <ion-card-content>
+            <p>redeemed D9: {{ greenPointsAccount.redeemedD9 }}</p>
+            <p>redeemed USDT: {{ greenPointsAccount.redeemedUsdt }}</p>
+            <p>Red Points: {{ redPoints }}</p>
+            <p>Accelerate Red Points: {{ accelerateRedPoints }}</p>
+            <ion-button expand="full" (click)="withdraw()">redeem</ion-button>
+         </ion-card-content>
+      </ion-card>
 
-    <ion-card id="merchant-account-card">
-      <ion-card-header>
-        <ion-card-subtitle>Subscribe</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <form>
-          <ion-select
-            placeholder="Select month"
-            label="Number of months"
-            label-placement="stacked"
-            [formControl]="numberOfMonths"
-          >
-            <ion-select-option value="1">1 month</ion-select-option>
-            <ion-select-option value="3">3 months</ion-select-option>
-            <ion-select-option value="6">6 months</ion-select-option>
-            <ion-select-option value="12">12 months</ion-select-option>
-            <ion-select-option value="24">24 months</ion-select-option>
-          </ion-select>
-          <ion-button
-            (click)="subscribe()"
-            [disabled]="numberOfMonths.value === 0"
-            >subscribe</ion-button
-          >
-        </form>
-      </ion-card-content>
-    </ion-card>
-  </div>
+
+
+   </div>
 </ion-content>

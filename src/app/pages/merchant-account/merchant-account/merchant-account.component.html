@@ -19,7 +19,7 @@
                <form>
                   <ion-input type="text" fill="solid" label="enter address" labelPlacement="floating"
                      errorText="must be valid address" id="addressInput" [formControl]="toAddress"></ion-input>
-                  <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
+                  <ion-input type="number" fill="solid" label="input D9" labelPlacement="floating"
                      errorText="must be greater than zero" id="burnInput"
                      [formControl]="amountToGreenPoints"></ion-input>
                </form>
@@ -28,16 +28,25 @@
          </div>
       </ion-card-header>
    </ion-card>
-   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-      <ion-fab-button>
-         <ion-icon name="chevron-up-circle"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-list side="top" *ngIf="isMerchantAccount()">
-         <ion-fab-button>
-            <ion-icon name="qr-code-outline" (click)="openModal()"></ion-icon>
-         </ion-fab-button>
 
-      </ion-fab-list>
-   </ion-fab>
+
 </ion-content>
-<ion-button (click)="openModal()">merchant qr code </ion-button>
+<ion-card id="merchant-account-card">
+   <ion-card-header>
+      <ion-card-subtitle>Subscribe</ion-card-subtitle>
+   </ion-card-header>
+   <ion-card-content>
+      <form>
+         <ion-select placeholder="Select month" label="Number of months" label-placement="stacked"
+            [formControl]="numberOfMonths">
+            <ion-select-option value="1">1 month</ion-select-option>
+            <ion-select-option value="3">3 months</ion-select-option>
+            <ion-select-option value="6">6 months</ion-select-option>
+            <ion-select-option value="12">12 months</ion-select-option>
+            <ion-select-option value="24">24 months</ion-select-option>
+         </ion-select>
+         <ion-button (click)="subscribe()" [disabled]="numberOfMonths.value === 0">subscribe</ion-button>
+      </form>
+   </ion-card-content>
+</ion-card>
+<ion-button (click)="openModal()" *ngIf="">merchant qr code </ion-button>

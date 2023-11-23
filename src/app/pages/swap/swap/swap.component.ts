@@ -3,10 +3,10 @@ import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { AllowanceRequestComponent } from 'app/modals/allowance-request/allowance-request/allowance-request.component';
-import { AmmService } from 'app/services/amm/amm.service';
+import { AmmService } from 'app/services/contracts/amm/amm.service';
 
 import { AssetsService } from 'app/services/asset/asset.service';
-import { UsdtService } from 'app/services/usdt/usdt.service';
+import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { CurrencyInfo, D9Balances, LiquidityProvider } from 'app/types';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
@@ -169,9 +169,9 @@ export class SwapComponent implements OnInit {
          const insufficientAllowance = control.value > (this.usdtAllowance as number);
 
          if (insufficientBalance) {
-                        return this.constructError('Insufficient USDT balance', control);
+            return this.constructError('Insufficient USDT balance', control);
          } else if (insufficientReserves) {
-                      return this.constructError('Insufficient USDT reserves', control);
+            return this.constructError('Insufficient USDT reserves', control);
          } else if (insufficientAllowance) {
 
             return this.constructError('Insufficient USDT allowance', control);

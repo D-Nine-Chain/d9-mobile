@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { WalletService } from '../wallet/wallet.service';
-import { D9ApiService } from '../d9-api/d9-api.service';
-import { TransactionsService } from '../transactions/transactions.service';
+import { WalletService } from '../../wallet/wallet.service';
+import { D9ApiService } from '../../d9-api/d9-api.service';
+import { TransactionsService } from '../../transactions/transactions.service';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Subscription, catchError, filter, firstValueFrom, lastValueFrom, take, tap } from 'rxjs';
 import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';

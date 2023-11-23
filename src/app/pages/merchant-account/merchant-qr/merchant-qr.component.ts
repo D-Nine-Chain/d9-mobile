@@ -1,11 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { MerchantMiningService } from 'app/services/contracts/merchant-mining/merchant-mining.service';
 import { QrCodeService } from 'app/services/qr-code/qr-code.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
 import { D9QrCode, MerchantQrCode } from 'app/types';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
-
+import { MerchantService } from 'app/services/contracts/merchant/merchant.service';
 @Component({
    selector: 'app-merchant-qr',
    templateUrl: './merchant-qr.component.html',
@@ -15,7 +14,7 @@ export class MerchantQrComponent implements OnInit {
    @ViewChild('qrCodeContainer') qrCodeContainer!: ElementRef;
    subs: any[] = [];
    address: string = '';
-   constructor(private modalControl: ModalController, private wallet: WalletService, private qrcode: QrCodeService, private merchant: MerchantMiningService) { }
+   constructor(private modalControl: ModalController, private wallet: WalletService, private qrcode: QrCodeService, private merchant: MerchantService) { }
 
    ngOnInit() { }
    async ngAfterViewInit() {

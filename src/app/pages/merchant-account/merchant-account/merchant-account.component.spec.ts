@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { MerchantMiningComponent } from './merchant-mining.component';
+import { MerchantAccountComponent } from './merchant-account.component';
 
-describe('MerchantMiningComponent', () => {
-  let component: MerchantMiningComponent;
-  let fixture: ComponentFixture<MerchantMiningComponent>;
+describe('MerchantAccountComponent', () => {
+  let component: MerchantAccountComponent;
+  let fixture: ComponentFixture<MerchantAccountComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MerchantMiningComponent ],
+      declarations: [ MerchantAccountComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MerchantMiningComponent);
+    fixture = TestBed.createComponent(MerchantAccountComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

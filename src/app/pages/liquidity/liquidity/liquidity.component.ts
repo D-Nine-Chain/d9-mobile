@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/forms';
-import { AmmService } from 'app/services/amm/amm.service';
+import { AmmService } from 'app/services/contracts/amm/amm.service';
 import { AssetsService } from 'app/services/asset/asset.service';
-import { UsdtService } from 'app/services/usdt/usdt.service';
+import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { LiquidityProvider } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';

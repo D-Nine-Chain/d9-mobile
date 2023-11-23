@@ -26,7 +26,7 @@ export const environment = {
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "xmmC5bcLix36extBt59kdDpqGETud1Nvgk1UnNkcx6kjvhY",
+         address: "wGXQwuJ4YXa9dmmjYc7MeowKxBYsgHLF7Sa9AVQGv5SwKz8",
          name: "d9_merchant_mining"
       },
       amm: {
@@ -36,7 +36,16 @@ export const environment = {
       usdt: {
          address: "z4mr21CwkZW6njfyGUBFP3JGm9KeBgzD5dsYqSotrYfxuaz",
          name: "d9_usdt"
-      }
+      },
+      node_reward: {
+         address: "ybyN3459G8z2qdAxNTT3hbt4BXDPdb9NEa7dkGfHGMAAriB",
+         name: "d9_node_reward"
+      },
+      mining_pool: {
+         address: "zNxJXSavSe7bWs4q6CqSQS27rY4SjcZpSmVUvNGdKzdSL3o",
+         name: "d9_mining_pool"
+      },
+
    }
 };
 /*

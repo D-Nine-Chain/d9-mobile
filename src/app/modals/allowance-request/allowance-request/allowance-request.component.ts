@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-import { UsdtService } from 'app/services/usdt/usdt.service';
+import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { Subscription } from 'rxjs';
 
 @Component({

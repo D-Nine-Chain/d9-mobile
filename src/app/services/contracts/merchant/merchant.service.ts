@@ -6,17 +6,17 @@ import { environment } from 'environments/environment';
 import { GreenPointsAccount } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, filter, from, map, switchMap, tap } from 'rxjs';
 
 @Injectable({
    providedIn: 'root'
 })
-export class MerchantMiningService {
+export class MerchantService {
 
    merchantManager: MerchantManager | null = null;
    merchantExpirySubject = new BehaviorSubject<number | null>(null);
    merchantAccountSubject = new BehaviorSubject<GreenPointsAccount | null>(null);
-
+   merchantManagerSubject = new BehaviorSubject<MerchantManager | null>(null);
    constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService) {
 
       this.init().catch((err) => {
@@ -25,16 +25,51 @@ export class MerchantMiningService {
    }
    async init() {
       this.merchantManager = await this.d9.getContract(environment.contracts.merchant.name)
-      this.updateExpiry().catch((err) => { })
-      this.updateMerchantAccount().catch((err) => { })
+      this.merchantManagerSubject.next(this.merchantManager)
+      this.updateGreenPointsAccount().catch((err) => { })
    }
 
    public merchantExpiryObservable() {
-      return this.merchantExpirySubject.asObservable()
+      return this.merchantManagerObservable()
+         .pipe(
+            filter((manager) => manager != null),
+            switchMap((manager) => {
+               return this.wallet.getActiveAddressObservable()
+                  .pipe(
+                     filter((address) => address != null),
+                     switchMap((address) => {
+                        console.log(`address for merchant account is ${address}`)
+                        return from(manager!.getMerchantExpiry(address!))
+                     }),
+                     map((callOutcome) => this.transaction.processReadOutcomes(callOutcome, this.formatExpiry)),
+                     tap((expiry) => { console.log(`expiry ${expiry}`) }),
+                  )
+            })
+         )
    }
 
-   public merchantAccountObservable() {
-      return this.merchantAccountSubject.asObservable()
+   public greenPointsAccountObservable() {
+      return this.merchantManagerObservable()
+         .pipe(
+            filter((manager) => manager != null),
+            switchMap((manager) => {
+               return this.wallet.getActiveAddressObservable()
+                  .pipe(
+                     filter((address) => address != null),
+                     switchMap((address) => {
+                        console.log(`address for merchant account is ${address}`)
+                        return from(manager!.getMerchantAccount(address!))
+                     }),
+                     map((callOutcome) => this.transaction.processReadOutcomes(callOutcome, this.formatGreenPointsAccount)),
+                     switchMap((greenAccount) => {
+                        console.log(`green account is ${greenAccount} in switch map`)
+                        this.merchantAccountSubject.next(greenAccount)
+                        return this.merchantAccountSubject.asObservable()
+                     }),
+                     tap((greenAccount) => { console.log(`expiry ${greenAccount}`) }),
+                  )
+            })
+         )
    }
 
    public calcTimeFactor(account: GreenPointsAccount): number {
@@ -98,12 +133,12 @@ export class MerchantMiningService {
 
    public async updateExpiry() {
       const userAddress = await this.wallet.getAddressPromise();
+      console.log(`address for merchant account is ${userAddress}`)
       if (!userAddress) throw new Error("no address")
       const outcome = await this.merchantManager?.getMerchantExpiry(userAddress)
       if (!outcome) throw new Error("could not get expiry")
       const expiry = this.transaction.processReadOutcomes(outcome, this.formatExpiry)
       if (expiry) this.merchantExpirySubject.next(expiry)
-
    }
 
    public async sendGreenPoints(toAddress: string, amount: number) {
@@ -114,14 +149,16 @@ export class MerchantMiningService {
          .subscribe(async (result) => {
             if (result.status.isFinalized) {
                sub.unsubscribe()
-               await this.updateMerchantAccount()
+               await this.updateGreenPointsAccount()
             }
          })
    }
 
+   private merchantManagerObservable() {
+      return this.merchantManagerSubject.asObservable()
+   }
 
-
-   public async updateMerchantAccount() {
+   public async updateGreenPointsAccount() {
       const userAddress = await this.wallet.getAddressPromise();
       if (!userAddress) throw new Error("no address")
       const outcome = await this.merchantManager?.getMerchantAccount(userAddress)
@@ -136,18 +173,19 @@ export class MerchantMiningService {
       return expiry as number
    }
 
-   private formatGreenPointsAccount(merchantAccount: any): GreenPointsAccount {
-      console.log("merchant account is ", merchantAccount)
-      const formattedMerchantAccount: GreenPointsAccount = {
-         greenPoints: Utils.reduceByCurrencyDecimal(merchantAccount.greenPoints, CurrencyTickerEnum.D9),
-         relationshipFactors: merchantAccount.relationshipFactors,
-         lastConversion: merchantAccount.lastConversion,
-         redeemedUsdt: Utils.reduceByCurrencyDecimal(merchantAccount.redeemedUsdt, CurrencyTickerEnum.USDT),
-         redeemedD9: Utils.reduceByCurrencyDecimal(merchantAccount.redeemedD9, CurrencyTickerEnum.D9),
-         createdAt: merchantAccount.createdAt,
-         expiry: merchantAccount.expiry,
+   private formatGreenPointsAccount(greenPointsAccount: any): GreenPointsAccount {
+      console.log("merchant account is ", greenPointsAccount)
+      const formattedGreenPoints: GreenPointsAccount = {
+         greenPoints: Utils.reduceByCurrencyDecimal(greenPointsAccount.greenPoints, CurrencyTickerEnum.GREEN_POINTS),
+         relationshipFactors: greenPointsAccount.relationshipFactors,
+         lastConversion: greenPointsAccount.lastConversion,
+         redeemedUsdt: Utils.reduceByCurrencyDecimal(greenPointsAccount.redeemedUsdt, CurrencyTickerEnum.USDT),
+         redeemedD9: Utils.reduceByCurrencyDecimal(greenPointsAccount.redeemedD9, CurrencyTickerEnum.D9),
+         createdAt: greenPointsAccount.createdAt,
+         expiry: greenPointsAccount.expiry,
       }
-      return formattedMerchantAccount;
+      console.log("formatted green points is ", formattedGreenPoints)
+      return formattedGreenPoints;
    }
 
 }

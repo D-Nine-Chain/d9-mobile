@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AssetsService } from 'app/services/asset/asset.service';
-import { UsdtService } from 'app/services/usdt/usdt.service';
+import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { substrateAddressValidator } from 'app/utils/Validators';
 
 @Component({

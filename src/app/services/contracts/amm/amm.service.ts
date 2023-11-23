@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { WalletService } from '../wallet/wallet.service';
-import { D9ApiService } from '../d9-api/d9-api.service';
-import { TransactionsService } from '../transactions/transactions.service';
-import { GenericContractServiceBase } from '../contracts/generic-contract/generic-contract.service';
+import { WalletService } from '../../wallet/wallet.service';
+import { D9ApiService } from '../../d9-api/d9-api.service';
+import { TransactionsService } from '../../transactions/transactions.service';
+import { GenericContractServiceBase } from '../generic-contract/generic-contract.service';
 import { environment } from 'environments/environment';
-import { GenericContractServiceInterface } from '../contracts/generic-contract/generic-interface';
+import { GenericContractServiceInterface } from '../generic-contract/generic-interface';
 import { D9Contract } from 'app/contracts/contracts';
 import { AmmManager } from 'app/contracts/amm-manager/amm-manager';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
@@ -12,7 +12,7 @@ import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { Asset, LiquidityProvider } from 'app/types';
 import { UsdtService } from '../usdt/usdt.service';
 import { BehaviorSubject, firstValueFrom, lastValueFrom, take, tap } from 'rxjs';
-import { AssetsService } from '../asset/asset.service';
+import { AssetsService } from '../../asset/asset.service';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
 @Injectable({

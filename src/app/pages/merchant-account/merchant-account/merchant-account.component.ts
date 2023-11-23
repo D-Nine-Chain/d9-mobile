@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { LoadingController, ModalController } from '@ionic/angular';
-import { MerchantMiningService } from 'app/services/contracts/merchant-mining/merchant-mining.service';
+import { MerchantService } from 'app/services/contracts/merchant/merchant.service';
 import { GreenPointsAccount } from 'app/types';
 import { substrateAddressValidator } from 'app/utils/Validators';
 import { Utils } from 'app/utils/utils';
@@ -9,11 +9,11 @@ import { Subscription } from 'rxjs';
 import { MerchantQrComponent } from '../merchant-qr/merchant-qr.component';
 
 @Component({
-   selector: 'app-merchant-mining',
-   templateUrl: './merchant-mining.component.html',
-   styleUrls: ['./merchant-mining.component.scss'],
+   selector: 'app-merchant-account',
+   templateUrl: './merchant-account.component.html',
+   styleUrls: ['./merchant-account.component.scss'],
 })
-export class MerchantMiningComponent implements OnInit {
+export class MerchantAccountComponent implements OnInit {
 
    merchantAccount: GreenPointsAccount = {
       greenPoints: 0,
@@ -29,7 +29,6 @@ export class MerchantMiningComponent implements OnInit {
       format: 'HH:mm:ss',
       leftime: 100,
    }
-   merchantSub: Subscription | null = null;
    expirySub: Subscription | null = null;
    loading: any;
    countdown = "";
@@ -38,28 +37,17 @@ export class MerchantMiningComponent implements OnInit {
    toAddress = new FormControl('', [Validators.required, substrateAddressValidator()]);
    accelerateRedPoints = 0;
    redPoints = 0;
-   constructor(private merchantMining: MerchantMiningService, private loadingController: LoadingController, public modalController: ModalController) {
-      this.merchantSub = this.merchantMining.merchantAccountObservable().subscribe((merchantAccount) => {
-         if (merchantAccount) {
-            this.merchantAccount = merchantAccount
-            this.redPoints = this.merchantMining.calcTimeFactor(merchantAccount)
-            console.log("merchant account", merchantAccount)
-            this.accelerateRedPoints = this.merchantMining.calcRelationshipFactor(merchantAccount)
-            this.loading?.dismiss();
-         }
-      })
-      this.expirySub = this.merchantMining.merchantExpiryObservable().subscribe((expiry) => {
+   constructor(private merchantService: MerchantService, private loadingController: LoadingController, public modalController: ModalController) {
+
+      this.expirySub = this.merchantService.merchantExpiryObservable().subscribe((expiry) => {
 
          console.info("expiry is ", expiry)
-         if (expiry != null) {
-            this.expiry = expiry
+         this.expiry = expiry
+         if (this.expiry != null) {
             this.countdownToFutureDate(this.expiry)
-
          }
+
       })
-
-
-
    }
 
    async ngOnInit() {
@@ -69,7 +57,6 @@ export class MerchantMiningComponent implements OnInit {
       // this.loading.present();
    }
    ngOnDestroy() {
-      this.merchantSub?.unsubscribe();
    }
 
 
@@ -86,7 +73,7 @@ export class MerchantMiningComponent implements OnInit {
       if (this.amountToGreenPoints.valid && this.toAddress.valid) {
          const amount = this.amountToGreenPoints.value!;
          const address = this.toAddress.value!;
-         this.merchantMining.sendGreenPoints(address, amount)
+         this.merchantService.sendGreenPoints(address, amount)
       }
    }
 
@@ -98,9 +85,14 @@ export class MerchantMiningComponent implements OnInit {
    }
 
    generateMerchantCode() {
-
    }
 
+   subscribe() {
+      if (this.numberOfMonths.valid) {
+         const months = this.numberOfMonths.value!;
+         this.merchantService.subscribe(months);
+      }
+   }
 
    countdownToFutureDate(futureDate: number) {
       const interval = setInterval(() => {

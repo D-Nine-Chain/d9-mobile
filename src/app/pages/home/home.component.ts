@@ -7,7 +7,7 @@ import { CurrencySymbol, CurrencyTickerEnum } from 'app/utils/utils';
 import { Utils } from 'app/utils/utils';
 import { Router } from '@angular/router';
 import { AssetsService } from 'app/services/asset/asset.service';
-import { UsdtService } from 'app/services/usdt/usdt.service';
+import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { NodesService } from 'app/services/nodes/nodes.service';
 @Component({
    selector: 'app-home',
