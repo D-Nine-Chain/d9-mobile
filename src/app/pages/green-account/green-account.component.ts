@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
+import { RedemptionConfirmationComponent } from 'app/modals/redemption-confirmation/redemption-confirmation.component';
 import { MerchantService } from 'app/services/contracts/merchant/merchant.service';
 import { GreenPointsAccount } from 'app/types';
 import { Subscription } from 'rxjs';
@@ -22,6 +23,7 @@ export class GreenAccountComponent implements OnInit {
    };
    redPoints = 0;
    accelerateRedPoints = 0;
+   conversionRate: number = 1 / 100;
 
    //UI helpers
    loading: any;
@@ -29,7 +31,8 @@ export class GreenAccountComponent implements OnInit {
    notGreenAccountMessage: string = '';
    greenPointsAccount: GreenPointsAccount | null = null;
    greenPointsAccountSub: Subscription | null = null;
-   constructor(private merchantService: MerchantService) {
+   currentModal: any = null;
+   constructor(private merchantService: MerchantService,  public modalController: ModalController) {
       this.greenPointsAccountSub = this.merchantService.greenPointsAccountObservable().subscribe((greenPointsAccount) => {
          console.log(`green points account is ${greenPointsAccount}`)
          if (greenPointsAccount) {
@@ -46,9 +49,20 @@ export class GreenAccountComponent implements OnInit {
    ngOnDestroy() {
    }
 
+   async openModal() {
+    this.currentModal = await this.modalController.create({
+       component: RedemptionConfirmationComponent,
+       componentProps: {
+        withdraw: this.withdraw,
+        baseCurrencyBalance: this.greenPointsAccount?.greenPoints,
+        calculatedConversion: (this.greenPointsAccount?.greenPoints ?? 0) * this.conversionRate
+       }
+    });
+    return await this.currentModal.present();
+ }
+
    withdraw() {
       console.log('withdraw started');
-
    }
 
 
