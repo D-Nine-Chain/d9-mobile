@@ -1,0 +1,32 @@
+#balance-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#details-card {
+  display: flex;
+  flex-direction: column;
+}
+
+#detail {
+  display: flex;
+  justify-content: space-between;
+}
+
+#action-section {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#currency-symbol {
+  font-size: 2.5rem;
+}
+
+.balance-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
