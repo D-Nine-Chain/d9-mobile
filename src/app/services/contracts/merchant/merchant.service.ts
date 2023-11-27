@@ -6,7 +6,7 @@ import { environment } from 'environments/environment';
 import { GreenPointsAccount } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { BehaviorSubject, filter, from, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, from, map, switchMap, tap } from 'rxjs';
 
 @Injectable({
    providedIn: 'root'
@@ -36,13 +36,16 @@ export class MerchantService {
             switchMap((manager) => {
                return this.wallet.activeAddressObservable()
                   .pipe(
-                     filter((address) => address != null),
+                     distinctUntilChanged(),
                      switchMap((address) => {
                         console.log(`address for merchant account is ${address}`)
                         return from(manager!.getMerchantExpiry(address!))
                      }),
                      map((callOutcome) => this.transaction.processReadOutcomes(callOutcome, this.formatExpiry)),
-                     tap((expiry) => { console.log(`expiry ${expiry}`) }),
+                     switchMap((expiry) => {
+                        this.merchantExpirySubject.next(expiry);
+                        return this.merchantExpirySubject.asObservable();
+                     })
                   )
             })
          )
@@ -153,8 +156,21 @@ export class MerchantService {
       if (expiry) this.merchantExpirySubject.next(expiry)
    }
 
-   public async sendGreenPoints(toAddress: string, amount: number) {
-      const tx = this.merchantManager?.giveGreenPoints(toAddress, amount)
+   public async giveGreenPointsD9(toAddress: string, amount: number) {
+      const tx = this.merchantManager?.giveGreenPointsD9(toAddress, amount)
+      if (!tx) throw new Error("could not create tx");
+      const signedTx = await this.wallet.signTransaction(tx)
+      const sub = this.transaction.sendSignedTransaction(signedTx)
+         .subscribe(async (result) => {
+            if (result.status.isFinalized) {
+               sub.unsubscribe()
+               await this.updateGreenPointsAccount()
+            }
+         })
+   }
+
+   public async giveGreenPointsUSDT(toAddress: string, amount: number) {
+      const tx = this.merchantManager?.giveGreenPointsUSDT(toAddress, amount)
       if (!tx) throw new Error("could not create tx");
       const signedTx = await this.wallet.signTransaction(tx)
       const sub = this.transaction.sendSignedTransaction(signedTx)

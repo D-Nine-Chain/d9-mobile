@@ -137,6 +137,10 @@ export class UsdtService {
             map((outcome) => {
                return this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
             }),
+            tap((allowance) => {
+               console.log("allowance is ", allowance)
+               this.allowanceSubject.next(allowance ?? 0);
+            })
          ))
    }
 

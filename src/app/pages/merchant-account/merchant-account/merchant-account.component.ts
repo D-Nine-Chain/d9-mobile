@@ -115,7 +115,7 @@ export class MerchantAccountComponent implements OnInit {
       if (this.amountToGreenPoints.valid && this.toAddress.valid) {
          const amount = this.amountToGreenPoints.value!;
          const address = this.toAddress.value!;
-         this.merchantService.sendGreenPoints(address, amount)
+         this.merchantService.giveGreenPointsD9(address, amount)
       }
    }
 
