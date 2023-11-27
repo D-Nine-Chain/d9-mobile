@@ -1,6 +1,6 @@
-export const ammContractABI= {
+export const ammContractABI = {
    "source": {
-      "hash": "0x1b765071d2c5ab78710e726a02f2eea104baf3133e79e12e4fd46e9dcc14a22f",
+      "hash": "0xbcc8e7f43c8369a98596e1f4a3f6574934a35ea90f47fc4c740dbfa0ecec0752",
       "language": "ink! 4.3.0",
       "compiler": "rustc 1.72.0",
       "build_info": {
@@ -34,21 +34,12 @@ export const ammContractABI= {
                   }
                },
                {
-                  "label": "fee_numerator",
+                  "label": "fee_percent",
                   "type": {
                      "displayName": [
                         "u32"
                      ],
-                     "type": 4
-                  }
-               },
-               {
-                  "label": "fee_denominator",
-                  "type": {
-                     "displayName": [
-                        "u32"
-                     ],
-                     "type": 4
+                     "type": 3
                   }
                },
                {
@@ -57,7 +48,7 @@ export const ammContractABI= {
                      "displayName": [
                         "u32"
                      ],
-                     "type": 4
+                     "type": 3
                   }
                }
             ],
@@ -87,32 +78,32 @@ export const ammContractABI= {
             "displayName": [
                "Balance"
             ],
-            "type": 3
+            "type": 4
          },
          "blockNumber": {
             "displayName": [
                "BlockNumber"
             ],
-            "type": 4
+            "type": 3
          },
          "chainExtension": {
             "displayName": [
                "ChainExtension"
             ],
-            "type": 25
+            "type": 23
          },
          "hash": {
             "displayName": [
                "Hash"
             ],
-            "type": 24
+            "type": 22
          },
          "maxEventTopics": 4,
          "timestamp": {
             "displayName": [
                "Timestamp"
             ],
-            "type": 23
+            "type": 21
          }
       },
       "events": [
@@ -135,7 +126,7 @@ export const ammContractABI= {
                   "label": "direction",
                   "type": {
                      "displayName": [],
-                     "type": 21
+                     "type": 20
                   }
                },
                {
@@ -146,7 +137,7 @@ export const ammContractABI= {
                      "displayName": [
                         "Timestamp"
                      ],
-                     "type": 23
+                     "type": 21
                   }
                }
             ],
@@ -214,7 +205,7 @@ export const ammContractABI= {
                      "displayName": [
                         "Balance"
                      ],
-                     "type": 3
+                     "type": 4
                   }
                }
             ],
@@ -230,7 +221,7 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 13
+               "type": 12
             },
             "selector": "0x264cd04b"
          },
@@ -246,35 +237,33 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 13
+               "type": 12
             },
             "selector": "0xbdd16bfa"
          },
          {
             "args": [
                {
-                  "label": "d9_liquidity",
-                  "type": {
-                     "displayName": [
-                        "Balance"
-                     ],
-                     "type": 3
-                  }
-               },
-               {
                   "label": "usdt_liquidity",
                   "type": {
                      "displayName": [
                         "Balance"
                      ],
-                     "type": 3
+                     "type": 4
+                  }
+               },
+               {
+                  "label": "d9_liquidity",
+                  "type": {
+                     "displayName": [
+                        "Balance"
+                     ],
+                     "type": 4
                   }
                }
             ],
             "default": false,
-            "docs": [
-               " ensure added liquidity will not deviate price more than tolerance"
-            ],
+            "docs": [],
             "label": "check_new_liquidity",
             "mutates": false,
             "payable": false,
@@ -283,7 +272,7 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 13
+               "type": 12
             },
             "selector": "0x5a150c03"
          },
@@ -295,7 +284,7 @@ export const ammContractABI= {
                      "displayName": [
                         "Balance"
                      ],
-                     "type": 3
+                     "type": 4
                   }
                }
             ],
@@ -311,7 +300,7 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 17
+               "type": 16
             },
             "selector": "0x0edab8e1"
          },
@@ -329,7 +318,7 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 17
+               "type": 16
             },
             "selector": "0x5b41ab8a"
          },
@@ -341,7 +330,7 @@ export const ammContractABI= {
                      "displayName": [
                         "Balance"
                      ],
-                     "type": 3
+                     "type": 4
                   }
                },
                {
@@ -350,7 +339,7 @@ export const ammContractABI= {
                      "displayName": [
                         "Balance"
                      ],
-                     "type": 3
+                     "type": 4
                   }
                }
             ],
@@ -366,9 +355,46 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 20
+               "type": 18
             },
             "selector": "0xbdcee4ed"
+         },
+         {
+            "args": [
+               {
+                  "label": "direction",
+                  "type": {
+                     "displayName": [
+                        "Direction"
+                     ],
+                     "type": 19
+                  }
+               },
+               {
+                  "label": "amount_0",
+                  "type": {
+                     "displayName": [
+                        "Balance"
+                     ],
+                     "type": 4
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [
+               " amount of currency B from A, if A => B"
+            ],
+            "label": "calculate_exchange",
+            "mutates": false,
+            "payable": false,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 16
+            },
+            "selector": "0x2413eb9a"
          },
          {
             "args": [
@@ -387,7 +413,7 @@ export const ammContractABI= {
                      "displayName": [
                         "Balance"
                      ],
-                     "type": 3
+                     "type": 4
                   }
                }
             ],
@@ -403,105 +429,9 @@ export const ammContractABI= {
                   "ink",
                   "MessageResult"
                ],
-               "type": 13
+               "type": 12
             },
             "selector": "0x4a74f8d9"
-         },
-         {
-            "args": [
-               {
-                  "label": "account_id",
-                  "type": {
-                     "displayName": [
-                        "AccountId"
-                     ],
-                     "type": 0
-                  }
-               }
-            ],
-            "default": false,
-            "docs": [],
-            "label": "get_usdt_balance",
-            "mutates": false,
-            "payable": false,
-            "returnType": {
-               "displayName": [
-                  "ink",
-                  "MessageResult"
-               ],
-               "type": 20
-            },
-            "selector": "0x1a7158d5"
-         },
-         {
-            "args": [
-               {
-                  "label": "owner",
-                  "type": {
-                     "displayName": [
-                        "AccountId"
-                     ],
-                     "type": 0
-                  }
-               },
-               {
-                  "label": "amount",
-                  "type": {
-                     "displayName": [
-                        "Balance"
-                     ],
-                     "type": 3
-                  }
-               }
-            ],
-            "default": false,
-            "docs": [],
-            "label": "check_usdt_allowance",
-            "mutates": false,
-            "payable": false,
-            "returnType": {
-               "displayName": [
-                  "ink",
-                  "MessageResult"
-               ],
-               "type": 13
-            },
-            "selector": "0x8ab78d6a"
-         },
-         {
-            "args": [
-               {
-                  "label": "recipient",
-                  "type": {
-                     "displayName": [
-                        "AccountId"
-                     ],
-                     "type": 0
-                  }
-               },
-               {
-                  "label": "amount",
-                  "type": {
-                     "displayName": [
-                        "Balance"
-                     ],
-                     "type": 3
-                  }
-               }
-            ],
-            "default": false,
-            "docs": [],
-            "label": "send_usdt_to_user",
-            "mutates": false,
-            "payable": false,
-            "returnType": {
-               "displayName": [
-                  "ink",
-                  "MessageResult"
-               ],
-               "type": 13
-            },
-            "selector": "0x5bd6068b"
          }
       ]
    },
@@ -521,41 +451,18 @@ export const ammContractABI= {
                   },
                   {
                      "layout": {
-                        "root": {
-                           "layout": {
-                              "leaf": {
-                                 "key": "0xb0052756",
-                                 "ty": 3
-                              }
-                           },
-                           "root_key": "0xb0052756"
-                        }
-                     },
-                     "name": "currency_balances"
-                  },
-                  {
-                     "layout": {
-                        "leaf": {
-                           "key": "0x00000000",
-                           "ty": 4
-                        }
-                     },
-                     "name": "fee_numerator"
-                  },
-                  {
-                     "layout": {
-                        "leaf": {
-                           "key": "0x00000000",
-                           "ty": 4
-                        }
-                     },
-                     "name": "fee_denominator"
-                  },
-                  {
-                     "layout": {
                         "leaf": {
                            "key": "0x00000000",
                            "ty": 3
+                        }
+                     },
+                     "name": "fee_percent"
+                  },
+                  {
+                     "layout": {
+                        "leaf": {
+                           "key": "0x00000000",
+                           "ty": 4
                         }
                      },
                      "name": "fee_total"
@@ -564,7 +471,7 @@ export const ammContractABI= {
                      "layout": {
                         "leaf": {
                            "key": "0x00000000",
-                           "ty": 4
+                           "ty": 3
                         }
                      },
                      "name": "liquidity_tolerance_percent"
@@ -573,46 +480,9 @@ export const ammContractABI= {
                      "layout": {
                         "root": {
                            "layout": {
-                              "struct": {
-                                 "fields": [
-                                    {
-                                       "layout": {
-                                          "leaf": {
-                                             "key": "0x838a4d0c",
-                                             "ty": 0
-                                          }
-                                       },
-                                       "name": "account_id"
-                                    },
-                                    {
-                                       "layout": {
-                                          "leaf": {
-                                             "key": "0x838a4d0c",
-                                             "ty": 3
-                                          }
-                                       },
-                                       "name": "usdt"
-                                    },
-                                    {
-                                       "layout": {
-                                          "leaf": {
-                                             "key": "0x838a4d0c",
-                                             "ty": 3
-                                          }
-                                       },
-                                       "name": "d9"
-                                    },
-                                    {
-                                       "layout": {
-                                          "leaf": {
-                                             "key": "0x838a4d0c",
-                                             "ty": 3
-                                          }
-                                       },
-                                       "name": "lp_tokens"
-                                    }
-                                 ],
-                                 "name": "LiquidityProvider"
+                              "leaf": {
+                                 "key": "0x838a4d0c",
+                                 "ty": 4
                               }
                            },
                            "root_key": "0x838a4d0c"
@@ -624,10 +494,10 @@ export const ammContractABI= {
                      "layout": {
                         "leaf": {
                            "key": "0x00000000",
-                           "ty": 3
+                           "ty": 4
                         }
                      },
-                     "name": "lp_tokens"
+                     "name": "total_lp_tokens"
                   }
                ],
                "name": "MarketMaker"
@@ -680,7 +550,7 @@ export const ammContractABI= {
          "id": 3,
          "type": {
             "def": {
-               "primitive": "u128"
+               "primitive": "u32"
             }
          }
       },
@@ -688,7 +558,7 @@ export const ammContractABI= {
          "id": 4,
          "type": {
             "def": {
-               "primitive": "u32"
+               "primitive": "u128"
             }
          }
       },
@@ -808,8 +678,8 @@ export const ammContractABI= {
          "type": {
             "def": {
                "tuple": [
-                  3,
-                  3
+                  4,
+                  4
                ]
             }
          }
@@ -869,7 +739,7 @@ export const ammContractABI= {
                      {
                         "fields": [
                            {
-                              "type": 12
+                              "type": 4
                            }
                         ],
                         "index": 1,
@@ -881,7 +751,7 @@ export const ammContractABI= {
             "params": [
                {
                   "name": "T",
-                  "type": 12
+                  "type": 4
                }
             ],
             "path": [
@@ -893,48 +763,12 @@ export const ammContractABI= {
          "id": 12,
          "type": {
             "def": {
-               "composite": {
-                  "fields": [
-                     {
-                        "name": "account_id",
-                        "type": 0,
-                        "typeName": "AccountId"
-                     },
-                     {
-                        "name": "usdt",
-                        "type": 3,
-                        "typeName": "Balance"
-                     },
-                     {
-                        "name": "d9",
-                        "type": 3,
-                        "typeName": "Balance"
-                     },
-                     {
-                        "name": "lp_tokens",
-                        "type": 3,
-                        "typeName": "Balance"
-                     }
-                  ]
-               }
-            },
-            "path": [
-               "market_maker",
-               "market_maker",
-               "LiquidityProvider"
-            ]
-         }
-      },
-      {
-         "id": 13,
-         "type": {
-            "def": {
                "variant": {
                   "variants": [
                      {
                         "fields": [
                            {
-                              "type": 14
+                              "type": 13
                            }
                         ],
                         "index": 0,
@@ -955,7 +789,7 @@ export const ammContractABI= {
             "params": [
                {
                   "name": "T",
-                  "type": 14
+                  "type": 13
                },
                {
                   "name": "E",
@@ -968,7 +802,7 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 14,
+         "id": 13,
          "type": {
             "def": {
                "variant": {
@@ -985,7 +819,7 @@ export const ammContractABI= {
                      {
                         "fields": [
                            {
-                              "type": 15
+                              "type": 14
                            }
                         ],
                         "index": 1,
@@ -1001,7 +835,7 @@ export const ammContractABI= {
                },
                {
                   "name": "E",
-                  "type": 15
+                  "type": 14
                }
             ],
             "path": [
@@ -1010,62 +844,96 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 15,
+         "id": 14,
          "type": {
             "def": {
                "variant": {
                   "variants": [
                      {
                         "index": 0,
+                        "name": "D9orUSDTProvidedLiquidityAtZero"
+                     },
+                     {
+                        "index": 1,
                         "name": "ConversionAmountTooLow"
+                     },
+                     {
+                        "index": 2,
+                        "name": "CouldntTransferUSDTFromUser"
                      },
                      {
                         "fields": [
                            {
-                              "type": 16,
+                              "type": 15,
                               "typeName": "Currency"
                            }
                         ],
-                        "index": 1,
+                        "index": 3,
                         "name": "InsufficientLiquidity"
                      },
                      {
-                        "index": 2,
+                        "index": 4,
                         "name": "InsufficientAllowance"
                      },
                      {
                         "fields": [
                            {
-                              "type": 16,
+                              "type": 15,
                               "typeName": "Currency"
                            }
                         ],
-                        "index": 3,
+                        "index": 5,
                         "name": "MarketMakerHasInsufficientFunds"
                      },
                      {
-                        "index": 4,
+                        "index": 6,
                         "name": "InsufficientLiquidityProvided"
                      },
                      {
-                        "index": 5,
+                        "index": 7,
                         "name": "USDTBalanceInsufficient"
                      },
                      {
-                        "index": 6,
+                        "index": 8,
                         "name": "LiquidityProviderNotFound"
                      },
                      {
-                        "index": 7,
+                        "fields": [
+                           {
+                              "type": 4,
+                              "typeName": "Balance"
+                           },
+                           {
+                              "type": 4,
+                              "typeName": "Balance"
+                           }
+                        ],
+                        "index": 9,
+                        "name": "LiquidityAddedBeyondTolerance"
+                     },
+                     {
+                        "index": 10,
                         "name": "InsufficientLPTokens"
                      },
                      {
-                        "index": 8,
+                        "index": 11,
                         "name": "InsufficientContractLPTokens"
                      },
                      {
-                        "index": 9,
+                        "index": 12,
                         "name": "DivisionByZero"
+                     },
+                     {
+                        "index": 13,
+                        "name": "MultiplicationError"
+                     },
+                     {
+                        "index": 14,
+                        "name": "USDTTooSmall"
+                     },
+                     {
+                        "index": 15,
+                        "name": "USDTTooMuch"
                      }
                   ]
                }
@@ -1078,7 +946,7 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 16,
+         "id": 15,
          "type": {
             "def": {
                "variant": {
@@ -1102,7 +970,7 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 17,
+         "id": 16,
          "type": {
             "def": {
                "variant": {
@@ -1110,7 +978,7 @@ export const ammContractABI= {
                      {
                         "fields": [
                            {
-                              "type": 18
+                              "type": 17
                            }
                         ],
                         "index": 0,
@@ -1131,11 +999,53 @@ export const ammContractABI= {
             "params": [
                {
                   "name": "T",
-                  "type": 18
+                  "type": 17
                },
                {
                   "name": "E",
                   "type": 7
+               }
+            ],
+            "path": [
+               "Result"
+            ]
+         }
+      },
+      {
+         "id": 17,
+         "type": {
+            "def": {
+               "variant": {
+                  "variants": [
+                     {
+                        "fields": [
+                           {
+                              "type": 4
+                           }
+                        ],
+                        "index": 0,
+                        "name": "Ok"
+                     },
+                     {
+                        "fields": [
+                           {
+                              "type": 14
+                           }
+                        ],
+                        "index": 1,
+                        "name": "Err"
+                     }
+                  ]
+               }
+            },
+            "params": [
+               {
+                  "name": "T",
+                  "type": 4
+               },
+               {
+                  "name": "E",
+                  "type": 14
                }
             ],
             "path": [
@@ -1152,60 +1062,7 @@ export const ammContractABI= {
                      {
                         "fields": [
                            {
-                              "type": 19
-                           }
-                        ],
-                        "index": 0,
-                        "name": "Ok"
-                     },
-                     {
-                        "fields": [
-                           {
-                              "type": 15
-                           }
-                        ],
-                        "index": 1,
-                        "name": "Err"
-                     }
-                  ]
-               }
-            },
-            "params": [
-               {
-                  "name": "T",
-                  "type": 19
-               },
-               {
-                  "name": "E",
-                  "type": 15
-               }
-            ],
-            "path": [
-               "Result"
-            ]
-         }
-      },
-      {
-         "id": 19,
-         "type": {
-            "def": {
-               "tuple": [
-                  16,
-                  3
-               ]
-            }
-         }
-      },
-      {
-         "id": 20,
-         "type": {
-            "def": {
-               "variant": {
-                  "variants": [
-                     {
-                        "fields": [
-                           {
-                              "type": 3
+                              "type": 4
                            }
                         ],
                         "index": 0,
@@ -1226,7 +1083,7 @@ export const ammContractABI= {
             "params": [
                {
                   "name": "T",
-                  "type": 3
+                  "type": 4
                },
                {
                   "name": "E",
@@ -1239,28 +1096,17 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 21,
-         "type": {
-            "def": {
-               "tuple": [
-                  22,
-                  22
-               ]
-            }
-         }
-      },
-      {
-         "id": 22,
+         "id": 19,
          "type": {
             "def": {
                "composite": {
                   "fields": [
                      {
-                        "type": 16,
+                        "type": 15,
                         "typeName": "Currency"
                      },
                      {
-                        "type": 16,
+                        "type": 15,
                         "typeName": "Currency"
                      }
                   ]
@@ -1274,7 +1120,18 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 23,
+         "id": 20,
+         "type": {
+            "def": {
+               "tuple": [
+                  19,
+                  19
+               ]
+            }
+         }
+      },
+      {
+         "id": 21,
          "type": {
             "def": {
                "primitive": "u64"
@@ -1282,7 +1139,7 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 24,
+         "id": 22,
          "type": {
             "def": {
                "composite": {
@@ -1302,15 +1159,14 @@ export const ammContractABI= {
          }
       },
       {
-         "id": 25,
+         "id": 23,
          "type": {
             "def": {
                "variant": {}
             },
             "path": [
-               "ink_env",
-               "types",
-               "NoChainExtension"
+               "d9_chain_extension",
+               "D9ChainExtension"
             ]
          }
       }

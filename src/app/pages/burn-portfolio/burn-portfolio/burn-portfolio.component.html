@@ -87,7 +87,11 @@
          </ion-card-content>
       </ion-card>
       <div id="burn-input-container">
+         <ion-toggle [checked]="true" (ionChange)="onToggleChange($event)">for you?</ion-toggle>
          <form>
+
+            <ion-input *ngIf="!useOwnAddress" type="text" fill="solid" label="enter address" labelPlacement="floating"
+               errorText="must be valid address" id="addressInput" [formControl]="beneficiary"></ion-input>
             <ion-input type="number" fill="solid" label="Burn D9" labelPlacement="floating"
                helperText="enter an amount you would like to burn" errorText={{getBurnAmountErrorMessage()}}
                id="burnInput" [formControl]="burnAmount"></ion-input>

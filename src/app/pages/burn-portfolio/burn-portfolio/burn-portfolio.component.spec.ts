@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { NodesComponent } from './nodes.component';
+import { BurnPortfolioComponent } from './burn-portfolio.component';
 
-describe('NodesComponent', () => {
-  let component: NodesComponent;
-  let fixture: ComponentFixture<NodesComponent>;
+describe('BurnPortfolioComponent', () => {
+  let component: BurnPortfolioComponent;
+  let fixture: ComponentFixture<BurnPortfolioComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NodesComponent ],
+      declarations: [ BurnPortfolioComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NodesComponent);
+    fixture = TestBed.createComponent(BurnPortfolioComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

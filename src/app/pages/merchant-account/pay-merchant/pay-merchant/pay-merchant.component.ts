@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AssetsService } from 'app/services/asset/asset.service';
+import { MerchantService } from 'app/services/contracts/merchant/merchant.service';
 import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { substrateAddressValidator } from 'app/utils/Validators';
 
@@ -22,7 +23,7 @@ export class PayMerchantComponent implements OnInit {
    usdtBalance: number = 0;
    isValidMerchant = this.merchantExpiry ? (new Date().getTime() < this.merchantExpiry!) : false;
    subs: any[] = [];
-   constructor(private asset: AssetsService, private usdt: UsdtService, private route: ActivatedRoute) { }
+   constructor(private asset: AssetsService, private usdt: UsdtService, private route: ActivatedRoute, merchant: MerchantService, private merchantService: MerchantService) { }
 
    ngOnInit() {
       this.queryParams = this.route.snapshot.queryParams;
@@ -53,10 +54,12 @@ export class PayMerchantComponent implements OnInit {
          sub.unsubscribe();
       })
    }
-   send() {
+   async send() {
       if (this.amountToSend.valid && this.merchantAddress) {
          const amount = this.amountToSend.value;
-         this.asset.transferD9(this.merchantAddress, amount!)
+         // this.asset.transferD9(this.merchantAddress, amount!)
+         console.log("paying merchant")
+         await this.merchantService.payMerchantD9(this.merchantAddress, amount!)
       }
    }
 

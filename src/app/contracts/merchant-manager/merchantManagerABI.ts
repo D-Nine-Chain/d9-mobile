@@ -1,6 +1,6 @@
 export const merchantContractABI = {
    "source": {
-      "hash": "0x831993283d81f9554a7ebe7da6deac99ab2374217ec0e8ed437dc63ee3524dea",
+      "hash": "0xf848137a007400f4f0a10d6aa5dff8072a4ca550e8c804b1151170dfa60ee4ab",
       "language": "ink! 4.3.0",
       "compiler": "rustc 1.72.0",
       "build_info": {
@@ -25,16 +25,16 @@ export const merchantContractABI = {
          {
             "args": [
                {
-                  "label": "subscription_fee",
+                  "label": "amm_contract",
                   "type": {
                      "displayName": [
-                        "Balance"
+                        "AccountId"
                      ],
-                     "type": 1
+                     "type": 2
                   }
                },
                {
-                  "label": "main_contract",
+                  "label": "mining_pool",
                   "type": {
                      "displayName": [
                         "AccountId"
@@ -86,19 +86,19 @@ export const merchantContractABI = {
             "displayName": [
                "BlockNumber"
             ],
-            "type": 22
+            "type": 25
          },
          "chainExtension": {
             "displayName": [
                "ChainExtension"
             ],
-            "type": 23
+            "type": 26
          },
          "hash": {
             "displayName": [
                "Hash"
             ],
-            "type": 21
+            "type": 24
          },
          "maxEventTopics": 4,
          "timestamp": {
@@ -135,7 +135,35 @@ export const merchantContractABI = {
                }
             ],
             "docs": [],
-            "label": "Subscription"
+            "label": "SubscriptionCreated"
+         },
+         {
+            "args": [
+               {
+                  "docs": [],
+                  "indexed": true,
+                  "label": "merchant",
+                  "type": {
+                     "displayName": [
+                        "GreenPointsCreated"
+                     ],
+                     "type": 23
+                  }
+               },
+               {
+                  "docs": [],
+                  "indexed": true,
+                  "label": "consumer",
+                  "type": {
+                     "displayName": [
+                        "GreenPointsCreated"
+                     ],
+                     "type": 23
+                  }
+               }
+            ],
+            "docs": [],
+            "label": "GreenPointsTransaction"
          }
       ],
       "lang_error": {
@@ -147,14 +175,24 @@ export const merchantContractABI = {
       },
       "messages": [
          {
-            "args": [],
+            "args": [
+               {
+                  "label": "usdt_amount",
+                  "type": {
+                     "displayName": [
+                        "Balance"
+                     ],
+                     "type": 1
+                  }
+               }
+            ],
             "default": false,
             "docs": [
                " create merchant account subscription"
             ],
-            "label": "d9_subscribe",
+            "label": "subscribe",
             "mutates": true,
-            "payable": true,
+            "payable": false,
             "returnType": {
                "displayName": [
                   "ink",
@@ -162,35 +200,7 @@ export const merchantContractABI = {
                ],
                "type": 8
             },
-            "selector": "0xd239eb98"
-         },
-         {
-            "args": [
-               {
-                  "label": "account_id",
-                  "type": {
-                     "displayName": [
-                        "AccountId"
-                     ],
-                     "type": 2
-                  }
-               }
-            ],
-            "default": false,
-            "docs": [
-               " pay green points to `account_id` using d9"
-            ],
-            "label": "give_green_points",
-            "mutates": true,
-            "payable": true,
-            "returnType": {
-               "displayName": [
-                  "ink",
-                  "MessageResult"
-               ],
-               "type": 11
-            },
-            "selector": "0x91be5816"
+            "selector": "0xfb968a8f"
          },
          {
             "args": [],
@@ -206,9 +216,133 @@ export const merchantContractABI = {
                   "ink",
                   "MessageResult"
                ],
-               "type": 14
+               "type": 11
             },
             "selector": "0x47082626"
+         },
+         {
+            "args": [
+               {
+                  "label": "consumer_id",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 2
+                  }
+               },
+               {
+                  "label": "usdt_payment",
+                  "type": {
+                     "displayName": [
+                        "Balance"
+                     ],
+                     "type": 1
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [],
+            "label": "give_green_points_usdt",
+            "mutates": true,
+            "payable": false,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 13
+            },
+            "selector": "0xf52b0ab9"
+         },
+         {
+            "args": [
+               {
+                  "label": "consumer_id",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 2
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [],
+            "label": "give_green_points_d9",
+            "mutates": true,
+            "payable": true,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 13
+            },
+            "selector": "0x88b8f067"
+         },
+         {
+            "args": [
+               {
+                  "label": "merchant_id",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 2
+                  }
+               },
+               {
+                  "label": "usdt_amount",
+                  "type": {
+                     "displayName": [
+                        "Balance"
+                     ],
+                     "type": 1
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [],
+            "label": "pay_merchant_usdt",
+            "mutates": true,
+            "payable": true,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 13
+            },
+            "selector": "0xedd032e0"
+         },
+         {
+            "args": [
+               {
+                  "label": "merchant_id",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 2
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [
+               " a customer pays a merchant using d9"
+            ],
+            "label": "pay_merchant_d9",
+            "mutates": true,
+            "payable": true,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 13
+            },
+            "selector": "0x95d33766"
          },
          {
             "args": [
@@ -263,6 +397,58 @@ export const merchantContractABI = {
                "type": 16
             },
             "selector": "0xd0f48683"
+         },
+         {
+            "args": [
+               {
+                  "label": "new_amm_contract",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 2
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [],
+            "label": "change_amm_contract",
+            "mutates": true,
+            "payable": false,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 21
+            },
+            "selector": "0x0db11b82"
+         },
+         {
+            "args": [
+               {
+                  "label": "new_mining_pool",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 2
+                  }
+               }
+            ],
+            "default": false,
+            "docs": [],
+            "label": "change_mining_pool",
+            "mutates": true,
+            "payable": false,
+            "returnType": {
+               "displayName": [
+                  "ink",
+                  "MessageResult"
+               ],
+               "type": 21
+            },
+            "selector": "0xafda72a6"
          }
       ]
    },
@@ -409,7 +595,7 @@ export const merchantContractABI = {
                            "ty": 2
                         }
                      },
-                     "name": "main_contract"
+                     "name": "usdt_contract"
                   },
                   {
                      "layout": {
@@ -418,7 +604,16 @@ export const merchantContractABI = {
                            "ty": 2
                         }
                      },
-                     "name": "usdt_contract"
+                     "name": "amm_contract"
+                  },
+                  {
+                     "layout": {
+                        "leaf": {
+                           "key": "0x00000000",
+                           "ty": 2
+                        }
+                     },
+                     "name": "mining_pool"
                   },
                   {
                      "layout": {
@@ -428,6 +623,15 @@ export const merchantContractABI = {
                         }
                      },
                      "name": "milliseconds_day"
+                  },
+                  {
+                     "layout": {
+                        "leaf": {
+                           "key": "0x00000000",
+                           "ty": 2
+                        }
+                     },
+                     "name": "admin"
                   }
                ],
                "name": "D9MerchantMining"
@@ -657,27 +861,83 @@ export const merchantContractABI = {
                      },
                      {
                         "index": 1,
-                        "name": "NoMerchantAccountFound"
+                        "name": "InsufficientAllowance"
                      },
                      {
                         "index": 2,
-                        "name": "MerchantAccountExpired"
+                        "name": "NoMerchantAccountFound"
                      },
                      {
                         "index": 3,
-                        "name": "NoAccountFound"
+                        "name": "MerchantAccountExpired"
                      },
                      {
                         "index": 4,
-                        "name": "NothingToRedeem"
+                        "name": "NoAccountFound"
                      },
                      {
                         "index": 5,
-                        "name": "ErrorTransferringToMainContract"
+                        "name": "NothingToRedeem"
                      },
                      {
                         "index": 6,
+                        "name": "TransferringToMainContract"
+                     },
+                     {
+                        "index": 7,
+                        "name": "TransferringToUSDTToMerchant"
+                     },
+                     {
+                        "index": 8,
+                        "name": "UserUSDTBalanceInsufficient"
+                     },
+                     {
+                        "index": 9,
                         "name": "D9TransferFailed"
+                     },
+                     {
+                        "index": 10,
+                        "name": "USDTTransferFailed"
+                     },
+                     {
+                        "index": 11,
+                        "name": "OnlyAdmin"
+                     },
+                     {
+                        "index": 12,
+                        "name": "GrantingAllowanceFailed"
+                     },
+                     {
+                        "index": 13,
+                        "name": "AMMConversionFailed"
+                     },
+                     {
+                        "index": 14,
+                        "name": "ReceivingUSDTFromUser"
+                     },
+                     {
+                        "index": 15,
+                        "name": "ConvertingToD9"
+                     },
+                     {
+                        "index": 16,
+                        "name": "SendUSDTToMerchant"
+                     },
+                     {
+                        "index": 17,
+                        "name": "SendingD9ToMiningPool"
+                     },
+                     {
+                        "index": 18,
+                        "name": "SendingUSDTToAMM"
+                     },
+                     {
+                        "index": 19,
+                        "name": "GettingUSDTFromAMM"
+                     },
+                     {
+                        "index": 20,
+                        "name": "RedeemD9TransferFailed"
                      }
                   ]
                }
@@ -740,101 +1000,6 @@ export const merchantContractABI = {
                      {
                         "fields": [
                            {
-                              "type": 13
-                           }
-                        ],
-                        "index": 0,
-                        "name": "Ok"
-                     },
-                     {
-                        "fields": [
-                           {
-                              "type": 10
-                           }
-                        ],
-                        "index": 1,
-                        "name": "Err"
-                     }
-                  ]
-               }
-            },
-            "params": [
-               {
-                  "name": "T",
-                  "type": 13
-               },
-               {
-                  "name": "E",
-                  "type": 10
-               }
-            ],
-            "path": [
-               "Result"
-            ]
-         }
-      },
-      {
-         "id": 13,
-         "type": {
-            "def": {
-               "tuple": [
-                  2,
-                  1
-               ]
-            }
-         }
-      },
-      {
-         "id": 14,
-         "type": {
-            "def": {
-               "variant": {
-                  "variants": [
-                     {
-                        "fields": [
-                           {
-                              "type": 15
-                           }
-                        ],
-                        "index": 0,
-                        "name": "Ok"
-                     },
-                     {
-                        "fields": [
-                           {
-                              "type": 7
-                           }
-                        ],
-                        "index": 1,
-                        "name": "Err"
-                     }
-                  ]
-               }
-            },
-            "params": [
-               {
-                  "name": "T",
-                  "type": 15
-               },
-               {
-                  "name": "E",
-                  "type": 7
-               }
-            ],
-            "path": [
-               "Result"
-            ]
-         }
-      },
-      {
-         "id": 15,
-         "type": {
-            "def": {
-               "variant": {
-                  "variants": [
-                     {
-                        "fields": [
-                           {
                               "type": 1
                            }
                         ],
@@ -865,6 +1030,116 @@ export const merchantContractABI = {
             ],
             "path": [
                "Result"
+            ]
+         }
+      },
+      {
+         "id": 13,
+         "type": {
+            "def": {
+               "variant": {
+                  "variants": [
+                     {
+                        "fields": [
+                           {
+                              "type": 14
+                           }
+                        ],
+                        "index": 0,
+                        "name": "Ok"
+                     },
+                     {
+                        "fields": [
+                           {
+                              "type": 7
+                           }
+                        ],
+                        "index": 1,
+                        "name": "Err"
+                     }
+                  ]
+               }
+            },
+            "params": [
+               {
+                  "name": "T",
+                  "type": 14
+               },
+               {
+                  "name": "E",
+                  "type": 7
+               }
+            ],
+            "path": [
+               "Result"
+            ]
+         }
+      },
+      {
+         "id": 14,
+         "type": {
+            "def": {
+               "variant": {
+                  "variants": [
+                     {
+                        "fields": [
+                           {
+                              "type": 15
+                           }
+                        ],
+                        "index": 0,
+                        "name": "Ok"
+                     },
+                     {
+                        "fields": [
+                           {
+                              "type": 10
+                           }
+                        ],
+                        "index": 1,
+                        "name": "Err"
+                     }
+                  ]
+               }
+            },
+            "params": [
+               {
+                  "name": "T",
+                  "type": 15
+               },
+               {
+                  "name": "E",
+                  "type": 10
+               }
+            ],
+            "path": [
+               "Result"
+            ]
+         }
+      },
+      {
+         "id": 15,
+         "type": {
+            "def": {
+               "composite": {
+                  "fields": [
+                     {
+                        "name": "merchant",
+                        "type": 1,
+                        "typeName": "Balance"
+                     },
+                     {
+                        "name": "consumer",
+                        "type": 1,
+                        "typeName": "Balance"
+                     }
+                  ]
+               }
+            },
+            "path": [
+               "d9_merchant_mining",
+               "d9_merchant_mining",
+               "GreenPointsResult"
             ]
          }
       },
@@ -1037,6 +1312,116 @@ export const merchantContractABI = {
          "id": 21,
          "type": {
             "def": {
+               "variant": {
+                  "variants": [
+                     {
+                        "fields": [
+                           {
+                              "type": 22
+                           }
+                        ],
+                        "index": 0,
+                        "name": "Ok"
+                     },
+                     {
+                        "fields": [
+                           {
+                              "type": 7
+                           }
+                        ],
+                        "index": 1,
+                        "name": "Err"
+                     }
+                  ]
+               }
+            },
+            "params": [
+               {
+                  "name": "T",
+                  "type": 22
+               },
+               {
+                  "name": "E",
+                  "type": 7
+               }
+            ],
+            "path": [
+               "Result"
+            ]
+         }
+      },
+      {
+         "id": 22,
+         "type": {
+            "def": {
+               "variant": {
+                  "variants": [
+                     {
+                        "fields": [
+                           {
+                              "type": 6
+                           }
+                        ],
+                        "index": 0,
+                        "name": "Ok"
+                     },
+                     {
+                        "fields": [
+                           {
+                              "type": 10
+                           }
+                        ],
+                        "index": 1,
+                        "name": "Err"
+                     }
+                  ]
+               }
+            },
+            "params": [
+               {
+                  "name": "T",
+                  "type": 6
+               },
+               {
+                  "name": "E",
+                  "type": 10
+               }
+            ],
+            "path": [
+               "Result"
+            ]
+         }
+      },
+      {
+         "id": 23,
+         "type": {
+            "def": {
+               "composite": {
+                  "fields": [
+                     {
+                        "name": "account_id",
+                        "type": 2,
+                        "typeName": "AccountId"
+                     },
+                     {
+                        "name": "green_points",
+                        "type": 1,
+                        "typeName": "Balance"
+                     }
+                  ]
+               }
+            },
+            "path": [
+               "d9_merchant_mining",
+               "d9_merchant_mining",
+               "GreenPointsCreated"
+            ]
+         }
+      },
+      {
+         "id": 24,
+         "type": {
+            "def": {
                "composite": {
                   "fields": [
                      {
@@ -1054,7 +1439,7 @@ export const merchantContractABI = {
          }
       },
       {
-         "id": 22,
+         "id": 25,
          "type": {
             "def": {
                "primitive": "u32"
@@ -1062,7 +1447,7 @@ export const merchantContractABI = {
          }
       },
       {
-         "id": 23,
+         "id": 26,
          "type": {
             "def": {
                "variant": {}

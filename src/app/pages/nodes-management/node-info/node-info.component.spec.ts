@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { BurnMiningComponent } from './burn-mining.component';
+import { NodeInfoComponent } from '../validator-info/validator-info.component';
 
-describe('BurnMiningComponent', () => {
-  let component: BurnMiningComponent;
-  let fixture: ComponentFixture<BurnMiningComponent>;
+describe('NodeInfoComponent', () => {
+  let component: NodeInfoComponent;
+  let fixture: ComponentFixture<NodeInfoComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ BurnMiningComponent ],
+      declarations: [ NodeInfoComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(BurnMiningComponent);
+    fixture = TestBed.createComponent(NodeInfoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

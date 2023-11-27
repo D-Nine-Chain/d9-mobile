@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,7 +16,7 @@ export class AccountManagementComponent implements OnInit {
    addressSet: Set<string> | null = null;
    accounts: Account[] = [];
    newAccountName = new FormControl('', [Validators.required, Validators.minLength(1)]);
-   constructor(private account: AccountService, private router: Router) {
+   constructor(private account: AccountService, private router: Router, private location: Location) {
       this.subscribeToLiveData()
    }
 
@@ -28,7 +29,8 @@ export class AccountManagementComponent implements OnInit {
    switchTo(account: Account) {
       console.log("switching to account ", account)
       this.account.switchToAccount(account)
-      this.router.navigate(['/home'])
+      this.location.back()
+      // this.router.navigate(['/home'])
       // this.account.switchToAddress(address)
    }
    async addAccount() {

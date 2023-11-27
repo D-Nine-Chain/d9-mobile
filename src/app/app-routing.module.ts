@@ -3,7 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { FirstRunComponent } from './pages/first-run/first-run.component';
 import { NewMnemonicComponent } from './pages/new-mnemonic/new-mnemonic.component';
 import { HomeComponent } from './pages/home/home.component';
-import { BurnMiningComponent } from './pages/burn-mining/burn-mining/burn-mining.component';
+import { BurnPortfolioComponent } from './pages/burn-portfolio/burn-portfolio/burn-portfolio.component';
 import { SettingsComponent } from './pages/settings/settings/settings.component';
 import { MerchantAccountComponent } from './pages/merchant-account/merchant-account/merchant-account.component';
 import { SendComponent } from './pages/send/send/send.component';
@@ -12,18 +12,17 @@ import { AncestorsComponent } from './pages/ancestors/ancestors/ancestors.compon
 import { SwapComponent } from './pages/swap/swap/swap.component';
 import { QrScannerComponent } from './pages/qr-scanner/qr-scanner/qr-scanner.component';
 import { AccountManagementComponent } from './pages/account-management/account-management/account-management.component';
-import { NodesComponent } from './pages/nodes/nodes/nodes.component';
+import { NodesManagementComponent } from './pages/nodes-management/nodes-management/nodes-management.component';
 import { BondComponent } from './pages/bond/bond/bond.component';
 import { LiquidityComponent } from './pages/liquidity/liquidity/liquidity.component';
 import { PayMerchantComponent } from './pages/merchant-account/pay-merchant/pay-merchant/pay-merchant.component';
 import { MerchantQrComponent } from './pages/merchant-account/merchant-qr/merchant-qr.component';
 import { AllowanceRequestComponent } from './modals/allowance-request/allowance-request/allowance-request.component';
-import { NodeVotingComponent } from './pages/nodes/node-voting/node-voting/node-voting.component';
-import { SessionOverviewComponent } from './pages/nodes/session-overview/session-overview/session-overview.component';
-import { ValidatorInfoComponent } from './nodes/validator-info/validator-info/validator-info.component';
+import { NodeVotingComponent } from './pages/nodes-management/node-voting/node-voting.component';
+import { SessionOverviewComponent } from './pages/nodes-management/session-overview/session-overview/session-overview.component';
 import { GreenAccountComponent } from './pages/green-account/green-account.component';
 import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.component';
-
+import { NodeInfoComponent } from './pages/nodes-management/node-info/node-info.component';
 const routes: Routes = [
    {
       path: 'first-run', component: FirstRunComponent
@@ -32,7 +31,7 @@ const routes: Routes = [
    { path: 'home', component: HomeComponent },
    { path: 'settings', component: SettingsComponent },
    {
-      path: 'burn-mining', component: BurnMiningComponent, children: [
+      path: 'burn', component: BurnPortfolioComponent, children: [
 
       ]
    },
@@ -57,10 +56,10 @@ const routes: Routes = [
       path: 'account-management', component: AccountManagementComponent
    },
    {
-      path: 'nodes', component: NodesComponent, children: [
+      path: 'nodes-management', component: NodesManagementComponent, children: [
          { path: 'node-voting', component: NodeVotingComponent },
          { path: '', component: SessionOverviewComponent },
-         { path: 'validator', component: ValidatorInfoComponent }
+         { path: 'node-info', component: NodeInfoComponent }
       ]
    },
    { path: 'bond', component: BondComponent },

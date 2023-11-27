@@ -45,10 +45,11 @@ export class SwapComponent implements OnInit {
    subs: Subscription[] = []
    constructor(private assets: AssetsService, private amm: AmmService, private router: Router, private usdt: UsdtService, public modalController: ModalController) {
       let d9Sub = this.assets.d9BalancesObservable().subscribe((d9Balances) => {
-         console.log("balances in swap", d9Balances)
-         this.d9Balances = d9Balances
-         this.fromBalance = d9Balances.free
-
+         if (d9Balances != null) {
+            this.d9Balances = d9Balances
+            this.fromBalance = d9Balances.free
+            this.swapAmount.updateValueAndValidity();
+         }
       })
       this.subs.push(d9Sub)
       let usdtSub = this.usdt.usdtBalanceObservable().subscribe((usdtBalance) => {
@@ -57,7 +58,6 @@ export class SwapComponent implements OnInit {
       this.subs.push(usdtSub)
       let reservesSub = this.amm.currencyReservesObservable().subscribe((reserves) => {
          if (reserves) {
-            console.log("getting new reserves ")
             this.d9Reserves = reserves[0]
             this.usdtReserves = reserves[1]
          }
@@ -67,7 +67,6 @@ export class SwapComponent implements OnInit {
       let allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
          if (allowance != null) {
             this.usdtAllowance = allowance
-            console.log(`allowance in swap component is ${allowance}`)
          }
 
       })
@@ -107,17 +106,19 @@ export class SwapComponent implements OnInit {
             to: this.toCurrency.ticker,
             fromAmount: amount!,
          }
-         await this.amm.swap(swap)
+         // await this.amm.swap(swap)
          // this.router.navigate(['/home'])
+         // not using openModal is custom modal
+         this.currentModal = await this.modalController.create({
+            component: ConfirmationComponent,
+            componentProps: swap,
+            breakpoints: [0, 2],
+            initialBreakpoint: 1,
+            handle: false,
+         });
       }
 
-      // not using openModal is custom modal
-      this.currentModal = await this.modalController.create({
-        component: ConfirmationComponent,
-        breakpoints: [0, 2],
-        initialBreakpoint: 1,
-        handle: false,
-      });
+
       return await this.currentModal.present();
    }
 
@@ -152,12 +153,12 @@ export class SwapComponent implements OnInit {
       return false;
    }
 
-   sufficientBalanceValidator(): ValidatorFn {
-      return (control: AbstractControl): { [key: string]: any } | null => {
-         console.log("is sufficient balance", this.isBalanceSufficient())
-         return this.isBalanceSufficient() ? null : { 'insufficient D9 Balance': { value: control.value } };
-      }
-   }
+   // sufficientBalanceValidator(): ValidatorFn {
+   //    return (control: AbstractControl): { [key: string]: any } | null => {
+   //       console.log("is sufficient balance", this.isBalanceSufficient())
+   //       return this.isBalanceSufficient() ? null : { 'insufficient D9 Balance': { value: control.value } };
+   //    }
+   // }
 
    swapValidator(): ValidatorFn {
       return (control: AbstractControl): { [key: string]: any } | null => {
@@ -168,6 +169,7 @@ export class SwapComponent implements OnInit {
    isInvalidSwap(control: AbstractControl): ValidationErrors | null {
 
       if (this.fromCurrency.ticker === CurrencyTickerEnum.D9) {
+         console.log(`control value is ${control.value} and from balance is ${this.fromBalance}`)
          const insufficientBalance = control.value > (this.fromBalance as number);
          if (insufficientBalance) {
             return this.constructError('Insufficient D9 balance', control);
@@ -195,6 +197,7 @@ export class SwapComponent implements OnInit {
    }
 
    isBalanceSufficient(): boolean {
+      console.log("checking if balance is sufficient")
       if (this.swapAmount) {
          if (this.swapAmount.value !== null) {
             console.log("this from balance is ", this.d9Balances.free)
@@ -208,8 +211,6 @@ export class SwapComponent implements OnInit {
          return false;
       }
    }
-
-
 
    getCurrentBalanceString() {
       console.log("this from balance is ", this.fromBalance)

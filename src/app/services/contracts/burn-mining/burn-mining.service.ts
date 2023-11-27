@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Account, BurnMinerAccount, BurnPortfolio } from 'app/types';
-import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, last, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, last, map, switchMap, tap } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
@@ -13,7 +13,7 @@ import { TransactionsService } from 'app/services/transactions/transactions.serv
    providedIn: 'root'
 })
 export class BurnMiningService {
-   private burnPortfolioSubject = new BehaviorSubject<BurnPortfolio>({
+   private burnPortfolioSubject = new BehaviorSubject<BurnPortfolio | null>({
       amountBurned: 0,
       balanceDue: 0,
       balancePaid: 0,
@@ -52,7 +52,22 @@ export class BurnMiningService {
    }
 
    public getPortfolioObservable() {
-      return this.burnPortfolioSubject.asObservable();
+      return this.wallet.getActiveAddressObservable()
+         .pipe(
+            filter((address) => address != null),
+            switchMap(
+               (address) => {
+                  return from(this.updatePortfolioFromChain(address!))
+               }
+            ),
+            switchMap(() => {
+               return this.burnPortfolioSubject.asObservable()
+            }),
+            tap((a) => {
+               console.log("portfolio observable", a)
+            }),
+         )
+      // return this.burnPortfolioSubject.asObservable();
    }
 
    public getNetworkBurnObservable() {
@@ -61,10 +76,11 @@ export class BurnMiningService {
 
 
 
-   public executeBurn(amount: number) {
+   public executeBurn(amount: number, beneficiary: string) {
+      console.log("execute burn called beenficiary is ", beneficiary)
       this.currentTransactionSub = from(this.getBurnManager()).pipe(
          switchMap((bm) => {
-            const burnTx = bm!.makeBurnTx(amount);
+            const burnTx = bm!.makeBurnTx(beneficiary, amount);
             return from(this.wallet.signTransaction(burnTx))
                .pipe(switchMap(signedTx => {
                   return from(this.transaction.sendSignedTransaction(signedTx))
@@ -206,19 +222,7 @@ export class BurnMiningService {
       let bm = await this.getBurnManager();
       const { output, result } = await bm!.getBurnPortfolio(address)
       if (result.isOk && (output?.toJSON() as any).ok == null) {
-         this.updateBurnPortfolio({
-            amountBurned: 0,
-            balanceDue: 0,
-            balancePaid: 0,
-            lastBurn: {
-               time: 0,
-               contract: ''
-            },
-            lastWithdrawal: {
-               time: 0,
-               contract: ''
-            }
-         });
+         this.updateBurnPortfolio(null);
       }
       else if (result.isOk && (output?.toJSON() as any).ok != null) {
          let burnPortfolio = (output!.toJSON()! as any).ok
@@ -246,7 +250,7 @@ export class BurnMiningService {
       }
    }
 
-   private updateBurnPortfolio(burnPortfolio: BurnPortfolio) {
+   private updateBurnPortfolio(burnPortfolio: BurnPortfolio | null) {
       this.burnPortfolioSubject.next(burnPortfolio);
    }
 

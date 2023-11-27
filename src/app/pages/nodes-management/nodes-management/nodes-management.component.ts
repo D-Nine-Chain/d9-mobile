@@ -4,11 +4,11 @@ import { SessionOverview } from 'app/types';
 import { Subscription } from 'rxjs';
 
 @Component({
-   selector: 'app-nodes',
-   templateUrl: './nodes.component.html',
-   styleUrls: ['./nodes.component.scss'],
+   selector: 'app-nodes-management',
+   templateUrl: './nodes-management.component.html',
+   styleUrls: ['./nodes-management.component.scss'],
 })
-export class NodesComponent implements OnInit {
+export class NodesManagementComponent implements OnInit {
 
    ngOnInit() { }
 

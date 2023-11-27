@@ -150,3 +150,31 @@ export interface SessionOverview {
    validatorCount: number,
    validators: string[]
 }
+
+export interface NodeInfo {
+   address: string;
+   preferences?: CommissionPreference,
+   bondedAccount?: string,
+   preferredNominations?: Nominations,
+   ledger?: LedgerInfo,
+   erasRewards?: any,
+
+}
+
+export interface CommissionPreference {
+   commission: number;
+   blocked: boolean;
+}
+
+export interface Nominations {
+   targets: string[];
+   submittedIn: number;
+   suppressed: boolean;
+}
+
+export interface LedgerInfo {
+   stash: string;
+   total: number | string;
+   active: number | string;
+   claimedRewards: any[]
+}

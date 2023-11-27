@@ -97,6 +97,17 @@ export class MerchantService {
       return sonsFactor + grandsonFactor;
    }
 
+   public async payMerchantD9(merchantId: string, amount: number) {
+      const tx = this.merchantManager?.payMerchantD9(merchantId, amount)
+      if (!tx) throw new Error("could not create tx");
+      const signedTx = await this.wallet.signTransaction(tx)
+      const sub = this.transaction.sendSignedTransaction(signedTx)
+         .subscribe(async (result) => {
+            if (result.status.isFinalized) {
+               sub.unsubscribe()
+            }
+         })
+   }
    public async withdrawD9(amount: number) {
       const address = await this.wallet.getAddressPromise();
       if (!address) {

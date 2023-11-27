@@ -22,13 +22,13 @@ export class BurnManager {
 
    }
 
-   makeBurnTx(amount: number): SubmittableExtrinsic<"rxjs"> {
-      console.log("making burn tx")
+   makeBurnTx(beneficiary: string, amount: number): SubmittableExtrinsic<"rxjs"> {
+      console.log(`beneficiary is ${beneficiary}`)
       return this.contract.tx['burn']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
          value: Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
-      }, environment.contracts.burn_miner.address)
+      }, beneficiary, environment.contracts.burn_miner.address)
    }
 
 

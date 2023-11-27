@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { D9ApiService } from '../d9-api/d9-api.service';
-import { BehaviorSubject, filter, firstValueFrom, forkJoin, from, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, firstValueFrom, forkJoin, from, map, switchMap, tap } from 'rxjs';
 import { WalletService } from '../wallet/wallet.service';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { TransactionsService } from '../transactions/transactions.service';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
-import { SessionOverview } from 'app/types';
+import { CommissionPreference, LedgerInfo, NodeInfo, Nominations, SessionOverview } from 'app/types';
 
 @Injectable({
    providedIn: 'root'
@@ -13,13 +13,17 @@ import { SessionOverview } from 'app/types';
 
 export class NodesService {
    unsubs: any[] = [];
-   constructor(private d9: D9ApiService, private wallet: WalletService, private transaction: TransactionsService) { }
+   constructor(private d9: D9ApiService, private wallet: WalletService, private transaction: TransactionsService) {
+
+   }
    validators: BehaviorSubject<string[]> = new BehaviorSubject<any>([]);
+   currentNode: BehaviorSubject<any> = new BehaviorSubject<any>(null);
    currentTransactionSub: any;
+
    public getSessionValidators() {
       const api = this.d9.getApi();
       // return api.query.staking.validators()
-
+      this.currentNode.next("5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY")
       return from(this.d9.getApi())
          .pipe(
             switchMap(
@@ -30,11 +34,50 @@ export class NodesService {
                )
             ),
             map(result => {
+               const data = result.map((data) => { return data.toString() })
+               console.log("validator data is  ", data)
                return {
                   validators: result[0].toJSON()
                }
             })
          )
+   }
+
+   public getNodeInfo(address: string): Observable<NodeInfo> {
+      console.log(`getting node info for ${address}`)
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.queryMulti(
+                  [
+                     [d9.query.staking.validators, address],
+                     [d9.query.staking.bonded, address],
+                     [d9.query.staking.nominators, address],
+                     [d9.query.staking.ledger, address],
+                     [d9.query.staking.erasValidatorPrefs, [40, address]],
+                     [d9.query.staking.erasValidatorReward, 40],
+                  ]
+               )
+            ),
+            map(result => {
+               // console.log("result is ", result)
+               const data = result.map((data) => { return data.toJSON() })
+
+               const nodeInfo: NodeInfo = {
+                  address: address,
+                  bondedAccount: data[1] as string,
+                  preferredNominations: (data[2] as any) as Nominations,
+                  ledger: (data[3] as any) as LedgerInfo,
+                  preferences: (data[0] as any) as CommissionPreference,
+                  erasRewards: data[5]
+               }
+               return this.formatNodeInfo(nodeInfo)
+            })
+         )
+   }
+
+   setCurrentNode(address: string) {
+      this.currentNode.next(address)
    }
 
 
@@ -48,19 +91,18 @@ export class NodesService {
          )
    }
    public test() {
-      this.getNominators().subscribe((result) => {
-         console.log("nominators ", result)
-      })
-      this.getHealth().subscribe((result) => {
-         console.log("health is ", result.toHuman())
-      })
 
-      // this.getValidatorsInfo().subscribe((result) => {
-      //    console.log("validator info ", result)
-      // })
-      this.getSessionValidators().subscribe((result) => {
-         console.log("session validators ", result)
-      })
+   }
+   public eraValidatorPrefs() {
+      return from(this.d9.getApi())
+         .pipe(
+            switchMap(
+               d9 => d9.query.staking.erasValidatorPrefs(0, '5DAv93yptzLKRrWJveVo6eetiexmxaGPWGdxnGPQrcJEp1rW')
+            ),
+            map(result => {
+               return result.toJSON()
+            })
+         )
    }
 
    public getNominators() {
@@ -72,14 +114,7 @@ export class NodesService {
          )
    }
 
-   public validatorInfo() {
-      return from(this.d9.getApi())
-         .pipe(
-            switchMap(
-               d9 => d9.query.staking.validators('ytBPqMwQPfbs9ugGHadMUjQk6VBRNWe9cRBtqPSX4eEdQR8')
-            )
-         )
-   }
+
 
    public getEpochInfo() {
       return from(this.d9.getApi())
@@ -184,6 +219,21 @@ export class NodesService {
                return result.toJSON()
             })
          )
+   }
+
+   formatNodeInfo(nodeInfo: any) {
+      const ledger = nodeInfo.ledger;
+      ledger.active = Utils.reduceByCurrencyDecimal(ledger.active, CurrencyTickerEnum.D9)
+      ledger.total = Utils.reduceByCurrencyDecimal(ledger.total, CurrencyTickerEnum.D9)
+      const formattedNodeInfo = {
+         address: nodeInfo.address,
+         bondedAccount: nodeInfo.bondedAccount,
+         preferredNominations: nodeInfo.preferredNominations,
+         ledger: nodeInfo.ledger,
+         preferences: nodeInfo.preferences,
+         erasRewards: nodeInfo.erasRewards
+      }
+      return formattedNodeInfo;
    }
 }
 export type ActiveEra = {

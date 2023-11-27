@@ -13,6 +13,9 @@ export const environment = {
    preferences_root_address: "d9_root_address",
    preferences_d9_soft_derivation_counter: "d9_soft_derivation_counter",
    preferences_assets: "d9_assets",
+   constants: {
+      milliseconds_per_day: 600000,
+   },
    contracts: {
       burn_manager: {
          address: "v4GeJMACGhNDr51pqii4rA6hDmXWgBzwVrVh4AGSBztSyAP",
@@ -23,17 +26,26 @@ export const environment = {
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "uXgbtFchEBq4frLX5HH55ZM5vPDmfbJb2NYFzpow19etiQD",
+         address: "wGXQwuJ4YXa9dmmjYc7MeowKxBYsgHLF7Sa9AVQGv5SwKz8",
          name: "d9_merchant_mining"
       },
       amm: {
-         address: "xEBMqViw3aKaH4NSHHC9qjMCzFA7JQEnMa3rRPsxZaYPJFH",
+         address: "wTL3mVzULnrnxVMdcvyCrQ3Xv5NpG6vhFmaqpgAu2NYahot",
          name: "d9_amm"
       },
       usdt: {
          address: "z4mr21CwkZW6njfyGUBFP3JGm9KeBgzD5dsYqSotrYfxuaz",
          name: "d9_usdt"
-      }
+      },
+      node_reward: {
+         address: "ybyN3459G8z2qdAxNTT3hbt4BXDPdb9NEa7dkGfHGMAAriB",
+         name: "d9_node_reward"
+      },
+      mining_pool: {
+         address: "zNxJXSavSe7bWs4q6CqSQS27rY4SjcZpSmVUvNGdKzdSL3o",
+         name: "d9_mining_pool"
+      },
+
    }
 };
 /*

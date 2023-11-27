@@ -1,40 +1,40 @@
 <ion-content>
-  <ion-header class="ion-padding">
-    <ion-text>
-      <h3>Confirm Conversion</h3>
-    </ion-text>
-  </ion-header>
-  <ion-card>
-    <ion-card-content>
-      <div id="balance-row">
-        <div class="balance-container">
-          <p>
-            <span id="currency-symbol">{{ baseCurrencySymbol }}</span>
-          </p>
-          <h2>{{ baseCurrency }}</h2>
-        </div>
-        <ion-icon name="arrow-forward-outline"></ion-icon>
-        <div class="balance-container">
-          <p>
-            <span id="currency-symbol">{{ convertedCurrencySymbol }}</span>
-          </p>
-          <h2>aaa</h2>
-        </div>
-      </div>
-    </ion-card-content>
-  </ion-card>
-  <ion-card>
-    <ion-card-content>
-      <div id="details-card">
-        <div *ngFor="let detail of details" id="detail">
-          <ion-text>{{ detail.title }}:</ion-text>
-          <ion-text>{{ detail.value }}</ion-text>
-        </div>
-      </div>
-    </ion-card-content>
-  </ion-card>
-  <div id="action-section" class="ion-padding">
-    <ion-button color="light" (click)="closeModal()">Back</ion-button>
-    <ion-button color="success">Confirm</ion-button>
-  </div>
+   <ion-header class="ion-padding">
+      <ion-text>
+         <h3>Confirm Conversion</h3>
+      </ion-text>
+   </ion-header>
+   <ion-card>
+      <ion-card-content>
+         <div id="balance-row">
+            <div class="balance-container">
+               <p>
+                  <span id="currency-symbol">{{ baseCurrencySymbol }}</span>
+               </p>
+               <h2>{{ baseCurrency }}</h2>
+            </div>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+            <div class="balance-container">
+               <p>
+                  <span id="currency-symbol">{{ convertedCurrencySymbol }}</span>
+               </p>
+               <h2>aaa</h2>
+            </div>
+         </div>
+      </ion-card-content>
+   </ion-card>
+   <ion-card>
+      <ion-card-content>
+         <div id="details-card">
+            <div *ngFor="let detail of details" id="detail">
+               <ion-text>{{ detail.title }}:</ion-text>
+               <ion-text>{{ detail.value }}</ion-text>
+            </div>
+         </div>
+      </ion-card-content>
+   </ion-card>
+   <div id="action-section" class="ion-padding">
+      <ion-button color="light" (click)="closeModal()">Back</ion-button>
+      <ion-button color="success" (click)="swap()">Confirm</ion-button>
+   </div>
 </ion-content>

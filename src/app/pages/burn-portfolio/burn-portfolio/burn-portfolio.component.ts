@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BurnMiningService } from 'app/services/contracts/burn-mining/burn-mining.service';
-import { BurnPortfolio } from 'app/types';
+import { Account, BurnPortfolio } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription, first, forkJoin, from, map, switchMap } from 'rxjs';
 import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/forms';
@@ -10,16 +10,19 @@ import { AssetsService } from 'app/services/asset/asset.service';
 import { decode } from 'querystring';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { ReferralService } from 'app/services/referral/referral.service';
+import { substrateAddressValidator } from 'app/utils/Validators';
 
 
 @Component({
-   selector: 'app-burn-mining',
-   templateUrl: './burn-mining.component.html',
-   styleUrls: ['./burn-mining.component.scss'],
+   selector: 'app-burn-portfolio',
+   templateUrl: './burn-portfolio.component.html',
+   styleUrls: ['./burn-portfolio.component.scss'],
 })
-export class BurnMiningComponent implements OnInit {
+export class BurnPortfolioComponent implements OnInit {
    burnableD9: number = 0;
+   useOwnAddress: boolean = true;
    burnAmount = new FormControl(100, [Validators.required, Validators.min(100), this.multipleOf100Validator()]);
+   beneficiary = new FormControl("", [Validators.required, substrateAddressValidator()]);
    networkBurned: number = 0;
    burnManagerBalance: number = 0;
    totalBurnedSub: Subscription | null = null;
@@ -30,6 +33,7 @@ export class BurnMiningComponent implements OnInit {
    returnPercent: number = 0;
    baseExtraction: number = 0;
    referralBoost: number = 0;
+   userAccount: Account | null = null;
    subs: Subscription[] = []
    currencySymbol = Utils.currenciesRecord["D9"].symbol;
    constructor(private burnMiningService: BurnMiningService, private accountService: AccountService, private loadingController: LoadingController, private assets: AssetsService, private referral: ReferralService) {
@@ -40,6 +44,8 @@ export class BurnMiningComponent implements OnInit {
             let encode = encodeAddress(decode);
             this.parent = encode;
          })
+
+
    }
 
    async ngOnInit() {
@@ -48,12 +54,20 @@ export class BurnMiningComponent implements OnInit {
    ngOnDestroy() {
 
    }
-
+   //5DyM3yLyRrx1JpRXwjvm1dR3rF54P8S7hBY51TnPdgkWWtVS
    async burn() {
-      if (this.burnAmount.valid) {
+      if (this.burnAmount.valid && !this.useOwnAddress && this.beneficiary.valid) {
          const amount = this.burnAmount.value;
-         this.burnMiningService.executeBurn(amount!)
+         const beneficiary = this.beneficiary.value!;
+         this.burnMiningService.executeBurn(amount!, beneficiary)
       }
+      else if (this.burnAmount.valid && this.useOwnAddress && this.userAccount) {
+         const amount = this.burnAmount.value;
+         const beneficiary = this.userAccount.address;
+         this.burnMiningService.executeBurn(amount!, beneficiary)
+      }
+
+
    }
 
    async withdraw() {
@@ -69,6 +83,7 @@ export class BurnMiningComponent implements OnInit {
    }
 
    async subscribeToLiveData() {
+
       const loading = await this.loadingController.create({
          message: 'Loading...',
       })
@@ -93,23 +108,31 @@ export class BurnMiningComponent implements OnInit {
       const portfolioSub = this.burnMiningService.getPortfolioObservable()
          .subscribe((portfolio) => {
             console.log("portfolio in component at subscription", portfolio)
+            if (!portfolio && this.burnPortfolio != null) {
+               this.burnPortfolio = null;
+            }
             if (portfolio) {
                loading.dismiss();
-               if (portfolio.balanceDue > 0) {
-                  this.burnPortfolio = portfolio;
-                  this.burnMiningService.calculateBaseExtraction(this.burnPortfolio)
-                     .then((baseExtraction) => {
-                        this.baseExtraction = baseExtraction;
-                        console.info(`expected dividends are ${baseExtraction}`)
-                     })
-                  this.burnMiningService.calculateReferralBoost()
-                     .then((referralBoost) => {
-                        this.referralBoost = referralBoost;
-                        console.info(`referral boost is ${this.referralBoost}`)
-                     })
-               }
+               this.burnPortfolio = portfolio;
+               this.burnMiningService.calculateBaseExtraction(this.burnPortfolio)
+                  .then((baseExtraction) => {
+                     this.baseExtraction = baseExtraction;
+                     console.info(`expected dividends are ${baseExtraction}`)
+                  })
+               this.burnMiningService.calculateReferralBoost()
+                  .then((referralBoost) => {
+                     this.referralBoost = referralBoost;
+                     console.info(`referral boost is ${this.referralBoost}`)
+                  })
             }
          })
+      const accountSub = this.accountService.getAccountObservable()
+         .subscribe((account) => {
+            console.log("account ", account)
+            this.userAccount = account;
+            this.burnPortfolio = null;
+         })
+      this.subs.push(accountSub)
       this.assets.getBurnManagerBalance()
          .then((balance) => {
             this.burnManagerBalance = balance.free as number
@@ -184,6 +207,16 @@ export class BurnMiningComponent implements OnInit {
       return (control: AbstractControl): { [key: string]: any } | null => {
          return control.value % 100 === 0 ? null : { 'notMultipleOf100': { value: control.value } };
       };
+   }
+
+   onToggleChange(event: any) {
+      const isChecked = event.detail.checked;
+      if (isChecked) {
+         this.useOwnAddress = true;
+      }
+      else {
+         this.useOwnAddress = false;
+      }
    }
 
    balanceValidator(balance: number): ValidatorFn {

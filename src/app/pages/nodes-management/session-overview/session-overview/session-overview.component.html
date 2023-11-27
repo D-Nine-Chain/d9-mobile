@@ -2,6 +2,8 @@
    <ion-card-header>
       <ion-card-title>Session Info</ion-card-title>
       <p>activeEra:{{overview.activeEra}} </p>
+      <p> currentIndex:{{overview.currentIndex}}</p>
+      <p>validatorCount:{{overview.validatorCount}}</p>
    </ion-card-header>
 </ion-card>
 <ion-list *ngIf="overview">
@@ -12,3 +14,8 @@
       {{validator}}
    </ion-item>
 </ion-list>
+<ion-button>see next elected</ion-button>
+<!--
+to add:
+something where they can see the next elected validators and click on anyone on the last and go to validator info page
+-->

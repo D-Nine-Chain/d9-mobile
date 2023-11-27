@@ -42,6 +42,14 @@ export class MerchantManager implements D9Contract {
       })
    }
 
+   payMerchantD9(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {
+      return this.contract.tx['payMerchantD9']({
+         gasLimit: this.gasLimits.writeLimit,
+         storageDepositLimit: environment.storage_deposit_limit,
+         value: Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
+      }, address)
+   }
+
    giveGreenPoints(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['giveGreenPoints']({
          gasLimit: this.gasLimits.writeLimit,

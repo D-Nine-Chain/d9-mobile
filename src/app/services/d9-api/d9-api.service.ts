@@ -36,6 +36,9 @@ export class D9ApiService {
          .then((metadata) => {
             this.contractsModuleMetadata = metadata.asLatest.pallets[13];
          })
+      this.d9.subscribe((api) => {
+         console.log(`staking is`, api.query.staking)
+      })
    }
    getError(index: string) {
       if (this.contractsModuleMetadata) {

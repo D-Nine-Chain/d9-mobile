@@ -19,7 +19,6 @@ export class SessionOverviewComponent implements OnInit {
       let overviewSub = this.nodesService.getOverview()
          .subscribe((data) => {
             if (data) {
-               console.log("overview ", data)
                this.overview = data
             }
          })
@@ -29,6 +28,6 @@ export class SessionOverviewComponent implements OnInit {
    ngOnInit() { }
    navigateTo(address: string) {
       console.log("navigate to ", address)
-      this.router.navigate(['/nodes/validator', { address: address }])
+      this.router.navigate(['/nodes-management/node-info', { address: address }])
    }
 }

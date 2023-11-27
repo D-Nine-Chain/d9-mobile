@@ -1,6 +1,6 @@
 export const burnContractABI: Record<string, unknown> = {
    "source": {
-      "hash": "0xd19e2cced986202cbb4f24319dd005f7f2c388c8a65c5c6ab8fac29febf2e372",
+      "hash": "0x2da1b7ebb4065bd2ec52012d674d4b203fab69681292bc4e594fc26fc9c2445f",
       "language": "ink! 4.3.0",
       "compiler": "rustc 1.72.0",
       "build_info": {
@@ -175,6 +175,15 @@ export const burnContractABI: Record<string, unknown> = {
       "messages": [
          {
             "args": [
+               {
+                  "label": "burn_beneficiary",
+                  "type": {
+                     "displayName": [
+                        "AccountId"
+                     ],
+                     "type": 0
+                  }
+               },
                {
                   "label": "burn_contract",
                   "type": {
