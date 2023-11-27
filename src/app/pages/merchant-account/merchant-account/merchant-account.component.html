@@ -31,6 +31,7 @@
 
 
 </ion-content>
+
 <ion-card id="merchant-account-card">
    <ion-card-header>
       <ion-card-subtitle>Subscribe</ion-card-subtitle>
@@ -38,15 +39,17 @@
    <ion-card-content>
       <form>
          <ion-select placeholder="Select month" label="Number of months" label-placement="stacked"
-            [formControl]="numberOfMonths">
+            errorText="check balance or allowance" [formControl]="numberOfMonths">
             <ion-select-option value="1">1 month</ion-select-option>
             <ion-select-option value="3">3 months</ion-select-option>
             <ion-select-option value="6">6 months</ion-select-option>
             <ion-select-option value="12">12 months</ion-select-option>
             <ion-select-option value="24">24 months</ion-select-option>
          </ion-select>
-         <ion-button (click)="subscribe()" [disabled]="numberOfMonths.value === 0">subscribe</ion-button>
+         <ion-button (click)="subscribe()" [disabled]="!numberOfMonths.valid">subscribe</ion-button>
+         <ion-button (click)="moreAllowance()" [disabled]="usdtBalance===0">allowance</ion-button>
       </form>
+      balance {{usdtBalance}} allowance {{usdtAllowance}}
    </ion-card-content>
 </ion-card>
-<ion-button (click)="openModal()" *ngIf="">merchant qr code </ion-button>
+<ion-button (click)="openMerchantQrModal()" *ngIf="">merchant qr code </ion-button>

@@ -34,7 +34,7 @@ export class MerchantService {
          .pipe(
             filter((manager) => manager != null),
             switchMap((manager) => {
-               return this.wallet.getActiveAddressObservable()
+               return this.wallet.activeAddressObservable()
                   .pipe(
                      filter((address) => address != null),
                      switchMap((address) => {
@@ -53,7 +53,7 @@ export class MerchantService {
          .pipe(
             filter((manager) => manager != null),
             switchMap((manager) => {
-               return this.wallet.getActiveAddressObservable()
+               return this.wallet.activeAddressObservable()
                   .pipe(
                      filter((address) => address != null),
                      switchMap((address) => {
@@ -128,7 +128,8 @@ export class MerchantService {
    }
 
    public async subscribe(months: number) {
-      const tx = this.merchantManager?.d9Subscribe(months)
+      console.log(`subscribing for ${months} months`)
+      const tx = this.merchantManager?.subscribe(months)
       if (!tx) throw new Error("could not create tx");
       const signedTx = await this.wallet.signTransaction(tx)
       const sub = this.transaction.sendSignedTransaction(signedTx)

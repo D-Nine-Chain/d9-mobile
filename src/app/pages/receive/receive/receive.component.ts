@@ -18,7 +18,7 @@ export class ReceiveComponent implements OnInit {
    }
    ngAfterViewInit() {
       console.log("qr code container", this.qrCodeContainer)
-      this.addressSub = this.wallet.getActiveAddressObservable().subscribe((address: string | null) => {
+      this.addressSub = this.wallet.activeAddressObservable().subscribe((address: string | null) => {
          if (address) {
             this.address = address
             const d9QrCode: D9QrCode = {

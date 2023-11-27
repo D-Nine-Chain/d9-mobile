@@ -18,7 +18,7 @@ export class MerchantQrComponent implements OnInit {
 
    ngOnInit() { }
    async ngAfterViewInit() {
-      combineLatest([this.wallet.getActiveAddressObservable(), this.merchant.merchantExpiryObservable()])
+      combineLatest([this.wallet.activeAddressObservable(), this.merchant.merchantExpiryObservable()])
          .pipe(filter(
             ([address, expiry]) => {
                return address != null && expiry != null

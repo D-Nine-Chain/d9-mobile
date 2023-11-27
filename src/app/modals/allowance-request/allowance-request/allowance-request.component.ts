@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, ValidatorFn, Validators } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController, NavParams } from '@ionic/angular';
 import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
+import { WalletService } from 'app/services/wallet/wallet.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -12,20 +13,27 @@ import { Subscription } from 'rxjs';
 export class AllowanceRequestComponent implements OnInit {
    currentAllowance: number = 0;
    usdtBalance: number = 0;
+   activeAddress: string = '';
    allowanceToAdd = new FormControl(1, [Validators.required, Validators.min(1), this.balanceValidator()]);
-   constructor(private modalControl: ModalController, private usdt: UsdtService) { }
+   constructor(private modalControl: ModalController, private usdt: UsdtService, private navParams: NavParams, private wallet: WalletService) { }
    subs: Subscription[] = [];
+   data: any = this.navParams.data
    ngOnInit() {
+
       let usdtSub = this.usdt.usdtBalanceObservable().subscribe((usdtBalance) => {
-         if (usdtBalance != null) {
-            this.usdtBalance = usdtBalance
-         }
+         this.usdtBalance = usdtBalance
       })
       this.subs.push(usdtSub)
-      let allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
+      console.log(`allowance request for ${this.data.forWho}`)
+      let allowanceSub = this.usdt.allowanceObservable(this.data.forWho).subscribe((allowance) => {
          if (allowance != null) {
             this.currentAllowance = allowance
          }
+         // this.modalControl.getTop().then((top) => {
+         //    if (top) {
+         //       this.modalControl.dismiss()
+         //    }
+         // })
       })
       this.subs.push(allowanceSub)
    }
@@ -37,7 +45,7 @@ export class AllowanceRequestComponent implements OnInit {
    }
 
 
-   insufficietBalance(): boolean {
+   insufficientBalance(): boolean {
       if (this.allowanceToAdd.value) {
          return this.usdtBalance < this.allowanceToAdd.value;
       }
@@ -46,7 +54,7 @@ export class AllowanceRequestComponent implements OnInit {
 
    increaseAllowance() {
       if (this.allowanceToAdd.valid) {
-         this.usdt.approveUsdt(this.allowanceToAdd.value!)
+         this.usdt.setAllowance(this.data['forWho'], this.allowanceToAdd.value!)
             .then(() => {
                this.modalControl.dismiss()
             })
@@ -55,7 +63,6 @@ export class AllowanceRequestComponent implements OnInit {
 
    balanceValidator(): ValidatorFn {
       return (control: AbstractControl): { [key: string]: any } | null => {
-         console.log(`balance is ${this.usdtBalance} and control value is ${control.value}`)
          return this.usdtBalance > control.value ? null : { 'insufficientFunds': { value: control.value } };
       }
    }

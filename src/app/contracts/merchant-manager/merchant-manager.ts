@@ -34,12 +34,12 @@ export class MerchantManager implements D9Contract {
       }, address));
    }
 
-   d9Subscribe(months: number): SubmittableExtrinsic<'rxjs'> {
-      return this.contract.tx['d9Subscribe']({
+   subscribe(months: number): SubmittableExtrinsic<'rxjs'> {
+      const usdtAmount = months * 10;
+      return this.contract.tx['subscribe']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-         value: new BN(months).mul(new BN(10).mul(new BN(10).pow(new BN(12)))).toString()
-      })
+      }, Utils.toBigNumberString(usdtAmount, CurrencyTickerEnum.USDT))
    }
 
    payMerchantD9(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {

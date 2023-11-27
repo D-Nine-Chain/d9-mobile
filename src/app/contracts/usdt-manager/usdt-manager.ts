@@ -17,17 +17,18 @@ export class UsdtManager implements D9Contract {
    }
 
    getBalance(address: string): Promise<ContractCallOutcome> {
+      console.log(`getting balance for ${address}`)
       return firstValueFrom(this.contract.query['psp22::balanceOf'](address, {
          gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit,
       }, address))
    }
 
-   getAllowance(userAddress: string): Promise<ContractCallOutcome> {
+   getAllowance(userAddress: string, requester: string): Promise<ContractCallOutcome> {
       return firstValueFrom(this.contract.query['psp22::allowance'](userAddress, {
          gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-      }, userAddress, environment.contracts.amm.address))
+      }, userAddress, requester))
    }
    makeUsdtTransferTx(to: string, amount: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['psp22::transfer']({

@@ -26,7 +26,7 @@ export const environment = {
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "vqtYmB8phXWgSGjCf5e5P6mXug5J4CYDWkZumC6NJJdmQQc",
+         address: "xTDzwFuwtzd1KFG8KWUzjxRC9gMfbcJeChZRqgNBhjCX4su",
          name: "d9_merchant_mining"
       },
       amm: {

@@ -94,12 +94,12 @@ export class WalletService {
       console.log("keyring loaded")
    }
    public getAddressPromise(): Promise<string | null> {
-      return firstValueFrom(this.getActiveAddressObservable().pipe(
+      return firstValueFrom(this.activeAddressObservable().pipe(
          filter(address => address !== null),
          first()
       ))
    }
-   public getActiveAddressObservable(): Observable<string | null> {
+   public activeAddressObservable(): Observable<string | null> {
       return this.activeAddressSubject.asObservable().pipe(
          filter(address => address != null),
       );
@@ -230,7 +230,7 @@ export class WalletService {
    public async signTransaction(transaction: SubmittableExtrinsic<'rxjs'>): Promise<SubmittableExtrinsic<'rxjs'>> {
       console.log("signing transaction")
       return firstValueFrom(
-         this.getActiveAddressObservable().pipe(
+         this.activeAddressObservable().pipe(
             filter(address => address != null),
             switchMap(address => from(this.getKeyPair(address!))
                .pipe(switchMap((keyPair) => {

@@ -1,12 +1,16 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { MerchantService } from 'app/services/contracts/merchant/merchant.service';
 import { GreenPointsAccount } from 'app/types';
 import { substrateAddressValidator } from 'app/utils/Validators';
 import { Utils } from 'app/utils/utils';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest, filter, forkJoin, switchMap } from 'rxjs';
 import { MerchantQrComponent } from '../merchant-qr/merchant-qr.component';
+import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
+import { AllowanceRequestComponent } from 'app/modals/allowance-request/allowance-request/allowance-request.component';
+import { environment } from 'environments/environment';
+import { WalletService } from 'app/services/wallet/wallet.service';
 
 @Component({
    selector: 'app-merchant-account',
@@ -32,12 +36,28 @@ export class MerchantAccountComponent implements OnInit {
    expirySub: Subscription | null = null;
    loading: any;
    countdown = "";
-   numberOfMonths = new FormControl(0, [Validators.required, Validators.min(1)]);
+   currentModal: any = null;
+   usdtBalance = 0;
+   usdtAllowance = 0;
+
+   numberOfMonths = new FormControl(0, [Validators.required, Validators.min(1), this.monthsValidator()]);
    amountToGreenPoints = new FormControl(1, [Validators.required, Validators.min(1)]);
    toAddress = new FormControl('', [Validators.required, substrateAddressValidator()]);
    accelerateRedPoints = 0;
    redPoints = 0;
-   constructor(private merchantService: MerchantService, private loadingController: LoadingController, public modalController: ModalController) {
+   subs: Subscription[] = []
+   constructor(private merchantService: MerchantService, private loadingController: LoadingController, public modalController: ModalController, private usdt: UsdtService, private wallet: WalletService) {
+      let balanceAllowanceSub = combineLatest([this.usdt.allowanceObservable(environment.contracts.merchant.address),
+      this.usdt.usdtBalanceObservable()])
+         .subscribe(([allowance, balance]) => {
+            console.log(`allowance is e is ${allowance} and balance is ${balance}`)
+            if (allowance != null) {
+               this.usdtAllowance = allowance;
+               this.usdtBalance = balance;
+            }
+         })
+      this.subs.push(balanceAllowanceSub)
+
 
       this.expirySub = this.merchantService.merchantExpiryObservable().subscribe((expiry) => {
 
@@ -49,7 +69,12 @@ export class MerchantAccountComponent implements OnInit {
 
       })
    }
+   showError() {
+      if (this.numberOfMonths) {
+         const errors = this.numberOfMonths.errors;
 
+      }
+   }
    async ngOnInit() {
       this.loading = await this.loadingController.create({
          message: "Loading..."
@@ -58,15 +83,32 @@ export class MerchantAccountComponent implements OnInit {
    }
    ngOnDestroy() {
    }
-
-
-
-   async openModal() {
-      const modal = await this.modalController.create({
+   async openMerchantQrModal() {
+      this.currentModal = await this.modalController.create({
          component: MerchantQrComponent,
-         // other modal options
       });
-      return await modal.present();
+      return await this.currentModal.present();
+   }
+
+   async openAllowanceModal() {
+      const data = {
+         'forWho': environment.contracts.merchant.address,
+      }
+      await this.openModal(AllowanceRequestComponent, data)
+   }
+
+   async moreAllowance() {
+      await this.openAllowanceModal();
+   }
+
+   async openModal(component: any, data?: any) {
+      this.currentModal = await this.modalController.create({
+         component: component,
+      });
+      if (data) {
+         this.currentModal.componentProps = data;
+      }
+      return await this.currentModal.present();
    }
    sendGreenPoints() {
       console.log("sending green points")
@@ -85,6 +127,19 @@ export class MerchantAccountComponent implements OnInit {
    }
 
    generateMerchantCode() {
+   }
+
+   monthsValidator(): ValidatorFn {
+      return (control: AbstractControl): { [key: string]: any } | null => {
+         const months = control.value;
+         return months * 10 > this.usdtAllowance ? { 'insufficientAllowance': { value: control.value } } : null;
+      };
+   }
+
+   balanceValidator(): ValidatorFn {
+      return (control: AbstractControl): { [key: string]: any } | null => {
+         return this.usdtBalance > control.value ? null : { 'insufficientFunds': { value: control.value } };
+      }
    }
 
    subscribe() {
@@ -115,3 +170,4 @@ export class MerchantAccountComponent implements OnInit {
       }, 1000);
    }
 }
+

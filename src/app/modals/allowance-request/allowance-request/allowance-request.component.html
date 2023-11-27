@@ -27,6 +27,6 @@
       <ion-input type="number" fill="solid" label="Increase USDT allowance" labelPlacement="floating"
          helperText="how much allowance would you like to add" errorText="error" id="allowanceInput"
          [formControl]="allowanceToAdd"></ion-input>
-      <ion-button [disabled]="insufficietBalance()" (click)="increaseAllowance()">increase allowance</ion-button>
+      <ion-button [disabled]="insufficientBalance()" (click)="increaseAllowance()">increase allowance</ion-button>
    </ion-card-content>
 </ion-card>

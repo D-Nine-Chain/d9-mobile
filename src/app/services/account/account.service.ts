@@ -16,14 +16,14 @@ export class AccountService {
    addressSubscription: Subscription | null = null;
    constructor(private wallet: WalletService) {
 
-      this.addressSubscription = this.wallet.getActiveAddressObservable().subscribe((address) => {
+      this.addressSubscription = this.wallet.activeAddressObservable().subscribe((address) => {
 
       })
       // this.accountSubject.next({ address: this.wallet.getAddressObservable(), name: "default" })
    }
    // todo convert this to a flat map thing
    public getAccountObservable(): Observable<Account> {
-      return this.wallet.getActiveAddressObservable().pipe(
+      return this.wallet.activeAddressObservable().pipe(
          filter(address => address != null),
          switchMap((address) => {
             return from(this.getAccountMetadata(address!))

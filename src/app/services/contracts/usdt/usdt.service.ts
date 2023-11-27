@@ -3,7 +3,7 @@ import { WalletService } from '../../wallet/wallet.service';
 import { D9ApiService } from '../../d9-api/d9-api.service';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Subscription, catchError, filter, firstValueFrom, lastValueFrom, take, tap } from 'rxjs';
+import { BehaviorSubject, Subscription, catchError, distinctUntilChanged, filter, firstValueFrom, from, lastValueFrom, map, switchMap, take, tap } from 'rxjs';
 import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 
@@ -15,6 +15,7 @@ export class UsdtService {
    private usdtAllowanceSubject = new BehaviorSubject<number>(0);
    private usdtBalanceSubject = new BehaviorSubject<number>(0);
    private addressSub: Subscription | null = null;
+   private usdtManagerSubject = new BehaviorSubject<UsdtManager | null>(null);
    constructor(private d9: D9ApiService, private transaction: TransactionsService, private wallet: WalletService) {
       this.init().catch((err) => {
          console.log(err)
@@ -23,15 +24,7 @@ export class UsdtService {
 
    public async init() {
       this.usdtManager = await this.d9.getContract(environment.contracts.usdt.name)
-      await this.updateBalance()
-      await this.updateAllowance()
-      this.addressSub = this.wallet.getActiveAddressObservable().subscribe((address) => {
-         if (address) {
-            console.log("address in usdt service is ", address)
-            this.updateBalance().catch((err) => { })
-            this.updateAllowance().catch((err) => { })
-         }
-      })
+      this.usdtManagerSubject.next(this.usdtManager);
    }
 
    getUsdtBalancePromise() {
@@ -47,20 +40,38 @@ export class UsdtService {
    }
 
    usdtBalanceObservable() {
-
-      return this.usdtBalanceSubject.asObservable()
+      return this.wallet.activeAddressObservable()
+         .pipe(
+            tap((address) => console.log("getting balance for", address)),
+            distinctUntilChanged(), // only emit when the current value is different than the last
+            switchMap((address) => {
+               console.log("address is ", address)
+               return from(this.updateBalance(address!))
+            }),
+            // switchMap((balance) => {
+            //    return this.usdtBalanceSubject.asObservable()
+            // }),
+            map((balance) => { return balance ?? 0 }),
+            tap((balance) => console.log("usdt balance observable", balance))
+         )
    }
 
-   usdtAllowancePromise() {
-      return firstValueFrom(this.allowanceObservable())
+
+   usdtAllowancePromise(forWhoAddress: string) {
+      return firstValueFrom(this.allowanceObservable(forWhoAddress))
    }
 
-   allowanceObservable() {
-      console.log("allowance observable called")
-      return this.usdtAllowanceSubject.asObservable()
+   allowanceObservable(forWhoAddress: string) {
+      return this.wallet.activeAddressObservable()
+         .pipe(
+            tap((address) => console.log("getting allowance for", address)),
+            switchMap((address) => {
+               return from(this.getCurrentAllowance(address!, forWhoAddress))
+            }),
+         )
    }
 
-   async increaseAllowance(amount: number) {
+   async increaseAllowance(userAddress: string, forWhoAddress: string, amount: number) {
       console.log('increase allowance called')
       const tx = this.usdtManager?.increaseAllowance(environment.contracts.amm.address, amount)
       if (!tx) {
@@ -71,14 +82,16 @@ export class UsdtService {
          .subscribe((result) => {
             console.log("result is ", result)
             if (result.status.isFinalized) {
-               this.updateAllowance()
+               this.getCurrentAllowance(userAddress, forWhoAddress)
                sub.unsubscribe()
             }
          })
    }
 
-   public async approveUsdt(amount: number) {
-      const tx = this.usdtManager?.approve(environment.contracts.amm.address, amount)
+   public async setAllowance(approveWho: string, amount: number) {
+      const userAddress = await this.wallet.getAddressPromise();
+      console.log(`approve usdt called with ${approveWho} and ${amount}`)
+      const tx = this.usdtManager?.approve(approveWho, amount)
       if (!tx) {
          throw new Error("could not create tx")
       }
@@ -87,37 +100,44 @@ export class UsdtService {
          .subscribe((result) => {
             console.log("result is ", result)
             if (result.status.isFinalized) {
-               this.updateAllowance()
+               this.getCurrentAllowance(userAddress!, approveWho)
                sub.unsubscribe()
             }
          })
    }
 
-   async updateBalance() {
-      console.log("getting usdt balance")
-      const address = await firstValueFrom(this.wallet.getActiveAddressObservable().pipe(filter((address) => address != null)))
-      const outcome = await this.usdtManager?.getBalance(address!)
-      if (!outcome) {
-         throw new Error("could not get balance")
-      }
-      const balance = this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
-      console.log("updating balance with ", balance)
-      if (balance != null) this.usdtBalanceSubject.next(balance)
+   updateBalance(userAddress: string): Promise<number | null> {
+      return firstValueFrom(this.usdtManagerSubject.asObservable()
+         .pipe(
+            filter((manager) => manager != null),
+            switchMap((manager) => {
+               return from(manager!.getBalance(userAddress))
+            }),
+            map((outcome) => {
+               return this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
+            }),
+            tap((balance) => {
+               console.log("balance is ", balance)
+               this.usdtBalanceSubject.next(balance ?? 0);
+            })
+         ))
    }
 
-   async updateAllowance() {
-      const userAddress = await this.wallet.getAddressPromise();
-      if (!userAddress) {
-         throw new Error("could not get user address")
-      }
-      const outcome = await this.usdtManager?.getAllowance(userAddress);
-      if (!outcome) {
-         throw new Error("could not get allowance")
-      }
-      const allowance = this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
-      if (allowance) {
-         this.usdtAllowanceSubject.next(allowance)
-      }
+   async getCurrentAllowance(userAddress: string, forWho: string) {
+      return firstValueFrom(this.usdtManagerSubject.asObservable()
+         .pipe(
+            filter((manager) => manager != null),
+            take(1),
+            switchMap((manager) => {
+               return from(manager!.getAllowance(userAddress, forWho))
+            }),
+            map((outcome) => {
+               return this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
+            }),
+            tap((balance) => {
+               this.usdtBalanceSubject.next(balance ?? 0);
+            })
+         ))
    }
 
    public formatUsdtBalance(balance: string | number) {

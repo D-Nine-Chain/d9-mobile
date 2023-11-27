@@ -46,7 +46,7 @@ export class AssetsService {
       const d9 = from(this.d9.getApi());
       return d9.pipe(
          switchMap(api =>
-            from(this.wallet.getActiveAddressObservable()).pipe(
+            from(this.wallet.activeAddressObservable()).pipe(
                filter(address => address != null),
                switchMap(address =>
                   api.derive.balances.all(address!)

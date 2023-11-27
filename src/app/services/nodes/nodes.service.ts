@@ -192,7 +192,7 @@ export class NodesService {
       const formattedAmount = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
       const api = await this.d9.getApi();
       // d9.tx.staking.bond(formattedAmount, address)
-      const address = await firstValueFrom(this.wallet.getActiveAddressObservable()
+      const address = await firstValueFrom(this.wallet.activeAddressObservable()
          .pipe(filter(
             address => address != null
          ))

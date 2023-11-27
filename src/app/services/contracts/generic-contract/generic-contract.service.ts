@@ -80,11 +80,11 @@ export class GenericContractServiceBase {
    }
 
    protected getAddressObservable(): Observable<string | null> {
-      return this.wallet.getActiveAddressObservable();
+      return this.wallet.activeAddressObservable();
    }
 
    protected getAddressPromise(): Promise<string | null> {
-      return firstValueFrom(this.wallet.getActiveAddressObservable().pipe(
+      return firstValueFrom(this.wallet.activeAddressObservable().pipe(
          filter(address => address !== null),
          first()
       ));

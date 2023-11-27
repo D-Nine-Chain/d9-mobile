@@ -11,7 +11,7 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { Asset, LiquidityProvider } from 'app/types';
 import { UsdtService } from '../usdt/usdt.service';
-import { BehaviorSubject, firstValueFrom, lastValueFrom, take, tap } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, lastValueFrom, map, switchMap, take, tap } from 'rxjs';
 import { AssetsService } from '../../asset/asset.service';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
@@ -62,7 +62,11 @@ export class AmmService {
          .subscribe(async (result) => {
             console.log("result is ", result)
             if (result.status.isFinalized) {
-               await this.usdtService.updateBalance();
+               const userAddress = await this.wallet.getAddressPromise();
+               if (userAddress) {
+                  await this.usdtService.updateBalance(userAddress);
+
+               }
                await this.updateReserves();
                sub.unsubscribe()
             }
@@ -83,9 +87,12 @@ export class AmmService {
          .subscribe(async (result) => {
             console.log("result is ", result)
             if (result.status.isFinalized) {
+               const userAddress = await this.wallet.getAddressPromise();
                await this.updateLiquidityProvider();
                await this.updateReserves();
-               await this.usdtService.updateBalance();
+               if (userAddress) {
+                  await this.usdtService.updateBalance(userAddress);
+               }
                sub.unsubscribe()
             }
          })
@@ -108,7 +115,7 @@ export class AmmService {
       console.log("adding liqudity")
       const d9BalanceCheck = await this.checkD9Balance(d9Amount);
       const usdtBalanceCheck = await this.checkUsdtBalance(usdtAmount);
-      const usdtAllowanceCheck = await this.checkUsdtAllowance(usdtAmount);
+      const usdtAllowanceCheck = await this.checkUsdtAllowance(environment.contracts.amm.address, usdtAmount);
       if (!d9BalanceCheck) {
          throw new Error("Insufficient D9")
       }
@@ -131,13 +138,17 @@ export class AmmService {
       const sub = this.transaction.sendSignedTransaction(signedTransaction)
          .subscribe(async (result) => {
             console.log("result is ", result)
+            const userAddress = await this.wallet.getAddressPromise();
             if (result.status.isFinalized) {
                await this.updateLiquidityProvider();
                await this.updateReserves();
-               await this.usdtService.updateBalance();
+               if (userAddress) {
+                  await this.usdtService.updateBalance(userAddress!);
+               }
                sub.unsubscribe()
             }
          })
+
    }
 
    private async checkLiquidity(d9: number, usdt: number): Promise<boolean> {
@@ -165,9 +176,9 @@ export class AmmService {
       return balance ? balance >= amount : false;
    }
 
-   private async checkUsdtAllowance(amount: number): Promise<boolean> {
+   private async checkUsdtAllowance(forWho: string, amount: number): Promise<boolean> {
       console.log("checking usdt allowance")
-      const allowance = await this.usdtService.usdtAllowancePromise();
+      const allowance = await this.usdtService.usdtAllowancePromise(forWho);
       return allowance ? allowance >= amount : false;
    }
 

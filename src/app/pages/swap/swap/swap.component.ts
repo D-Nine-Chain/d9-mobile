@@ -11,6 +11,7 @@ import { CurrencyInfo, D9Balances, LiquidityProvider } from 'app/types';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
 import { ConfirmationComponent } from 'app/modals/swap/confirmation/confirmation.component';
+import { environment } from 'environments/environment';
 
 @Component({
    selector: 'app-swap',
@@ -64,7 +65,7 @@ export class SwapComponent implements OnInit {
       });
       this.subs.push(reservesSub)
 
-      let allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
+      let allowanceSub = this.usdt.allowanceObservable(environment.contracts.amm.address).subscribe((allowance) => {
          if (allowance != null) {
             this.usdtAllowance = allowance
          }

@@ -6,6 +6,7 @@ import { UsdtService } from 'app/services/contracts/usdt/usdt.service';
 import { LiquidityProvider } from 'app/types';
 import { Utils } from 'app/utils/utils';
 import { Subscription } from 'rxjs';
+import { environment } from 'environments/environment';
 
 @Component({
    selector: 'app-liquidity',
@@ -59,7 +60,7 @@ export class LiquidityComponent implements OnInit {
          })
       this.subs.push(usdtBalanceSub)
 
-      const allowanceSub = this.usdt.allowanceObservable().subscribe((allowance) => {
+      const allowanceSub = this.usdt.allowanceObservable(environment.contracts.amm.address).subscribe((allowance) => {
          console.log("allwoance in liquidity component", allowance)
          if (allowance != null) {
             console.log(`allowances is ${allowance}`)
@@ -103,7 +104,8 @@ export class LiquidityComponent implements OnInit {
    async addAllowance() {
       if (this.allowance.valid) {
          const amount = this.allowance.value;
-         await this.usdt.approveUsdt(amount!)
+         const requester = environment.contracts.amm.address;
+         await this.usdt.setAllowance(requester, amount!)
 
       }
    }

@@ -44,7 +44,7 @@ export class BurnMiningService {
    }
 
    public async getAccountOnBurnMiner(): Promise<BurnMinerAccount> {
-      const address = await firstValueFrom(this.wallet.getActiveAddressObservable());
+      const address = await firstValueFrom(this.wallet.activeAddressObservable());
       const burnMiner = await this.d9.getContract(environment.contracts.burn_miner.name);
       const contractCallOutcome = await burnMiner.getAccount(address)
       const account = this.transaction.processReadOutcomes(contractCallOutcome, this.formatBurnMinerAccount)!;
@@ -52,7 +52,7 @@ export class BurnMiningService {
    }
 
    public getPortfolioObservable() {
-      return this.wallet.getActiveAddressObservable()
+      return this.wallet.activeAddressObservable()
          .pipe(
             filter((address) => address != null),
             switchMap(
