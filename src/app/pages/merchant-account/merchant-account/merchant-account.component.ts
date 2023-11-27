@@ -48,7 +48,7 @@ export class MerchantAccountComponent implements OnInit {
    subs: Subscription[] = []
    constructor(private merchantService: MerchantService, private loadingController: LoadingController, public modalController: ModalController, private usdt: UsdtService, private wallet: WalletService) {
       let balanceAllowanceSub = combineLatest([this.usdt.allowanceObservable(environment.contracts.merchant.address),
-      this.usdt.usdtBalanceObservable()])
+      this.usdt.balanceObservable()])
          .subscribe(([allowance, balance]) => {
             console.log(`allowance is e is ${allowance} and balance is ${balance}`)
             if (allowance != null) {

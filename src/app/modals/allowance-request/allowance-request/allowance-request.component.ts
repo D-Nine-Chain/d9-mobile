@@ -20,7 +20,7 @@ export class AllowanceRequestComponent implements OnInit {
    data: any = this.navParams.data
    ngOnInit() {
 
-      let usdtSub = this.usdt.usdtBalanceObservable().subscribe((usdtBalance) => {
+      let usdtSub = this.usdt.balanceObservable().subscribe((usdtBalance) => {
          this.usdtBalance = usdtBalance
       })
       this.subs.push(usdtSub)

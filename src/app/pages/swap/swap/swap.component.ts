@@ -53,7 +53,7 @@ export class SwapComponent implements OnInit {
          }
       })
       this.subs.push(d9Sub)
-      let usdtSub = this.usdt.usdtBalanceObservable().subscribe((usdtBalance) => {
+      let usdtSub = this.usdt.balanceObservable().subscribe((usdtBalance) => {
          this.usdtBalance = usdtBalance
       })
       this.subs.push(usdtSub)

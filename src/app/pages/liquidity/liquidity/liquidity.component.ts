@@ -51,7 +51,7 @@ export class LiquidityComponent implements OnInit {
 
       // this.subs.push(reservesSub)
 
-      let usdtBalanceSub = this.usdt.usdtBalanceObservable()
+      let usdtBalanceSub = this.usdt.balanceObservable()
          .subscribe((usdtBalance) => {
             console.log(`usdt balance in liquidity component is ${usdtBalance}`)
             if (usdtBalance) {

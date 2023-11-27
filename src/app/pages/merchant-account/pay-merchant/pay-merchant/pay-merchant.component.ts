@@ -41,7 +41,7 @@ export class PayMerchantComponent implements OnInit {
       })
       this.subs.push(sub1);
 
-      let sub2 = this.usdt.usdtBalanceObservable().subscribe((balance) => {
+      let sub2 = this.usdt.balanceObservable().subscribe((balance) => {
          if (balance != null) {
             this.usdtBalance = balance
          }

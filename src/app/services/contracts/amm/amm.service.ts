@@ -178,7 +178,7 @@ export class AmmService {
 
    private async checkUsdtAllowance(forWho: string, amount: number): Promise<boolean> {
       console.log("checking usdt allowance")
-      const allowance = await this.usdtService.usdtAllowancePromise(forWho);
+      const allowance = await this.usdtService.allowancePromise(forWho);
       return allowance ? allowance >= amount : false;
    }
 

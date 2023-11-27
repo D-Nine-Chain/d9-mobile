@@ -12,7 +12,7 @@ import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 })
 export class UsdtService {
    private usdtManager: UsdtManager | null = null;
-   private usdtAllowanceSubject = new BehaviorSubject<number>(0);
+   private allowanceSubject = new BehaviorSubject<number>(0);
    private usdtBalanceSubject = new BehaviorSubject<number>(0);
    private addressSub: Subscription | null = null;
    private usdtManagerSubject = new BehaviorSubject<UsdtManager | null>(null);
@@ -28,7 +28,7 @@ export class UsdtService {
    }
 
    getUsdtBalancePromise() {
-      return lastValueFrom(this.usdtBalanceObservable().pipe(
+      return lastValueFrom(this.balanceObservable().pipe(
          catchError(err => {
             console.log('Error in stream', err);
             throw err;
@@ -39,35 +39,38 @@ export class UsdtService {
       ))
    }
 
-   usdtBalanceObservable() {
+   balanceObservable() {
       return this.wallet.activeAddressObservable()
          .pipe(
-            tap((address) => console.log("getting balance for", address)),
             distinctUntilChanged(), // only emit when the current value is different than the last
             switchMap((address) => {
-               console.log("address is ", address)
                return from(this.updateBalance(address!))
             }),
-            // switchMap((balance) => {
-            //    return this.usdtBalanceSubject.asObservable()
-            // }),
             map((balance) => { return balance ?? 0 }),
-            tap((balance) => console.log("usdt balance observable", balance))
+            switchMap((balance) => {
+               this.usdtBalanceSubject.next(balance);
+               return this.usdtBalanceSubject.asObservable()
+            })
          )
    }
 
 
-   usdtAllowancePromise(forWhoAddress: string) {
+   allowancePromise(forWhoAddress: string) {
       return firstValueFrom(this.allowanceObservable(forWhoAddress))
    }
 
    allowanceObservable(forWhoAddress: string) {
       return this.wallet.activeAddressObservable()
          .pipe(
-            tap((address) => console.log("getting allowance for", address)),
+            distinctUntilChanged(),
             switchMap((address) => {
                return from(this.getCurrentAllowance(address!, forWhoAddress))
             }),
+            map((allowance) => { return allowance ?? 0 }),
+            switchMap((allowance) => {
+               this.allowanceSubject.next(allowance);
+               return this.allowanceSubject.asObservable()
+            })
          )
    }
 
@@ -134,9 +137,6 @@ export class UsdtService {
             map((outcome) => {
                return this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
             }),
-            tap((balance) => {
-               this.usdtBalanceSubject.next(balance ?? 0);
-            })
          ))
    }
 
