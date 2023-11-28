@@ -34,14 +34,17 @@ export class PayMerchantComponent implements OnInit {
    constructor(private asset: AssetsService, private usdt: UsdtService, private route: ActivatedRoute, merchant: MerchantService, private merchantService: MerchantService, public modalController: ModalController, private wallet: WalletService) { }
 
    ngOnInit() {
-      this.queryParams = this.route.snapshot.queryParams;
-      if (this.queryParams) {
-         this.merchantAddress = this.queryParams.merchantAccount;
-         this.merchantExpiry = this.queryParams.validUntil;
-         if (this.merchantExpiry != null) {
-            this.countdownToFutureDate(this.merchantExpiry!)
+      this.queryParams = this.route.queryParams.subscribe((params) => {
+         if (params) {
+            this.merchantAddress = params['merchantAddress'];
+            console.log("merh", params['merchantAddress'])
+            this.merchantExpiry = params['validUntil'];
+            if (this.merchantExpiry != null) {
+               this.countdownToFutureDate(this.merchantExpiry!)
+            }
          }
-      }
+      });
+
       let sub1 = this.asset.d9BalancesObservable().subscribe((balances) => {
          if (balances != null) {
             this.d9Balance = balances.free as number;
@@ -86,7 +89,7 @@ export class PayMerchantComponent implements OnInit {
    }
 
    async send() {
-      console.log("buttons pressed")
+
       if (this.amountToSend.valid && this.merchantAddress) {
          console.log("conditions met")
          const amount = this.amountToSend.value;

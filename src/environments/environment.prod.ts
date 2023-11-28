@@ -18,31 +18,31 @@ export const environment = {
    },
    contracts: {
       burn_manager: {
-         address: "v4GeJMACGhNDr51pqii4rA6hDmXWgBzwVrVh4AGSBztSyAP",
+         address: "ypLPGqt7U7qhAdDgC4rD5EAvrRyoCoKJGD2FoNyqHcymW2U",
          name: "d9_burn_manager",
       },
       burn_miner: {
-         address: "vmVC5JNeDj41ZufdvVnHP7c4hMcb8JZBkPnTvPiGibv6hxb",
+         address: "uGMR9uUbAvgdhj9jrBGdh7JenS7GRgCJHZM89mfESrDFhfn",
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "wGXQwuJ4YXa9dmmjYc7MeowKxBYsgHLF7Sa9AVQGv5SwKz8",
-         name: "d9_merchant_mining"
+         address: "uK9yapBkpux69oLqkCPxV7YBAV3xGY7ZA5Y7bdbXn31PR9s",
+         name: "D9 Merchant"
       },
       amm: {
-         address: "wTL3mVzULnrnxVMdcvyCrQ3Xv5NpG6vhFmaqpgAu2NYahot",
-         name: "d9_amm"
+         address: "umNwVqtuXtW2Kky99wKPPXDywC3YFRcgyjtahjy8bj36SA5",
+         name: "D9 AMM"
       },
       usdt: {
          address: "z4mr21CwkZW6njfyGUBFP3JGm9KeBgzD5dsYqSotrYfxuaz",
-         name: "d9_usdt"
+         name: "USDT"
       },
       node_reward: {
          address: "ybyN3459G8z2qdAxNTT3hbt4BXDPdb9NEa7dkGfHGMAAriB",
          name: "d9_node_reward"
       },
       mining_pool: {
-         address: "zNxJXSavSe7bWs4q6CqSQS27rY4SjcZpSmVUvNGdKzdSL3o",
+         address: "wKzVvCnePUupz3StVa7RFoAVzAohg34qNcWTeyjVwDmfWpQ",
          name: "d9_mining_pool"
       },
 

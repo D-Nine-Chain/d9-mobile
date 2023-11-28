@@ -119,6 +119,7 @@ export class QrCodeService {
          merchantAddress: merchantCode.accountId,
          validUntil: merchantCode.validUntil
       }
+      console.log("params in process merchant code ", param)
       this.router.navigate(['/pay-merchant'], { queryParams: param });
    }
 
