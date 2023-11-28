@@ -7,6 +7,7 @@ import { GreenPointsAccount, GreenPointsCreated } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { BehaviorSubject, catchError, distinctUntilChanged, filter, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
+import { UsdtService } from '../usdt/usdt.service';
 
 @Injectable({
    providedIn: 'root'
@@ -17,7 +18,7 @@ export class MerchantService {
    merchantExpirySubject = new BehaviorSubject<number | null>(null);
    greenAccountSubject = new BehaviorSubject<GreenPointsAccount | null>(null);
    merchantManagerSubject = new BehaviorSubject<MerchantManager | null>(null);
-   constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService) {
+   constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService, private usdt: UsdtService) {
 
       this.init().catch((err) => {
          console.log(err)
@@ -94,16 +95,51 @@ export class MerchantService {
    }
 
    public async payMerchant(merchantId: string, amount: number, currency: CurrencyTickerEnum) {
-      const tx = this.merchantManager?.payMerchantD9(merchantId, amount)
-      if (!tx) throw new Error("could not create tx");
-      const signedTx = await this.wallet.signTransaction(tx)
-      const sub = this.transaction.sendSignedTransaction(signedTx)
-         .subscribe(async (result) => {
-            if (result.status.isFinalized) {
-               sub.unsubscribe()
+      const methodName = currency == CurrencyTickerEnum.USDT ? "payMerchantUSDT" : "payMerchantD9"
+      if (!this.merchantManager) {
+         throwError(() => new Error("Merchant Manager is not defined"));
+      }
+
+      let sub = from(this.wallet.getAddressPromise()).pipe(
+         switchMap(userAddress => {
+            const tx = this.merchantManager![methodName](merchantId, amount);
+            if (!tx) {
+               return throwError(() => new Error("could not create tx"));
             }
+
+            return from(this.wallet.signTransaction(tx)).pipe(
+               switchMap(signedTx => {
+                  return this.transaction.sendSignedTransaction(signedTx).pipe(
+                     tap({
+                        next: async (result) => {
+                           if (result.status.isFinalized) {
+                              await this.updateGreenPointsAccount(userAddress!)
+                              sub.unsubscribe()
+                           }
+                        },
+                        error: err => {
+                           // Handle any errors here
+                        },
+                        complete: () => {
+                           // Handle completion here
+                           if (currency == CurrencyTickerEnum.USDT) {
+                              this.usdt.updateBalance(userAddress!)
+                           }
+
+                        }
+                     })
+                  );
+               })
+            );
+         }),
+         catchError(err => {
+            // Handle errors that occur during the observable stream
+            console.error(err);
+            return throwError(() => err);
          })
+      ).subscribe();
    }
+
    public async withdrawD9() {
       const address = await this.wallet.getAddressPromise();
       if (!address) {

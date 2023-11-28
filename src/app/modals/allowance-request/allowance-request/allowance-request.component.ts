@@ -69,7 +69,8 @@ export class AllowanceRequestComponent implements OnInit {
 
    balanceValidator(): ValidatorFn {
       return (control: AbstractControl): { [key: string]: any } | null => {
-         return this.usdtBalance > control.value ? null : { 'insufficientFunds': { value: control.value } };
+         return this.usdtBalance >= control.value ? null : { 'insufficientFunds': { value: control.value } };
+
       }
    }
 }

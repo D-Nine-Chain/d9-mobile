@@ -58,7 +58,11 @@ export class UsdtService {
    allowancePromise(forWhoAddress: string) {
       return firstValueFrom(this.allowanceObservable(forWhoAddress))
    }
-
+   /**
+    * @description increasse allowance for some contract
+    * @param forWhoAddress the requester of allowance
+    * @returns 
+    */
    allowanceObservable(forWhoAddress: string) {
       return this.wallet.activeAddressObservable()
          .pipe(

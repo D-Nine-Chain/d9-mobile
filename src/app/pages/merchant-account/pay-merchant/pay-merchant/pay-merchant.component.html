@@ -29,9 +29,16 @@
       </ion-card-title>
       <ion-card-subtitle>{{merchantAddress}}</ion-card-subtitle>
       <ion-card-content>
+         <ion-select placeholder="Select month" label="Paying currency" label-placement="stacked"
+            errorText="check balance or allowance" [formControl]="currency">
+            <ion-select-option value="USDT">USDT</ion-select-option>
+            <ion-select-option value="D9">D9</ion-select-option>
+         </ion-select>
          <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
             errorText="must be greater than zero" id="burnInput" [formControl]="amountToSend"></ion-input>
-         <ion-button (click)="send()">send</ion-button>
+         <ion-button (click)="send()" [disabled]="disableButton()">send</ion-button>
+         <ion-button *ngIf="currency.value==='USDT'" (click)="openAllowanceModal()">allowance</ion-button>
+         <p *ngIf="currency.value==='USDT'">allowance: {{allowance}}</p>
       </ion-card-content>
    </ion-card-header>
 </ion-card>
