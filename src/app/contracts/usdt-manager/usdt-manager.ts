@@ -44,11 +44,11 @@ export class UsdtManager implements D9Contract {
       }, spender, Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT))
    }
 
-   increaseAllowance(spender: string, amount: number): SubmittableExtrinsic<'rxjs'> {
-      return this.contract.tx['psp22::increase_allowance']({
+   increaseAllowance(spender: string, delta: number): SubmittableExtrinsic<'rxjs'> {
+      return this.contract.tx['psp22::increaseAllowance']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-      }, spender, Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT))
+      }, spender, Utils.toBigNumberString(delta, CurrencyTickerEnum.USDT))
    }
 
 }

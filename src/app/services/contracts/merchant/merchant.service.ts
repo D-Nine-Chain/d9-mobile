@@ -3,10 +3,10 @@ import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { TransactionsService } from 'app/services/transactions/transactions.service';
 import { WalletService } from 'app/services/wallet/wallet.service';
 import { environment } from 'environments/environment';
-import { GreenPointsAccount } from 'app/types';
+import { GreenPointsAccount, GreenPointsCreated } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { BehaviorSubject, distinctUntilChanged, filter, from, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, distinctUntilChanged, filter, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
 
 @Injectable({
    providedIn: 'root'
@@ -15,7 +15,7 @@ export class MerchantService {
 
    merchantManager: MerchantManager | null = null;
    merchantExpirySubject = new BehaviorSubject<number | null>(null);
-   merchantAccountSubject = new BehaviorSubject<GreenPointsAccount | null>(null);
+   greenAccountSubject = new BehaviorSubject<GreenPointsAccount | null>(null);
    merchantManagerSubject = new BehaviorSubject<MerchantManager | null>(null);
    constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService) {
 
@@ -26,7 +26,8 @@ export class MerchantService {
    async init() {
       this.merchantManager = await this.d9.getContract(environment.contracts.merchant.name)
       this.merchantManagerSubject.next(this.merchantManager)
-      this.updateGreenPointsAccount().catch((err) => { })
+      const userAddress = await this.wallet.getAddressPromise();
+      this.updateGreenPointsAccount(userAddress!).catch((err) => { })
    }
 
    public merchantExpiryObservable() {
@@ -51,28 +52,20 @@ export class MerchantService {
          )
    }
 
-   public greenPointsAccountObservable() {
-      return this.merchantManagerObservable()
+   public greenAccountObservable() {
+      return this.wallet.activeAddressObservable()
          .pipe(
-            filter((manager) => manager != null),
-            switchMap((manager) => {
-               return this.wallet.activeAddressObservable()
-                  .pipe(
-                     filter((address) => address != null),
-                     switchMap((address) => {
-                        console.log(`address for merchant account is ${address}`)
-                        return from(manager!.getMerchantAccount(address!))
-                     }),
-                     map((callOutcome) => this.transaction.processReadOutcomes(callOutcome, this.formatGreenPointsAccount)),
-                     switchMap((greenAccount) => {
-                        console.log(`green account is ${greenAccount} in switch map`)
-                        this.merchantAccountSubject.next(greenAccount)
-                        return this.merchantAccountSubject.asObservable()
-                     }),
-                     tap((greenAccount) => { console.log(`expiry ${greenAccount}`) }),
-                  )
+            distinctUntilChanged(),
+            tap({
+               next: async (address) => {
+                  await this.updateGreenPointsAccount(address!)
+               }
+            }),
+            switchMap(() => {
+               return this.greenAccountSubject.asObservable()
             })
          )
+
    }
 
    public calcTimeFactor(account: GreenPointsAccount): number {
@@ -100,7 +93,7 @@ export class MerchantService {
       return sonsFactor + grandsonFactor;
    }
 
-   public async payMerchantD9(merchantId: string, amount: number) {
+   public async payMerchant(merchantId: string, amount: number, currency: CurrencyTickerEnum) {
       const tx = this.merchantManager?.payMerchantD9(merchantId, amount)
       if (!tx) throw new Error("could not create tx");
       const signedTx = await this.wallet.signTransaction(tx)
@@ -111,7 +104,7 @@ export class MerchantService {
             }
          })
    }
-   public async withdrawD9(amount: number) {
+   public async withdrawD9() {
       const address = await this.wallet.getAddressPromise();
       if (!address) {
          throw new Error("no address")
@@ -123,8 +116,8 @@ export class MerchantService {
       const signedTx = await this.wallet.signTransaction(extrinsic)
       const sub = this.transaction.sendSignedTransaction(signedTx)
          .subscribe((result) => {
-            console.log("result is ", result)
             if (result.status.isFinalized) {
+               this.updateGreenPointsAccount(address!)
                sub.unsubscribe()
             }
          })
@@ -156,43 +149,103 @@ export class MerchantService {
       if (expiry) this.merchantExpirySubject.next(expiry)
    }
 
-   public async giveGreenPointsD9(toAddress: string, amount: number) {
-      const tx = this.merchantManager?.giveGreenPointsD9(toAddress, amount)
-      if (!tx) throw new Error("could not create tx");
-      const signedTx = await this.wallet.signTransaction(tx)
-      const sub = this.transaction.sendSignedTransaction(signedTx)
-         .subscribe(async (result) => {
-            if (result.status.isFinalized) {
-               sub.unsubscribe()
-               await this.updateGreenPointsAccount()
+   // public async giveGreenPointsD9(toAddress: string, amount: number) {
+   //    const tx = this.merchantManager?.giveGreenPointsD9(toAddress, amount)
+   //    if (!tx) throw new Error("could not create tx");
+   //    const signedTx = await this.wallet.signTransaction(tx)
+   //    const sub = this.transaction.sendSignedTransaction(signedTx)
+   //       .subscribe(async (result) => {
+   //          if (result.status.isFinalized) {
+   //             sub.unsubscribe()
+   //             await this.updateGreenPointsAccount()
+   //          }
+   //       })
+   // }
+
+   public giveGreenPoints(toAddress: string, amount: number, currency: CurrencyTickerEnum) {
+      // First, we need to handle the potential nullability of this.merchantManager
+      const methodName = currency == CurrencyTickerEnum.USDT ? "giveGreenPointsUSDT" : "giveGreenPointsD9"
+      if (!this.merchantManager) {
+         throwError(() => new Error("Merchant Manager is not defined"));
+      }
+
+      let sub = from(this.wallet.getAddressPromise()).pipe(
+         switchMap(userAddress => {
+            const tx = this.merchantManager![methodName](toAddress, amount);
+            if (!tx) {
+               return throwError(() => new Error("could not create tx"));
             }
+
+            return from(this.wallet.signTransaction(tx)).pipe(
+               switchMap(signedTx => {
+                  return this.transaction.sendSignedTransaction(signedTx).pipe(
+                     tap({
+                        next: async (result) => {
+                           if (result.status.isFinalized) {
+                              await this.updateGreenPointsAccount(userAddress!)
+                              sub.unsubscribe()
+                           }
+                        },
+                        error: err => {
+                           // Handle any errors here
+                        },
+                        complete: () => {
+                           // Handle completion here
+                        }
+                     })
+                  );
+               })
+            );
+         }),
+         catchError(err => {
+            // Handle errors that occur during the observable stream
+            console.error(err);
+            return throwError(() => err);
          })
+      ).subscribe();
+
    }
 
-   public async giveGreenPointsUSDT(toAddress: string, amount: number) {
-      const tx = this.merchantManager?.giveGreenPointsUSDT(toAddress, amount)
-      if (!tx) throw new Error("could not create tx");
-      const signedTx = await this.wallet.signTransaction(tx)
-      const sub = this.transaction.sendSignedTransaction(signedTx)
-         .subscribe(async (result) => {
-            if (result.status.isFinalized) {
-               sub.unsubscribe()
-               await this.updateGreenPointsAccount()
-            }
-         })
+   /**
+    * Calculates the amount of green points given a specified USDT amount.
+    *
+    * @param {number} usdtAmount - The amount of USDT.
+    * @return {Object} An object containing the calculated green points for the consumer and merchant.
+    */
+   public calculateGiveGreenPoints(usdtAmount: number): { consumer: string, merchant: string } {
+      const consumerGreenPoints = (usdtAmount / 0.16) * 100;
+      const merchantGreenPoints = consumerGreenPoints * 0.16;
+      return {
+         consumer: consumerGreenPoints.toFixed(2),
+         merchant: merchantGreenPoints.toFixed(2)
+      };
    }
-
    private merchantManagerObservable() {
       return this.merchantManagerSubject.asObservable()
    }
 
-   public async updateGreenPointsAccount() {
-      const userAddress = await this.wallet.getAddressPromise();
-      if (!userAddress) throw new Error("no address")
-      const outcome = await this.merchantManager?.getMerchantAccount(userAddress)
-      if (!outcome) throw new Error("could not get merchant account")
-      const merchantAccount = this.transaction.processReadOutcomes(outcome, this.formatGreenPointsAccount)
-      if (merchantAccount) this.merchantAccountSubject.next(merchantAccount)
+   // public async updateGreenPointsAccount(userAddress: string) {
+   //    const outcome = await this.merchantManager?.getGreenPointsAccount(userAddress)
+   //    if (!outcome) throw new Error("could not get merchant account")
+   //    const greenAccount = this.transaction.processReadOutcomes(outcome, this.formatGreenPointsAccount)
+   //    if (greenAccount) this.greenAccountSubject.next(greenAccount)
+   // }
+
+   public updateGreenPointsAccount(userAddress: string) {
+      return firstValueFrom(this.merchantManagerObservable()
+         .pipe(
+            filter((manager) => manager != null),
+            distinctUntilChanged(),
+            switchMap((manager) => {
+               return from(manager!.getGreenPointsAccount(userAddress))
+            }),
+            map((outcome) => {
+               return this.transaction.processReadOutcomes(outcome, this.formatGreenPointsAccount)
+            }),
+            tap((greenAccount) => {
+               this.greenAccountSubject.next(greenAccount)
+            })
+         ))
    }
 
 
@@ -210,7 +263,6 @@ export class MerchantService {
          redeemedUsdt: Utils.reduceByCurrencyDecimal(greenPointsAccount.redeemedUsdt, CurrencyTickerEnum.USDT),
          redeemedD9: Utils.reduceByCurrencyDecimal(greenPointsAccount.redeemedD9, CurrencyTickerEnum.D9),
          createdAt: greenPointsAccount.createdAt,
-         expiry: greenPointsAccount.expiry,
       }
       console.log("formatted green points is ", formattedGreenPoints)
       return formattedGreenPoints;

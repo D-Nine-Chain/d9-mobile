@@ -86,6 +86,11 @@ export class AssetsService {
    }
 
 
+   public getAssetIcon(ticker: CurrencyTickerEnum): string {
+      const currencyInfo = Utils.getCurrencyInfo(ticker);
+      return currencyInfo.symbol
+   }
+
 
 
 

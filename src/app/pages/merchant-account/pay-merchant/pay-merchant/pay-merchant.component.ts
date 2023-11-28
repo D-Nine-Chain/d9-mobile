@@ -59,7 +59,7 @@ export class PayMerchantComponent implements OnInit {
          const amount = this.amountToSend.value;
          // this.asset.transferD9(this.merchantAddress, amount!)
          console.log("paying merchant")
-         await this.merchantService.payMerchantD9(this.merchantAddress, amount!)
+         await this.merchantService.payMerchant(this.merchantAddress, amount!)
       }
    }
 

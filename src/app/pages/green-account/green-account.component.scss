@@ -1,9 +1,14 @@
 ion-title {
-  text-align: left;
-  padding: 10px;
+   text-align: left;
+   padding: 10px;
 }
 #green-points-card {
-  p {
-     margin: 10px 0px;
-  }
+   p {
+      margin: 10px 0px;
+   }
+}
+#address-holder {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
 }

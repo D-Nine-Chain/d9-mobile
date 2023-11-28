@@ -71,8 +71,10 @@ export interface GreenPointsAccount {
    redeemedUsdt: number;
    redeemedD9: number;
    createdAt: number;
-   //locale date string
-   expiry?: any;
+}
+export interface GreenPointsCreated {
+   accountId: string,
+   greenPoints: string,
 }
 export interface LiquidityProvider {
    accountId: string;
@@ -177,4 +179,9 @@ export interface LedgerInfo {
    total: number | string;
    active: number | string;
    claimedRewards: any[]
+}
+
+export interface USDTAllowanceRequest {
+   name: string;
+   address: string;
 }

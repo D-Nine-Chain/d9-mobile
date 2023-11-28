@@ -62,4 +62,5 @@ export class MerchantQrComponent implements OnInit {
    }
 
 
+
 }

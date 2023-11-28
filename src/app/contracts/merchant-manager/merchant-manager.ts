@@ -3,7 +3,7 @@ import { GasLimits } from "app/types";
 import { ContractRx } from "app/utils/api-contract";
 import { ContractCallOutcome } from "app/utils/api-contract/types";
 import { environment } from "environments/environment";
-import { firstValueFrom } from "rxjs";
+import { distinctUntilChanged, firstValueFrom, from, map, switchMap } from "rxjs";
 import { BN } from '@polkadot/util';
 import { CurrencyTickerEnum, Utils } from "app/utils/utils";
 import { D9Contract } from "../contracts";
@@ -26,7 +26,7 @@ export class MerchantManager implements D9Contract {
       }, address));
    }
 
-   getMerchantAccount(address: string): Promise<ContractCallOutcome> {
+   getGreenPointsAccount(address: string): Promise<ContractCallOutcome> {
       console.log(`getting merchant account for ${address}`)
       return firstValueFrom(this.contract.query['getAccount'](address, {
          gasLimit: this.gasLimits.readLimit,
@@ -50,6 +50,20 @@ export class MerchantManager implements D9Contract {
       }, address)
    }
 
+   payMerchantUSDT(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {
+      return this.contract.tx['payMerchantUsdt']({
+         gasLimit: this.gasLimits.writeLimit,
+         storageDepositLimit: environment.storage_deposit_limit,
+      }, address, Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT))
+   }
+
+   /**
+    * Generates a transaction to give green points in USDT to a specified address.
+    *
+    * @param {string} address - The address to receive the green points.
+    * @param {number} usdtAmount - The amount of USDT to give as green points.
+    * @return {SubmittableExtrinsic<'rxjs'>} - The transaction to give green points.
+    */
    giveGreenPointsUSDT(address: string, usdtAmount: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['giveGreenPointsUsdt']({
          gasLimit: this.gasLimits.writeLimit,
@@ -58,10 +72,11 @@ export class MerchantManager implements D9Contract {
    }
 
    giveGreenPointsD9(address: string, amount: number): SubmittableExtrinsic<'rxjs'> {
+      console.log(`doing green points through d9`)
       return this.contract.tx['giveGreenPointsD9']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-         value: Utils.toBigNumberString(amount, CurrencyTickerEnum.GREEN_POINTS)
+         value: Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
       }, address)
    }
 

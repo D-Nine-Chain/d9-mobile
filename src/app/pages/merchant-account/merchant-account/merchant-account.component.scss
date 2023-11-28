@@ -1,5 +1,30 @@
-
 #countdown {
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+}
+#greenPointsCalcDisplay {
+   transform: translateX(0%);
+   transition: transform 0.4s ease-out;
+}
+#greenPointsCalcDisplay.show {
+   transform: translateX(100%);
+}
+#green-points-calculation {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   width: 100%;
+}
+.points-containers {
+   display: flex;
+   flex-direction: column;
+}
+.green-point {
+   color: green;
+}
+
+#qrcode {
    display: flex;
    flex-direction: row;
    justify-content: center;

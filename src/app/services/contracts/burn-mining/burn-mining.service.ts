@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Account, BurnMinerAccount, BurnPortfolio } from 'app/types';
-import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, last, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Subscription, filter, first, firstValueFrom, from, switchMap, tap } from 'rxjs';
 import { BurnManager } from 'app/contracts/burn-manager/burn-manager';
 // import { D9ApiService } from 'app/services/d9-api/d9-api.service';
 import { WalletService } from 'app/services/wallet/wallet.service';

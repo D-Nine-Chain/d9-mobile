@@ -23,6 +23,7 @@ import { SessionOverviewComponent } from './pages/nodes-management/session-overv
 import { GreenAccountComponent } from './pages/green-account/green-account.component';
 import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.component';
 import { NodeInfoComponent } from './pages/nodes-management/node-info/node-info.component';
+import { AllowancesComponent } from './pages/allowances/allowances/allowances.component';
 const routes: Routes = [
    {
       path: 'first-run', component: FirstRunComponent
@@ -36,7 +37,7 @@ const routes: Routes = [
       ]
    },
    {
-      path: 'merchant', component: MerchantAccountComponent,
+      path: 'merchant-account', component: MerchantAccountComponent,
    },
    { path: 'send', component: SendComponent },
    { path: 'receive', component: ReceiveComponent },
@@ -69,6 +70,8 @@ const routes: Routes = [
    { path: 'allowance', component: AllowanceRequestComponent },
    { path: 'swap-confirmation', component: ConfirmationComponent },
    { path: 'green-account', component: GreenAccountComponent },
+   { path: 'allowances', component: AllowancesComponent },
+
 ];
 
 @NgModule({

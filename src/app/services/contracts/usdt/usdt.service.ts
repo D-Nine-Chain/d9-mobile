@@ -74,9 +74,13 @@ export class UsdtService {
          )
    }
 
-   async increaseAllowance(userAddress: string, forWhoAddress: string, amount: number) {
+   async increaseAllowance(forWhoAddress: string, increaseByAmount: number) {
+      const userAddress = await this.wallet.getAddressPromise();
+      if (!userAddress) {
+         throw new Error("no address")
+      }
       console.log('increase allowance called')
-      const tx = this.usdtManager?.increaseAllowance(environment.contracts.amm.address, amount)
+      const tx = this.usdtManager?.increaseAllowance(forWhoAddress, increaseByAmount)
       if (!tx) {
          throw new Error("could not create tx")
       }

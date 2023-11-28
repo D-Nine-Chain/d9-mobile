@@ -11,6 +11,7 @@ import { QrCodeDataType, QrCodeService } from 'app/services/qr-code/qr-code.serv
 })
 export class ReceiveComponent implements OnInit {
    @ViewChild('qrCodeContainer') qrCodeContainer!: ElementRef;
+
    addressSub: Subscription | null = null;
    private longPressActive = false;
    constructor(private wallet: WalletService, private qrcodeService: QrCodeService) {

@@ -1,33 +1,71 @@
-<ion-content class="ion-padding">
+<ion-content class="ion-padding no-scroll">
    <ion-card *ngIf="isMerchantAccount()">
-      <ion-card-header>
+      <ion-card-header *ngIf="!calculationVisible">
          <ion-card-subtitle>Merchant Countdown</ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
-         <div id="countdown">
-            <h3>{{countdown}}</h3>
+         <div *ngIf="!calculationVisible">
+            <div id="countdown">
+               <h3>{{countdown}}</h3>
+            </div>
+         </div>
+         <div id="green-points-calculation" *ngIf="calculationVisible">
+            <div class="points-container">
+               <span class="green-point"><fa-icon [icon]="receiveArrow"></fa-icon></span>
+               <p>{{formatNumber(receivedGreenPoints)}}</p>
+            </div>
+            <div class="points-container">
+               <p>Tokens Consumed</p>
+               <p>{{formatNumber(tokensConsumed)}}</p>
+            </div>
+            <div class="points-container">
+               <span class="green-point"><fa-icon [icon]="sendArrow"></fa-icon></span>
+               <p>{{formatNumber(sentGreenPoints)}}</p>
+            </div>
          </div>
       </ion-card-content>
    </ion-card>
-
-   <ion-card *ngIf="isMerchantAccount()" id="merchant-account-card">
-      <ion-card-header>
-         <ion-card-subtitle>Merchant Account</ion-card-subtitle>
-         <div>
+   <swiper-container space-between="1" slides-per-view="auto" centered-slides="true">
+      <swiper-slide>
+         <ion-card *ngIf="isMerchantAccount()" id="merchant-account-card">
+            <ion-card-header>
+               <ion-card-subtitle>Merchant Account</ion-card-subtitle>
+               <div>
+                  <ion-card-content>
+                     <form>
+                        <ion-input type="text" fill="solid" label="enter address" labelPlacement="floating"
+                           errorText="must be valid address" id="addressInput" [formControl]="toAddress"></ion-input>
+                        <ion-input type="number" fill="solid" label="input {{paymentMethod.value}}"
+                           labelPlacement="floating" errorText="must be greater than zero" id="burnInput"
+                           [formControl]="amountToGreenPoints"></ion-input>
+                        <ion-select placeholder="Select Payment" label="payment" label-placement="stacked"
+                           errorText="check balance or allowance" [formControl]="paymentMethod">
+                           <ion-select-option value="USDT">USDT</ion-select-option>
+                           <ion-select-option value="D9">D9</ion-select-option>
+                        </ion-select>
+                        <p>balance:{{getCurrencyIcon()}} {{showBalance()}}</p>
+                     </form>
+                  </ion-card-content>
+                  <ion-button (click)="sendGreenPoints()" [disabled]="disableSendButton()">send green
+                     points</ion-button>
+               </div>
+            </ion-card-header>
+         </ion-card>
+      </swiper-slide>
+      <swiper-slide>
+         <ion-card>
+            <ion-card-header>
+               <ion-card-subtitle>Merchant QR Code</ion-card-subtitle>
+            </ion-card-header>
             <ion-card-content>
-               <form>
-                  <ion-input type="text" fill="solid" label="enter address" labelPlacement="floating"
-                     errorText="must be valid address" id="addressInput" [formControl]="toAddress"></ion-input>
-                  <ion-input type="number" fill="solid" label="input D9" labelPlacement="floating"
-                     errorText="must be greater than zero" id="burnInput"
-                     [formControl]="amountToGreenPoints"></ion-input>
-               </form>
+               <div id="qrcode" #qrCodeContainer></div>
             </ion-card-content>
-            <ion-button (click)="sendGreenPoints()">send green points</ion-button>
-         </div>
-      </ion-card-header>
-   </ion-card>
+         </ion-card>
+      </swiper-slide>
+      ...
+   </swiper-container>
+
 
 
 </ion-content>

@@ -53,7 +53,7 @@ export class AppComponent {
             this._router.navigate(['/new-mnemonic']);
          }
          else {
-            this._router.navigate(['merchant']);
+            this._router.navigate(['merchant-account']);
          }
       });
    }

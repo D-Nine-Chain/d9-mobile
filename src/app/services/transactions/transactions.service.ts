@@ -36,7 +36,6 @@ export class TransactionsService {
     * @returns 
     */
    public processReadOutcomes<T>(callOutcome: ContractCallOutcome, dataFormatter: (data: any) => T): T | null {
-      console.log("processing contract read call", callOutcome)
       if (callOutcome.result.isOk) {
          const contractResponse = (callOutcome.output!.toJSON()! as any).ok
          console.log("contract response is ", contractResponse)

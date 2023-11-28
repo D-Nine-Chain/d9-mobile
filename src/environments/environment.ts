@@ -26,16 +26,16 @@ export const environment = {
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "xTDzwFuwtzd1KFG8KWUzjxRC9gMfbcJeChZRqgNBhjCX4su",
-         name: "d9_merchant_mining"
+         address: "uDc3uT8Ch9fBCtFYW1WUVwKgcHM5tUmYbaasEGRWvZKwnom",
+         name: "D9 Merchant"
       },
       amm: {
          address: "umNwVqtuXtW2Kky99wKPPXDywC3YFRcgyjtahjy8bj36SA5",
-         name: "d9_amm"
+         name: "D9 AMM"
       },
       usdt: {
          address: "z4mr21CwkZW6njfyGUBFP3JGm9KeBgzD5dsYqSotrYfxuaz",
-         name: "d9_usdt"
+         name: "USDT"
       },
       node_reward: {
          address: "ybyN3459G8z2qdAxNTT3hbt4BXDPdb9NEa7dkGfHGMAAriB",

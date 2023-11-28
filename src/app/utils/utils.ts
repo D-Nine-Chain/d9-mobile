@@ -38,7 +38,7 @@ export class Utils {
          name: "Green Points",
          ticker: CurrencyTickerEnum.GREEN_POINTS,
          symbol: CurrencySymbol.GREEN_POINTS,
-         decimals: 12
+         decimals: 2
       },
       [CurrencyTickerEnum.RMB]: {
          name: "RMB",
@@ -63,8 +63,8 @@ export class Utils {
       return numberString
    }
 
-   static formatNumberForUI(number: number): string {
-      return number.toLocaleString('zh-CN', { compactDisplay: "long", maximumFractionDigits: 2, notation: "standard" })
+   static formatNumberForUI(number: number, compact?: "long" | "short", notation?: "standard" | "scientific" | "engineering" | "compact" | undefined): string {
+      return number.toLocaleString('zh-CN', { compactDisplay: compact ?? "long", maximumFractionDigits: 2, notation: notation ?? "standard" })
    }
 
    static reduceByCurrencyDecimal(number: string | number, currency: CurrencyTickerEnum): number {

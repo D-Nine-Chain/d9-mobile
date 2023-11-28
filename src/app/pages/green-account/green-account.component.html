@@ -5,6 +5,8 @@
       <ion-header>
          <ion-title>Green Points Account</ion-title>
       </ion-header>
+      <h2>{{accountName}}</h2>
+      <p id="address-holder">{{accountAddress}}</p>
       <ion-card id="green-points-card" *ngIf="greenPointsAccount">
          <ion-card-header>
             <ion-card-title>{{
@@ -13,7 +15,6 @@
             <ion-card-subtitle>My Green Points</ion-card-subtitle>
          </ion-card-header>
          <ion-card-content>
-            <p>redeemed D9: {{ greenPointsAccount.redeemedD9 }}</p>
             <p>redeemed USDT: {{ greenPointsAccount.redeemedUsdt }}</p>
             <p>Red Points: {{ redPoints }}</p>
             <p>Accelerate Red Points: {{ accelerateRedPoints }}</p>
