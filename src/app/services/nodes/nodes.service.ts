@@ -21,10 +21,10 @@ export class NodesService {
    currentTransactionSub: any;
 
    public getSessionValidators() {
-      const api = this.d9.getApi();
+      const api = this.d9.getApiPromise();
       // return api.query.staking.validators()
       this.currentNode.next("5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY")
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.queryMulti(
@@ -45,7 +45,7 @@ export class NodesService {
 
    public getNodeInfo(address: string): Observable<NodeInfo> {
       console.log(`getting node info for ${address}`)
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.queryMulti(
@@ -83,7 +83,7 @@ export class NodesService {
 
 
    public getHealth() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.rpc.system.health()
@@ -94,7 +94,7 @@ export class NodesService {
 
    }
    public eraValidatorPrefs() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.query.staking.erasValidatorPrefs(0, '5DAv93yptzLKRrWJveVo6eetiexmxaGPWGdxnGPQrcJEp1rW')
@@ -106,7 +106,7 @@ export class NodesService {
    }
 
    public getNominators() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.query.staking.nominators.keys()
@@ -117,7 +117,7 @@ export class NodesService {
 
 
    public getEpochInfo() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.derive.session.info()
@@ -144,7 +144,7 @@ export class NodesService {
 
 
    public getValidatorsAddresses() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.query.staking.validators.keys()
@@ -153,7 +153,7 @@ export class NodesService {
    }
 
    public getOverview() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.derive.staking.overview()
@@ -176,7 +176,7 @@ export class NodesService {
    }
    // public 
    public getActiveEra() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.query.staking.activeEra()
@@ -190,7 +190,7 @@ export class NodesService {
    public async bondTokens(amount: number) {
       console.log(`bonding ${amount}`)
       const formattedAmount = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9)
-      const api = await this.d9.getApi();
+      const api = await this.d9.getApiPromise();
       // d9.tx.staking.bond(formattedAmount, address)
       const address = await firstValueFrom(this.wallet.activeAddressObservable()
          .pipe(filter(
@@ -210,7 +210,7 @@ export class NodesService {
    }
 
    public getEraStakers() {
-      return from(this.d9.getApi())
+      return from(this.d9.getApiPromise())
          .pipe(
             switchMap(
                d9 => d9.query.staking.erasStakers(0, '5DAv93yptzLKRrWJveVo6eetiexmxaGPWGdxnGPQrcJEp1rW')

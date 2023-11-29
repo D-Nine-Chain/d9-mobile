@@ -24,6 +24,7 @@ import { GreenAccountComponent } from './pages/green-account/green-account.compo
 import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.component';
 import { NodeInfoComponent } from './pages/nodes-management/node-info/node-info.component';
 import { AllowancesComponent } from './pages/allowances/allowances/allowances.component';
+import { ErrorComponent } from './pages/error/error/error.component';
 const routes: Routes = [
    {
       path: 'first-run', component: FirstRunComponent
@@ -71,7 +72,7 @@ const routes: Routes = [
    { path: 'swap-confirmation', component: ConfirmationComponent },
    { path: 'green-account', component: GreenAccountComponent },
    { path: 'allowances', component: AllowancesComponent },
-
+   { path: 'error', component: ErrorComponent },
 ];
 
 @NgModule({

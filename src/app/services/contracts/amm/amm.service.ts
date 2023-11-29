@@ -169,9 +169,7 @@ export class AmmService {
    }
 
    private async checkUsdtBalance(amount: number): Promise<boolean> {
-      console.log("checking usdt balance")
       const balance = (await this.usdtService.getUsdtBalancePromise()) ?? 0;
-      console.log("usdt balance is ", balance)
 
       return balance ? balance >= amount : false;
    }

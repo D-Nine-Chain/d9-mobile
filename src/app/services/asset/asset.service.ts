@@ -30,7 +30,7 @@ export class AssetsService {
 
    private async init() {
 
-      const api = await this.d9.getApi();
+      const api = await this.d9.getApiPromise();
    }
 
    public async d9BalancesPromise(): Promise<D9Balances> {
@@ -43,7 +43,7 @@ export class AssetsService {
     */
    public d9BalancesObservable(): Observable<D9Balances> {
       console.log("getting d9 balance");
-      const d9 = from(this.d9.getApi());
+      const d9 = from(this.d9.getApiPromise());
       return d9.pipe(
          switchMap(api =>
             from(this.wallet.activeAddressObservable()).pipe(
@@ -60,7 +60,7 @@ export class AssetsService {
    }
 
    public async getBurnManagerBalance() {
-      const d9 = await this.d9.getApi();
+      const d9 = await this.d9.getApiPromise();
       const burnManagerBalance = await firstValueFrom(d9.derive.balances.all(environment.contracts.burn_manager.address));
       console.log("burn manager balance", burnManagerBalance)
       return this.formatD9Balances(burnManagerBalance);
@@ -68,7 +68,7 @@ export class AssetsService {
 
    public async transferD9(toAddress: string, amount: number) {
       const numberString = Utils.toBigNumberString(amount, CurrencyTickerEnum.D9);
-      const api = await this.d9.getApi();
+      const api = await this.d9.getApiPromise();
       const transferTx = api.tx.balances.transfer(toAddress, numberString)
       const signedTransaction = await this.wallet.signTransaction(transferTx)
       this.transactionSub = this.transaction.sendSignedTransaction(signedTransaction)

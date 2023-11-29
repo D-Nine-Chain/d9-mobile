@@ -1,17 +1,31 @@
 <ion-content class="ion-padding">
+   <ion-card>
+      <ion-card-header>
+         <ion-card-title>Balance Info</ion-card-title>
+         <ion-card-content>
+            <p>{{d9CurrencySymbol}} {{formatNumber(d9Balance)}}</p>
+            <p>{{usdtCurrencySymbol}} {{formatNumber(usdtBalance)}}</p>
+         </ion-card-content>
+      </ion-card-header>
+   </ion-card>
    <ion-card id="send-account-card">
       <ion-card-header>
          <ion-card-subtitle>Send D9</ion-card-subtitle>
          <div>
             <ion-card-content>
                <form>
+                  <ion-select placeholder="Select currency" label="select your currency" label-placement="stacked"
+                     errorText="check balance or allowance" [formControl]="currencyChoice">
+                     <ion-select-option value="D9">D9</ion-select-option>
+                     <ion-select-option value="USDT">USDT</ion-select-option>
+                  </ion-select>
                   <ion-input type="text" fill="solid" label="enter address" labelPlacement="floating"
                      errorText="must be valid address" id="addressInput" [formControl]="toAddress"></ion-input>
                   <ion-input type="number" fill="solid" label="input amount" labelPlacement="floating"
                      errorText="must be greater than zero" id="burnInput" [formControl]="amountToSend"></ion-input>
                </form>
             </ion-card-content>
-            <ion-button (click)="send()">send D9</ion-button>
+            <ion-button (click)="send()" [disabled]="amountToSend.invalid || toAddress.invalid">send</ion-button>
          </div>
       </ion-card-header>
    </ion-card>

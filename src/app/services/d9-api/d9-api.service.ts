@@ -36,9 +36,7 @@ export class D9ApiService {
          .then((metadata) => {
             this.contractsModuleMetadata = metadata.asLatest.pallets[13];
          })
-      this.d9.subscribe((api) => {
-         console.log(`staking is`, api.query.staking)
-      })
+
    }
    getError(index: string) {
       if (this.contractsModuleMetadata) {
@@ -47,19 +45,23 @@ export class D9ApiService {
       return null;
    }
    async getMetadata() {
-      const d9 = await this.getApi();
+      const d9 = await this.getApiPromise();
       return firstValueFrom(d9.rpc.state.getMetadata());
    }
 
-   getApi() {
+   getApiPromise() {
       return firstValueFrom(this.d9.pipe(
          filter(api => api !== null && api !== undefined),
          first()
       ))
    }
 
+   getApiObservable() {
+      return this.d9
+   }
+
    async getContract(contractName: string): Promise<any> {
-      const d9 = await this.getApi();
+      const d9 = await this.getApiPromise();
       const contractMetadata = await ContractUtils.getContractMetadata(contractName);
       const contract = new ContractRx(d9, contractMetadata.abi, contractMetadata.address);
       const gasLimits: GasLimits = {
@@ -84,12 +86,12 @@ export class D9ApiService {
    }
 
    public async getGasLimit() {
-      let api = await this.getApi();
+      let api = await this.getApiPromise();
       return api.registry.createType('WeightV2', { refTime: new BN(50_000_000_000), proofSize: new BN(800_000) }) as WeightV2;
    }
 
    public async getReadGasLimit() {
-      let api = await this.getApi();
+      let api = await this.getApiPromise();
       return api.registry.createType('WeightV2', { refTime: MAX_CALL_WEIGHT, proofSize: PROOFSIZE }) as WeightV2
    }
 

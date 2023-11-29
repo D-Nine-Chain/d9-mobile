@@ -170,7 +170,6 @@ export class SwapComponent implements OnInit {
    isInvalidSwap(control: AbstractControl): ValidationErrors | null {
 
       if (this.fromCurrency.ticker === CurrencyTickerEnum.D9) {
-         console.log(`control value is ${control.value} and from balance is ${this.fromBalance}`)
          const insufficientBalance = control.value > (this.fromBalance as number);
          if (insufficientBalance) {
             return this.constructError('Insufficient D9 balance', control);
@@ -198,10 +197,8 @@ export class SwapComponent implements OnInit {
    }
 
    isBalanceSufficient(): boolean {
-      console.log("checking if balance is sufficient")
       if (this.swapAmount) {
          if (this.swapAmount.value !== null) {
-            console.log("this from balance is ", this.d9Balances.free)
             return this.swapAmount.value <= (this.d9Balances.free as number)
          }
          else {
@@ -214,7 +211,6 @@ export class SwapComponent implements OnInit {
    }
 
    getCurrentBalanceString() {
-      console.log("this from balance is ", this.fromBalance)
       return `your current ${this.fromCurrency.name} balance is ${this.fromBalance}`
    }
 

@@ -1,7 +1,7 @@
 <ion-content class="ion-padding">
-   <div *ngIf="!isGreenAccount">You don't have a green account.</div>
+   <div *ngIf="!greenPointsAccount">You don't have a green account.</div>
 
-   <div *ngIf="isGreenAccount">
+   <div *ngIf="greenPointsAccount">
       <ion-header>
          <ion-title>Green Points Account</ion-title>
       </ion-header>
@@ -15,7 +15,7 @@
             <ion-card-subtitle>My Green Points</ion-card-subtitle>
          </ion-card-header>
          <ion-card-content>
-            <p>redeemed USDT: {{ greenPointsAccount.redeemedUsdt }}</p>
+            <p>redeemed D9: {{ greenPointsAccount.redeemedD9 }}</p>
             <p>Red Points: {{ redPoints }}</p>
             <p>Accelerate Red Points: {{ accelerateRedPoints }}</p>
             <ion-button expand="full" (click)="withdraw()">redeem</ion-button>

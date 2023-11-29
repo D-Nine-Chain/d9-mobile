@@ -68,6 +68,7 @@ export class Utils {
    }
 
    static reduceByCurrencyDecimal(number: string | number, currency: CurrencyTickerEnum): number {
+      console.log("number is", number)
       // Check if the input is an empty string
       if (typeof number === 'string' && number.trim().length === 0) {
          return new BN(0).toNumber();
@@ -85,9 +86,7 @@ export class Utils {
       }
       // If the input is a number, handle it directly
       else if (typeof number === 'number') {
-         return new BN(number).div(
-            new BN(10).pow(new BN(this.currenciesRecord[currency].decimals))
-         ).toNumber();
+         return number / Math.pow(10, this.currenciesRecord[currency].decimals)
       }
       // If none of the above, return 0 or throw an error
       else {

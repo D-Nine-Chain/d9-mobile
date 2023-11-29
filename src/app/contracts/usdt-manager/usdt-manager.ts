@@ -30,11 +30,12 @@ export class UsdtManager implements D9Contract {
          storageDepositLimit: environment.storage_deposit_limit,
       }, userAddress, requester))
    }
-   makeUsdtTransferTx(to: string, amount: number): SubmittableExtrinsic<'rxjs'> {
+
+   transfer(to: string, amount: number): SubmittableExtrinsic<'rxjs'> {
       return this.contract.tx['psp22::transfer']({
          gasLimit: this.gasLimits.writeLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-      }, to, Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT))
+      }, to, Utils.toBigNumberString(amount, CurrencyTickerEnum.USDT), '0x0')
    }
 
    approve(spender: string, amount: number): SubmittableExtrinsic<'rxjs'> {

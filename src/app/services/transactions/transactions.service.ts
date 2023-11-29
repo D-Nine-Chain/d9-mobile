@@ -4,13 +4,16 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import { BehaviorSubject, Observable, Subscription, catchError, from, tap, throwError } from 'rxjs';
 import { NotificationService } from '../notification/notification.service';
 import { ContractCallOutcome } from 'app/utils/api-contract/types';
+import { EventsService } from '../events/events.service';
+import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
 
 @Injectable({
    providedIn: 'root'
 })
 export class TransactionsService {
    private transactionResultSub: BehaviorSubject<ISubmittableResult | null> = new BehaviorSubject<ISubmittableResult | null>(null);
-   constructor(private notification: NotificationService) { }
+   constructor(private notification: NotificationService, private events: EventsService, private router: Router, private alertControl: AlertController) { }
    public currentTransactionSub: Subscription | null = null;
    public sendSignedTransaction(transaction: SubmittableExtrinsic<'rxjs', ISubmittableResult>): Observable<ISubmittableResult> {
       console.log("sending signed transactions");
@@ -23,7 +26,12 @@ export class TransactionsService {
          }),
          catchError(err => {
             console.error("Error sending transaction:", err);
-            return throwError(err); // or handle the error as appropriate
+            this.alertControl.create({
+               header: 'Error',
+               message: err.message,
+               buttons: ['OK']
+            }).then((alert) => { alert.present() })
+            return throwError(err);
          })
       );
 
@@ -86,11 +94,12 @@ export class TransactionsService {
       if (result.dispatchError) {
          // sendNotification("error", "", `${JSON.stringify(result.dispatchError.toHuman())}`)
          this.currentTransactionSub?.unsubscribe();
+         this.router.navigate(['/error'], { queryParams: { error: JSON.stringify(result.toHuman()) } });
          this.transactionResultSub.next(result);
          result.events.forEach((e) => {
             console.log(e.toJSON())
          })
-         console.log("transaction result is ", result.toHuman())
+         console.log("RESULT WITH DISPATCH ERROR ", result.toHuman())
       }
    }
 }

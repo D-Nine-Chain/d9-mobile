@@ -13,7 +13,7 @@ export class ReferralService {
       return this.wallet.activeAddressObservable()
          .pipe(
             switchMap(address =>
-               from(this.d9.getApi()).pipe(
+               from(this.d9.getApiPromise()).pipe(
                   switchMap(d9 =>
                      d9.query['d9Referral']['directReferralsCount'](address)
                   ),
@@ -27,7 +27,7 @@ export class ReferralService {
    getParent(): Promise<string> {
       const observable$ = this.wallet.activeAddressObservable().pipe(
          switchMap(account =>
-            from(this.d9.getApi()).pipe(
+            from(this.d9.getApiPromise()).pipe(
                switchMap(d9 => from((d9.rpc as any).referral.getParent(account)))
 
             ).pipe(
@@ -44,7 +44,7 @@ export class ReferralService {
       return this.wallet.activeAddressObservable()
          .pipe(
             switchMap(address =>
-               from(this.d9.getApi()).pipe(
+               from(this.d9.getApiPromise()).pipe(
                   switchMap(d9 =>
                      from((d9.rpc as any).referral.getDirectReferralsCount(address))
                   )
@@ -57,7 +57,7 @@ export class ReferralService {
       return this.wallet.activeAddressObservable()
          .pipe(switchMap(
             async (account) => {
-               const d9 = await this.d9.getApi();
+               const d9 = await this.d9.getApiPromise();
                return await (d9.rpc as any).referral.getAncestors(account)
             }
          ),

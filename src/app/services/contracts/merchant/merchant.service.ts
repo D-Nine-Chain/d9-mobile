@@ -8,6 +8,7 @@ import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { BehaviorSubject, catchError, distinctUntilChanged, filter, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
 import { UsdtService } from '../usdt/usdt.service';
+import { Router } from '@angular/router';
 
 @Injectable({
    providedIn: 'root'
@@ -18,7 +19,7 @@ export class MerchantService {
    merchantExpirySubject = new BehaviorSubject<number | null>(null);
    greenAccountSubject = new BehaviorSubject<GreenPointsAccount | null>(null);
    merchantManagerSubject = new BehaviorSubject<MerchantManager | null>(null);
-   constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService, private usdt: UsdtService) {
+   constructor(private wallet: WalletService, private transaction: TransactionsService, private d9: D9ApiService, private usdt: UsdtService, private router: Router) {
 
       this.init().catch((err) => {
          console.log(err)
@@ -40,7 +41,6 @@ export class MerchantService {
                   .pipe(
                      distinctUntilChanged(),
                      switchMap((address) => {
-                        console.log(`address for merchant account is ${address}`)
                         return from(manager!.getMerchantExpiry(address!))
                      }),
                      map((callOutcome) => this.transaction.processReadOutcomes(callOutcome, this.formatExpiry)),
@@ -177,7 +177,6 @@ export class MerchantService {
 
    public async updateExpiry() {
       const userAddress = await this.wallet.getAddressPromise();
-      console.log(`address for merchant account is ${userAddress}`)
       if (!userAddress) throw new Error("no address")
       const outcome = await this.merchantManager?.getMerchantExpiry(userAddress)
       if (!outcome) throw new Error("could not get expiry")
@@ -217,10 +216,16 @@ export class MerchantService {
                   return this.transaction.sendSignedTransaction(signedTx).pipe(
                      tap({
                         next: async (result) => {
-                           if (result.status.isFinalized) {
+                           if (result.status.isFinalized && !result.dispatchError) {
                               await this.updateGreenPointsAccount(userAddress!)
+                              this.router.navigate(['green-account'])
                               sub.unsubscribe()
                            }
+                           else if (result.dispatchError) {
+                              this.router.navigate(['error'])
+                              sub.unsubscribe()
+                           }
+
                         },
                         error: err => {
                            // Handle any errors here
@@ -291,7 +296,6 @@ export class MerchantService {
    }
 
    private formatGreenPointsAccount(greenPointsAccount: any): GreenPointsAccount {
-      console.log("merchant account is ", greenPointsAccount)
       const formattedGreenPoints: GreenPointsAccount = {
          greenPoints: Utils.reduceByCurrencyDecimal(greenPointsAccount.greenPoints, CurrencyTickerEnum.GREEN_POINTS),
          relationshipFactors: greenPointsAccount.relationshipFactors,

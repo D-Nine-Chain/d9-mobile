@@ -49,7 +49,6 @@ export class WalletService {
       } else {
          this.softDerivationCounter = 0;
       }
-      console.log("loading addresses");
       const allAddressesResult = await Preferences.get({ key: environment.preferences_addresses });
       const defaultAddressResult = await Preferences.get({ key: environment.preferences_default_address });
       const rootAddressResult = await Preferences.get({ key: environment.preferences_root_address });
@@ -62,7 +61,6 @@ export class WalletService {
          this.activeAddressSubject.next(defaultAddressResult.value);
       }
       if (!defaultAddressResult.value && allAddresses.length > 0) {
-         console.log("actived address set from all addresses array", allAddresses[0])
          this.activeAddressSubject.next(allAddresses[0]);
          this.rootAddress = allAddresses[0];
       }

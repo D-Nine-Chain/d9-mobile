@@ -3,10 +3,11 @@ import { WalletService } from '../../wallet/wallet.service';
 import { D9ApiService } from '../../d9-api/d9-api.service';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Subscription, catchError, distinctUntilChanged, filter, firstValueFrom, from, lastValueFrom, map, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Subscription, catchError, combineLatest, distinctUntilChanged, filter, firstValueFrom, from, lastValueFrom, map, switchMap, take, tap } from 'rxjs';
 import { UsdtManager } from 'app/contracts/usdt-manager/usdt-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-
+import { Abi } from '@polkadot/api-contract';
+import { ContractUtils } from 'app/contracts/contract-utils/contract-utils';
 @Injectable({
    providedIn: 'root'
 })
@@ -25,6 +26,8 @@ export class UsdtService {
    public async init() {
       this.usdtManager = await this.d9.getContract(environment.contracts.usdt.name)
       this.usdtManagerSubject.next(this.usdtManager);
+      this.watchEvents()
+         .subscribe()
    }
 
    getUsdtBalancePromise() {
@@ -78,6 +81,38 @@ export class UsdtService {
          )
    }
 
+   transfer(toAddress: string, amount: number) {
+      let userAddress: string | null = null;
+      let sub = combineLatest(
+         [
+            this.usdtManagerSubject.asObservable(),
+            this.wallet.activeAddressObservable()
+         ]
+      ).pipe(
+         filter(([manager, address]) => manager != null && address != null),
+         take(1),
+         tap(([_, address]) => userAddress = address),
+         map(([manager, _]) => {
+            if (!manager || !userAddress) {
+               throw new Error("Could not get manager or user address");
+            }
+            return manager.transfer(toAddress, amount);
+         }),
+         switchMap((tx) => {
+            return from(this.wallet.signTransaction(tx));
+         }),
+         switchMap((signedTx) => {
+            return this.transaction.sendSignedTransaction(signedTx);
+         }),
+         tap((result) => {
+            if (result.status.isFinalized && userAddress) {
+               this.updateBalance(userAddress);
+               sub.unsubscribe();
+            }
+         })
+      ).subscribe();
+   }
+
    async increaseAllowance(forWhoAddress: string, increaseByAmount: number) {
       const userAddress = await this.wallet.getAddressPromise();
       if (!userAddress) {
@@ -117,6 +152,17 @@ export class UsdtService {
          })
    }
 
+   regularUSDTBalanceCheck() {
+      return this.wallet.activeAddressObservable()
+         .pipe(
+            tap((address) => {
+               setInterval(async () => {
+                  await this.updateBalance(address!)
+               }, 6000)
+            })
+         )
+   }
+
    updateBalance(userAddress: string): Promise<number | null> {
       return firstValueFrom(this.usdtManagerSubject.asObservable()
          .pipe(
@@ -128,7 +174,6 @@ export class UsdtService {
                return this.transaction.processReadOutcomes(outcome, this.formatUsdtBalance)
             }),
             tap((balance) => {
-               console.log("balance is ", balance)
                this.usdtBalanceSubject.next(balance ?? 0);
             })
          ))
@@ -154,6 +199,54 @@ export class UsdtService {
 
    public formatUsdtBalance(balance: string | number) {
       return Utils.reduceByCurrencyDecimal(balance, CurrencyTickerEnum.USDT)
+   }
+
+   private watchEvents() {
+      return combineLatest([
+         this.d9.getApiObservable(),
+         this.usdtManagerSubject.asObservable()
+      ]).pipe(
+         switchMap(([api, contract]) => api.query.system.events().pipe(
+            map(events => ({ events, contract }))
+         )),
+         tap(({ events, contract }) => this.processEvents(contract, events))
+      );
+   }
+
+
+   private async processEvents(contract: any, events: any) {
+      console.log("events are ", events)
+      events.forEach(async (record: any) => {
+         // Extract the phase, event and the event types
+         const { event, phase } = record;
+         const types = event.typeDef;
+         const abi = (await ContractUtils.getContractMetadata(environment.contracts.burn_manager.name)).abi;
+         const contractAbi = new Abi(abi)
+         // Show what we are busy with
+         console.log(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
+         console.log("event data is ", event.data.toJSON())
+         if (event.section == "contracts" && event.method == "ContractEmitted") {
+            console.log("contract emitted event")
+            const [emittedContractAddress, data] = event.data;
+            console.log("emitted contract address is ", emittedContractAddress)
+            const decodedData = contractAbi.decodeEvent(data);
+            console.log("decoded data to json", decodedData)
+            const eventArgs = decodedData.args;
+            eventArgs.forEach((arg: any) => {
+               console.log("arg is ", arg)
+               console.log("arg is ", arg.toJSON())
+            })
+            console.log("Contract emitted event:", decodedData.event);
+
+
+         }
+         // console.log("phase is :", phase.toJSON())
+         // Loop through each of the parameters, displaying the type and data
+         event.data.forEach((data: any, index: any) => {
+            console.log(`\t\t\t${types[index].type}: ${data.toJSON()}`);
+            console.log("perhaps decoded data is :", data.toJSON())
+         });
+      });
    }
 
 }

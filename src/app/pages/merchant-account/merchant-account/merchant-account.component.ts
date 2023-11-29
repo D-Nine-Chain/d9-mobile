@@ -83,16 +83,16 @@ export class MerchantAccountComponent implements OnInit {
 
       this.subs.push(d9balanceSub)
 
-      let balanceAllowanceSub = combineLatest([this.usdt.allowanceObservable(environment.contracts.merchant.address),
+      let balanceAndAllowanceSub = combineLatest([this.usdt.allowanceObservable(environment.contracts.merchant.address),
       this.usdt.balanceObservable()])
          .subscribe(([allowance, balance]) => {
-            console.log(`allowance is e is ${allowance} and balance is ${balance}`)
             if (allowance != null) {
                this.usdtAllowance = allowance;
                this.usdtBalance = balance;
+               this.amountToGreenPoints.updateValueAndValidity();
             }
          })
-      this.subs.push(balanceAllowanceSub)
+      this.subs.push(balanceAndAllowanceSub)
 
       let inputSub = this.amountToGreenPoints.valueChanges.subscribe((value) => {
          if (value != null) {
@@ -225,7 +225,9 @@ export class MerchantAccountComponent implements OnInit {
       return (control: AbstractControl): { [key: string]: any } | null => {
          const amount = control.value;
          if (this.paymentMethod.value == "USDT") {
-            return amount > this.usdtBalance ? { 'insufficientFunds': { value: control.value } } : null;
+            const sufficientBalance = amount <= this.usdtBalance;
+            const sufficientAllowance = amount <= this.usdtAllowance;
+            return sufficientAllowance && sufficientBalance ? null : { 'insufficientFunds': { value: control.value } };
          }
          else if (this.paymentMethod.value == "D9") {
             return amount > this.d9FreeBalance ? { 'insufficientFunds': { value: control.value } } : null;

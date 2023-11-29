@@ -41,28 +41,31 @@ export class HomeComponent implements OnInit {
    accountSub: Subscription | null = null;
    balancesSub: Subscription | null = null;
    usdtBalanceSub: Subscription | null = null;
+   subs: Subscription[] = []
    constructor(private accountService: AccountService, private router: Router, private assetsService: AssetsService, private usdtService: UsdtService, private node: NodesService) {
       this.node.test()
-      this.accountSub = this.accountService.getAccountObservable().subscribe((account) => {
+      let accountSub = this.accountSub = this.accountService.getAccountObservable().subscribe((account) => {
          this.account = account
-         console.log("account is ", account);
          if (account.address.length > 0) {
             this.balancesSub = this.assetsService.d9BalancesObservable().subscribe((d9Balances) => {
-               console.log("d9 balances", d9Balances)
                this.d9Balances = d9Balances
             })
          }
       })
+      this.subs.push(accountSub)
 
-      this.usdtService
+      let d9BalanceSub = this.usdtService
          .balanceObservable()
          .subscribe((usdtBalance) => {
-            console.log("usdt balance in home component is ", usdtBalance)
             if (usdtBalance != null) {
                this.usdtBalance = usdtBalance
             }
          })
 
+      this.subs.push(d9BalanceSub)
+      // let regularCheck = this.usdtService.regularUSDTBalanceCheck()
+      //    .subscribe()
+      // this.subs.push(regularCheck)
    }
    formatNumber(number: string | number) {
       return Utils.formatNumberForUI(number as number)
