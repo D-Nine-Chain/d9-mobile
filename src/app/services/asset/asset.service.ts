@@ -61,7 +61,7 @@ export class AssetsService {
 
    public async getBurnManagerBalance() {
       const d9 = await this.d9.getApiPromise();
-      const burnManagerBalance = await firstValueFrom(d9.derive.balances.all(environment.contracts.burn_manager.address));
+      const burnManagerBalance = await firstValueFrom(d9.derive.balances.all(environment.contracts.main_pool.address));
       console.log("burn manager balance", burnManagerBalance)
       return this.formatD9Balances(burnManagerBalance);
    }

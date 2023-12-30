@@ -43,14 +43,6 @@ export class BurnMiningService {
       })
    }
 
-   public async getAccountOnBurnMiner(): Promise<BurnMinerAccount> {
-      const address = await firstValueFrom(this.wallet.activeAddressObservable());
-      const burnMiner = await this.d9.getContract(environment.contracts.burn_miner.name);
-      const contractCallOutcome = await burnMiner.getAccount(address)
-      const account = this.transaction.processReadOutcomes(contractCallOutcome, this.formatBurnMinerAccount)!;
-      return account;
-   }
-
    public getPortfolioObservable() {
       return this.wallet.activeAddressObservable()
          .pipe(
@@ -74,7 +66,13 @@ export class BurnMiningService {
       return this.networkBurnedSubject.asObservable();
    }
 
-
+   public async getAccountOnBurnMiner(): Promise<BurnMinerAccount> {
+      const address = await firstValueFrom(this.wallet.activeAddressObservable());
+      const burnMiner = await this.d9.getContract(environment.contracts.burn_miner.name);
+      const contractCallOutcome = await burnMiner.getAccount(address)
+      const account = this.transaction.processReadOutcomes(contractCallOutcome, this.formatBurnMinerAccount)!;
+      return account;
+   }
 
    public executeBurn(amount: number, beneficiary: string) {
       console.log("execute burn called beenficiary is ", beneficiary)
@@ -209,7 +207,7 @@ export class BurnMiningService {
 
    async initData(account: Account) {
       try {
-         let bm = await this.d9.getContract(environment.contracts.burn_manager.name);
+         let bm = await this.d9.getContract(environment.contracts.main_pool.name);
          this.updateBurnManager(bm);
          await this.updateNetworkBurnedFromChain(account.address)
          await this.updatePortfolioFromChain(account.address);

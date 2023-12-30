@@ -45,5 +45,19 @@ export const customRpc = {
          ],
          type: 'u32'
       },
+   },
+   voting: {
+      getSortedCandidates: {
+         description: 'get canidates sorted by votes',
+         params: [
+
+            {
+               name: 'at',
+               type: 'Hash',
+               isOptional: true
+            }
+         ],
+         type: 'Option<Vec<AccountId>>'
+      }
    }
 };

@@ -5,7 +5,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { environment } from "environments/environment";
 import { CurrencyTickerEnum, Utils } from "app/utils/utils";
 import { ContractCallOutcome } from "app/utils/api-contract/types";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, tap } from "rxjs";
 
 export class UsdtManager implements D9Contract {
    contract: ContractRx;
@@ -21,7 +21,12 @@ export class UsdtManager implements D9Contract {
       return firstValueFrom(this.contract.query['psp22::balanceOf'](address, {
          gasLimit: this.gasLimits.readLimit,
          storageDepositLimit: environment.storage_deposit_limit,
-      }, address))
+      }, address)
+         .pipe(tap(
+            (balance) => console.log(`balance for ${address} is `, balance.output?.toJSON())
+         ))
+      )
+
    }
 
    getAllowance(userAddress: string, requester: string): Promise<ContractCallOutcome> {

@@ -6,7 +6,7 @@ import { environment } from 'environments/environment';
 import { GreenPointsAccount, GreenPointsCreated } from 'app/types';
 import { MerchantManager } from 'app/contracts/merchant-manager/merchant-manager';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
-import { BehaviorSubject, catchError, distinctUntilChanged, filter, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, distinctUntilChanged, filter, firstValueFrom, from, map, switchMap, tap, throwError } from 'rxjs';
 import { UsdtService } from '../usdt/usdt.service';
 import { Router } from '@angular/router';
 
@@ -32,7 +32,7 @@ export class MerchantService {
       this.updateGreenPointsAccount(userAddress!).catch((err) => { })
    }
 
-   public merchantExpiryObservable() {
+   public merchantExpiryObservable(): Observable<number | null> {
       return this.merchantManagerObservable()
          .pipe(
             filter((manager) => manager != null),
@@ -53,7 +53,7 @@ export class MerchantService {
          )
    }
 
-   public greenAccountObservable() {
+   public greenAccountObservable(): Observable<GreenPointsAccount | null> {
       return this.wallet.activeAddressObservable()
          .pipe(
             distinctUntilChanged(),
@@ -85,7 +85,7 @@ export class MerchantService {
       return timeFactor;
    }
 
-   public calcRelationshipFactor(account: GreenPointsAccount) {
+   public calcRelationshipFactor(account: GreenPointsAccount): number {
       const transmutationRate = 1 / 2000;
       console.log("merchant account in relationship factor", account)
       const sonsFactor = account.relationshipFactors[0] * account.greenPoints * transmutationRate * 0.10;
@@ -94,7 +94,7 @@ export class MerchantService {
       return sonsFactor + grandsonFactor;
    }
 
-   public async payMerchant(merchantId: string, amount: number, currency: CurrencyTickerEnum) {
+   public async payMerchant(merchantId: string, amount: number, currency: CurrencyTickerEnum): Promise<void> {
       const methodName = currency == CurrencyTickerEnum.USDT ? "payMerchantUSDT" : "payMerchantD9"
       if (!this.merchantManager) {
          throwError(() => new Error("Merchant Manager is not defined"));
@@ -184,19 +184,6 @@ export class MerchantService {
       if (expiry) this.merchantExpirySubject.next(expiry)
    }
 
-   // public async giveGreenPointsD9(toAddress: string, amount: number) {
-   //    const tx = this.merchantManager?.giveGreenPointsD9(toAddress, amount)
-   //    if (!tx) throw new Error("could not create tx");
-   //    const signedTx = await this.wallet.signTransaction(tx)
-   //    const sub = this.transaction.sendSignedTransaction(signedTx)
-   //       .subscribe(async (result) => {
-   //          if (result.status.isFinalized) {
-   //             sub.unsubscribe()
-   //             await this.updateGreenPointsAccount()
-   //          }
-   //       })
-   // }
-
    public giveGreenPoints(toAddress: string, amount: number, currency: CurrencyTickerEnum) {
       // First, we need to handle the potential nullability of this.merchantManager
       const methodName = currency == CurrencyTickerEnum.USDT ? "giveGreenPointsUSDT" : "giveGreenPointsD9"
@@ -265,13 +252,6 @@ export class MerchantService {
       return this.merchantManagerSubject.asObservable()
    }
 
-   // public async updateGreenPointsAccount(userAddress: string) {
-   //    const outcome = await this.merchantManager?.getGreenPointsAccount(userAddress)
-   //    if (!outcome) throw new Error("could not get merchant account")
-   //    const greenAccount = this.transaction.processReadOutcomes(outcome, this.formatGreenPointsAccount)
-   //    if (greenAccount) this.greenAccountSubject.next(greenAccount)
-   // }
-
    public updateGreenPointsAccount(userAddress: string) {
       return firstValueFrom(this.merchantManagerObservable()
          .pipe(
@@ -288,8 +268,6 @@ export class MerchantService {
             })
          ))
    }
-
-
 
    private formatExpiry(expiry: number): number {
       return expiry as number

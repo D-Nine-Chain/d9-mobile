@@ -9,7 +9,10 @@ export enum CurrencyTickerEnum {
    LP_TOKEN = "LP_TOKEN"
 }
 
-// Enum for standardized messages
+export enum ChainEnum {
+   'D9' = 'D9',
+   'TRON' = 'TRON',
+}
 
 
 export enum CurrencySymbol {

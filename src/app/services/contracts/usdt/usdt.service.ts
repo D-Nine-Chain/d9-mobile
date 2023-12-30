@@ -220,7 +220,7 @@ export class UsdtService {
          // Extract the phase, event and the event types
          const { event, phase } = record;
          const types = event.typeDef;
-         const abi = (await ContractUtils.getContractMetadata(environment.contracts.burn_manager.name)).abi;
+         const abi = (await ContractUtils.getContractMetadata(environment.contracts.main_pool.name)).abi;
          const contractAbi = new Abi(abi)
          // Show what we are busy with
          console.log(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);

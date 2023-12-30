@@ -6,6 +6,7 @@
 export const environment = {
    production: false,
    ws_endpoint: "wss://testnet.d9network.com:40300",
+   // ws_endpoint: "ws://localhost:40300",
    storage_deposit_limit: null,
    secure_storage_keypair_aggregate: "d9_keyring",
    preferences_default_address: "d9_default_address",
@@ -13,16 +14,19 @@ export const environment = {
    preferences_root_address: "d9_root_address",
    preferences_d9_soft_derivation_counter: "d9_soft_derivation_counter",
    preferences_assets: "d9_assets",
+   cross_transfer_endpoint: "http3.82.230.0:3000/api/",
    constants: {
       milliseconds_per_day: 600000,
    },
    contracts: {
-      burn_manager: {
+      main_pool: {
          address: "ypLPGqt7U7qhAdDgC4rD5EAvrRyoCoKJGD2FoNyqHcymW2U",
+         // address: "ywFAvcZ2rTEcCKFhSMHH1yanK4UctqiVw2c7eyxixk7eHn5",
          name: "d9_burn_manager",
       },
       burn_miner: {
-         address: "uGMR9uUbAvgdhj9jrBGdh7JenS7GRgCJHZM89mfESrDFhfn",
+         // address: "uGMR9uUbAvgdhj9jrBGdh7JenS7GRgCJHZM89mfESrDFhfn",
+         address: "xhWPnXMcEJcmA7vKJQMVy2Zw8YoJje791A1ouwoWivwW4Ej",
          name: "d9_burn_miner"
       },
       merchant: {
@@ -45,7 +49,10 @@ export const environment = {
          address: "wKzVvCnePUupz3StVa7RFoAVzAohg34qNcWTeyjVwDmfWpQ",
          name: "d9_mining_pool"
       },
-
+      cross_chain_transfer: {
+         address: "yuEy5C1kfs9WozPALHhtwJRmp5rGGRzEvHTbwTK643MMVbR",
+         name: "d9_cross_transfer"
+      },
    }
 };
 /*

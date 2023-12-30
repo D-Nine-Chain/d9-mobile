@@ -78,7 +78,7 @@ export class WalletService {
    public async loadKeyring(): Promise<void> {
 
       this.keyRing = new Keyring({ type: 'sr25519' });
-      this.keyRing.setSS58Format(42);
+      this.keyRing.setSS58Format(9);
       const keypairAggregate = await SecureStorage.get(environment.secure_storage_keypair_aggregate);
       if (!keypairAggregate) {
          console.log("cant find keypairs ")

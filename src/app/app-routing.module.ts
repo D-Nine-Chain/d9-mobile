@@ -25,6 +25,7 @@ import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.c
 import { NodeInfoComponent } from './pages/nodes-management/node-info/node-info.component';
 import { AllowancesComponent } from './pages/allowances/allowances/allowances.component';
 import { ErrorComponent } from './pages/error/error/error.component';
+import { VotingComponent } from './pages/voting/voting/voting.component';
 const routes: Routes = [
    {
       path: 'first-run', component: FirstRunComponent
@@ -73,6 +74,7 @@ const routes: Routes = [
    { path: 'green-account', component: GreenAccountComponent },
    { path: 'allowances', component: AllowancesComponent },
    { path: 'error', component: ErrorComponent },
+   { path: 'voting', component: VotingComponent },
 ];
 
 @NgModule({

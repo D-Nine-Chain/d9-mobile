@@ -19,9 +19,9 @@ export class AccountService {
       this.addressSubscription = this.wallet.activeAddressObservable().subscribe((address) => {
 
       })
-      // this.accountSubject.next({ address: this.wallet.getAddressObservable(), name: "default" })
    }
-   // todo convert this to a flat map thing
+
+
    public getAccountObservable(): Observable<Account> {
       return this.wallet.activeAddressObservable().pipe(
          filter(address => address != null),
@@ -37,26 +37,6 @@ export class AccountService {
                )
          })
       )
-      // return this.accountSubject.asObservable().pipe(
-      //    filter(
-      //       (account) => {
-      //          return account.address != ""
-      //       }
-      //    ),
-      //    switchMap((account) => {
-      //       console.log("address in the pipe", account)
-      //       return from(this.getAccountMetadata(account.address))
-      //          .pipe(map((meta) => {
-      //             account.name = meta.name || "default"
-      //             return account
-      //          })
-      //             , tap((account) => {
-      //                console.log("get account observable", account)
-      //             }
-      //             )
-      //          )
-      //    })
-      // )
    }
 
    public async getAccountMetadata(address: string): Promise<KeyringPair$Meta> {

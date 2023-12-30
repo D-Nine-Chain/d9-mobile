@@ -36,7 +36,18 @@ export class D9ApiService {
          .then((metadata) => {
             this.contractsModuleMetadata = metadata.asLatest.pallets[13];
          })
+      this.getContractInfo().then((contractInfo) => { })
+   }
+   async getContractInfo() {
+      console.log("getting contract info")
+      const api = await this.getApiPromise();
 
+      api.query.balances.totalIssuance()
+         .subscribe((issuance) => {
+            console.log("issuance", issuance.toHuman())
+         })
+      const contractInfo = (await firstValueFrom(api.query.contracts.contractInfoOf(environment.contracts.main_pool.address))).toJSON();
+      console.log("contract info", contractInfo)
    }
    getError(index: string) {
       if (this.contractsModuleMetadata) {
@@ -70,7 +81,7 @@ export class D9ApiService {
       }
 
       switch (contractName) {
-         case environment.contracts.burn_manager.name:
+         case environment.contracts.main_pool.name:
             return new BurnManager(contract, gasLimits);
          case environment.contracts.merchant.name:
             return new MerchantManager(contract, gasLimits);

@@ -38,10 +38,11 @@ import { GreenAccountComponent } from './pages/green-account/green-account.compo
 import { ConfirmationComponent } from './modals/swap/confirmation/confirmation.component';
 import { AllowancesComponent } from './pages/allowances/allowances/allowances.component';
 import { ErrorComponent } from './pages/error/error/error.component';
+import { VotingComponent } from './pages/voting/voting/voting.component';
 
 @NgModule({
    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnPortfolioComponent, SettingsComponent, MerchantAccountComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesManagementComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, NodeInfoComponent, NumberFormatPipe, GreenAccountComponent, ConfirmationComponent, AllowancesComponent, ErrorComponent],
+   declarations: [AppComponent, FirstRunComponent, NewMnemonicComponent, HomeComponent, ExchangeCardComponent, MenuComponent, AssestsListComponent, BurnPortfolioComponent, SettingsComponent, MerchantAccountComponent, SendComponent, ReceiveComponent, AncestorsComponent, SwapComponent, QrScannerComponent, AccountManagementComponent, NodesManagementComponent, BondComponent, LiquidityComponent, PayMerchantComponent, MerchantQrComponent, AllowanceRequestComponent, NodeVotingComponent, SessionOverviewComponent, NodeInfoComponent, NumberFormatPipe, GreenAccountComponent, ConfirmationComponent, AllowancesComponent, ErrorComponent, VotingComponent],
    imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FontAwesomeModule, ReactiveFormsModule, SweetAlert2Module.forRoot(), CountdownModule],
    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
    bootstrap: [AppComponent],

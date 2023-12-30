@@ -1,5 +1,5 @@
 
-import { CurrencySymbol, CurrencyTickerEnum } from "./utils/utils";
+import { ChainEnum, CurrencySymbol, CurrencyTickerEnum } from "./utils/utils";
 import type { WeightV2 } from '@polkadot/types/interfaces'
 export interface Account {
    address: string;
@@ -184,4 +184,25 @@ export interface LedgerInfo {
 export interface USDTAllowanceRequest {
    name: string;
    address: string;
+}
+
+// info about a validator
+export interface ValidatorInfo {
+   // validators identification
+   accountId: string;
+   // total votes received
+   totalVotes: number;
+   // how many votes did validator give themselves
+   selfVotes: number;
+   // how many votes did validator receive from their own delegators
+   delegatedVotes: number;
+}
+
+export interface Commit {
+   transactionId: string;
+   fromAddress: string;
+   toAddress: string;
+   amount: number;
+   fromChain: ChainEnum;
+   toChain: ChainEnum;
 }
