@@ -57,7 +57,7 @@ export const customRpc = {
                isOptional: true
             }
          ],
-         type: 'Option<Vec<AccountId>>'
+         type: 'Vec<(AccountId, u64)>'
       }
    }
 };

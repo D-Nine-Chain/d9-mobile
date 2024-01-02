@@ -5,7 +5,7 @@
 
 export const environment = {
    production: false,
-   ws_endpoint: "wss://testnet.d9network.com:40300",
+   ws_endpoint: "wss://testnet.d9network.org:40300",
    // ws_endpoint: "ws://localhost:40300",
    storage_deposit_limit: null,
    secure_storage_keypair_aggregate: "d9_keyring",
@@ -20,29 +20,29 @@ export const environment = {
    },
    contracts: {
       main_pool: {
-         address: "ypLPGqt7U7qhAdDgC4rD5EAvrRyoCoKJGD2FoNyqHcymW2U",
+         address: "wbWmdEHVvAYm7W7XKeXsp6a1GH2uCk4oGxUTwAZczHpjQo6",
          // address: "ywFAvcZ2rTEcCKFhSMHH1yanK4UctqiVw2c7eyxixk7eHn5",
          name: "d9_burn_manager",
       },
       burn_miner: {
          // address: "uGMR9uUbAvgdhj9jrBGdh7JenS7GRgCJHZM89mfESrDFhfn",
-         address: "xhWPnXMcEJcmA7vKJQMVy2Zw8YoJje791A1ouwoWivwW4Ej",
+         address: "v4TkLRA8LtUu6XGxozXt4RkuRDrTsqCikKeqRthdkuYjkvB",
          name: "d9_burn_miner"
       },
       merchant: {
-         address: "uK9yapBkpux69oLqkCPxV7YBAV3xGY7ZA5Y7bdbXn31PR9s",
+         address: "voXkugLukCacWcAzUezGyPM6j4WNq46hfse5f3LHgamByrJ",
          name: "D9 Merchant"
       },
       amm: {
-         address: "umNwVqtuXtW2Kky99wKPPXDywC3YFRcgyjtahjy8bj36SA5",
+         address: "yerCSUuimFfmiX1Tjcg2ob99h6TXRHNH9ZoB7hNHqnetVSJ",
          name: "D9 AMM"
       },
       usdt: {
-         address: "z4mr21CwkZW6njfyGUBFP3JGm9KeBgzD5dsYqSotrYfxuaz",
+         address: "znZ2jsRKXdMbRx51UYYxS3qwGBcoHYkjm7sYzrpEcWP5MMV",
          name: "USDT"
       },
       node_reward: {
-         address: "ybyN3459G8z2qdAxNTT3hbt4BXDPdb9NEa7dkGfHGMAAriB",
+         address: "uKwBUzzdCa2bzBD9pqVfBEh6QBwgFqgGBYtcwkNFnDzxWcb",
          name: "d9_node_reward"
       },
       mining_pool: {

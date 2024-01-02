@@ -12,19 +12,39 @@ export class VotingComponent implements OnInit {
    constructor(private voting: VotingService, private usdt: UsdtService, private wallet: WalletService) { }
 
    ngOnInit() {
-      // this.voting.getSortedCandidates().subscribe((candidates) => {
-      //    console.log("sorted candidates ", candidates);
-      // })
+      /**
+       * get a user's voting power
+       */
+      this.voting.getVotingInterest().subscribe((interest) => {
+         console.log("voting interest", interest)
+      })
 
-      // this.voting.getVotingInterest().subscribe((interest) => {
-      //    console.log("voting interest", interest)
-      // })
-
+      this.voting.getCandidates().subscribe((candidates) => {
+         console.log("candidates ", candidates)
+      })
+   }
+   /**
+    * add voting power to user's account
+    */
+   addVote() {
+      this.voting.addVotingInterest(500)
+   }
+   /**
+    * vote for a node
+    */
+   delegateVotes() {
+      const voteDelegation = {
+         candidate: "ytBPqMwQPfbs9ugGHadMUjQk6VBRNWe9cRBtqPSX4eEdQR8", votes: 100
+      }
+      this.voting.delegateVotes([voteDelegation])
    }
 
-   addVote() {
-      // this.voting.addVotingInterest(100)
+   redistributeVotes() {
+      this.voting.redistributeVotes("ytBPqMwQPfbs9ugGHadMUjQk6VBRNWe9cRBtqPSX4eEdQR8", "xK27mBoGffhi9RAqMcgc8pSeFUHxq7JenGrqUFmT5izrYLj")
+   }
 
+   removeVotes() {
+      this.voting.removeVotesFromCandidate("xK27mBoGffhi9RAqMcgc8pSeFUHxq7JenGrqUFmT5izrYLj", 50)
    }
 }
 /*!query

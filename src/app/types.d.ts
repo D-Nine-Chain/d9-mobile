@@ -206,3 +206,24 @@ export interface Commit {
    fromChain: ChainEnum;
    toChain: ChainEnum;
 }
+
+export interface Candidate {
+   address: string;
+   votes: number;
+}
+/**
+ * @description a user's voting power
+ * @note the number of votes that a user can cast is the total minus the delegated
+ * if a user wants to move votes they can call the `redistributeVotes` function or `tryRmovevotesFromCandidate`
+ */
+export interface VotingInterest {
+   //total voting power
+   total: number;
+   // how many votes have been delegated already
+   delegated: number;
+}
+
+export interface VoteDelegation {
+   candidate: string;
+   votes: number;
+}
