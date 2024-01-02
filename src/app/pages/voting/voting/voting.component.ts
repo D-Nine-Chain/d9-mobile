@@ -9,18 +9,40 @@ import { WalletService } from 'app/services/wallet/wallet.service';
    styleUrls: ['./voting.component.scss'],
 })
 export class VotingComponent implements OnInit {
+   subs: any[] = []
    constructor(private voting: VotingService, private usdt: UsdtService, private wallet: WalletService) { }
 
    ngOnInit() {
       /**
        * get a user's voting power
        */
-      this.voting.getVotingInterest().subscribe((interest) => {
+      let sub1 = this.voting.getVotingInterest().subscribe((interest) => {
          console.log("voting interest", interest)
       })
+      this.subs.push(sub1)
 
-      this.voting.getCandidates().subscribe((candidates) => {
+      let sub2 = this.voting.getCandidates().subscribe((candidates) => {
          console.log("candidates ", candidates)
+      })
+      this.subs.push(sub2)
+
+      let sub3 = this.voting.getCandidateAccumulativeVotes("ytBPqMwQPfbs9ugGHadMUjQk6VBRNWe9cRBtqPSX4eEdQR8").subscribe((votes) => {
+         console.log("candidate accumulative votes", votes)
+      })
+      this.subs.push(sub3)
+
+      let sub4 = this.voting.getCurrentCandidateCount().subscribe((count) => {
+         console.log("current candidate count", count)
+      })
+      this.subs.push(sub4)
+
+      let sub5 = this.voting.getCurrentValidatorInfo('ytBPqMwQPfbs9ugGHadMUjQk6VBRNWe9cRBtqPSX4eEdQR8').subscribe((validatorInfo) => {
+         console.log("current validator info", validatorInfo)
+      })
+      this.subs.push(sub5)
+
+      let sub6 = this.voting.getVoteDelegations().subscribe((delegations) => {
+         console.log("delegations", delegations)
       })
    }
    /**
@@ -45,6 +67,13 @@ export class VotingComponent implements OnInit {
 
    removeVotes() {
       this.voting.removeVotesFromCandidate("xK27mBoGffhi9RAqMcgc8pSeFUHxq7JenGrqUFmT5izrYLj", 50)
+   }
+
+   ngOnDestroy() {
+      this.subs.forEach((sub) => {
+         sub.unsubscribe()
+      })
+
    }
 }
 /*!query

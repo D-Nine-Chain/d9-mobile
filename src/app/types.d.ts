@@ -227,3 +227,8 @@ export interface VoteDelegation {
    candidate: string;
    votes: number;
 }
+
+export interface VoteDelegatee {
+   delegatee: string;
+   votes: number;
+}

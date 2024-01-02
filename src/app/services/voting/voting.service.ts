@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { WalletService } from '../wallet/wallet.service';
 import { D9ApiService } from '../d9-api/d9-api.service';
 import { Observable, firstValueFrom, from, map, switchMap, tap } from 'rxjs';
-import { Candidate, ValidatorInfo, VoteDelegation, VotingInterest } from 'app/types';
+import { Candidate, ValidatorInfo, VoteDelegatee, VoteDelegation, VotingInterest } from 'app/types';
 import { TransactionsService } from '../transactions/transactions.service';
 import { CurrencyTickerEnum, Utils } from 'app/utils/utils';
 import { environment } from 'environments/environment';
@@ -22,6 +22,61 @@ export class VotingService {
          console.log("d9 query", d9.tx["d9NodeVoting"])
 
       })
+   }
+   /**
+    *  @description get information on a current validator
+    * @returns {Observable<ValidatorInfo>} list of validators
+    */
+   getCurrentValidatorInfo(validatorId: string): Observable<ValidatorInfo> {
+      return this.d9.getApiObservable().pipe(
+         switchMap(d9 => {
+            return d9.query['d9NodeVoting']['currentValidators'](validatorId)
+         }),
+         map((validator) => {
+            return (validator.toJSON() as any) as ValidatorInfo
+         })
+      )
+   }
+   /**
+    * @description get the candidates that a user voted for 
+    * @returns {Observable<VoteDelegatee[]>} list of candidates that a user voted for 
+    */
+   getVoteDelegations(): Observable<VoteDelegatee[]> {
+      return this.wallet.activeAddressObservable().pipe(
+         switchMap(address => this.d9.getApiObservable().pipe(
+            switchMap(d9 => {
+               let mapping = d9.query['d9NodeVoting']['voteDelegations'];
+               console.log("mapping is ", mapping);
+               // Use the address as the partial key to query only relevant entries
+               return mapping.entries(address);  // This will filter entries based on the partial key (address)
+            }),
+            map(entries => {
+               return entries.map(([storageKey, votes]) => {
+                  // Decode the key to get the actual account IDs, assuming accountId1 is the partial key you've used to query
+                  const [, accountId2] = storageKey.args.map(k => k.toString());
+                  console.log("Decoded key", address, accountId2);
+                  // Map the account IDs and votes into the desired structure
+                  return { delegatee: accountId2, votes: votes.toJSON() as number };
+               });
+            }),
+         ))
+      )
+   }
+
+   /**
+    * 
+    * @returns {Observable<number>} the number of candidates that can receive votes
+    * @note the cap is 300 
+    */
+   getCurrentCandidateCount(): Observable<number> {
+      return this.d9.getApiObservable().pipe(
+         switchMap(d9 => {
+            return d9.query['d9NodeVoting']['currentNumberOfCandidates']()
+         }),
+         map((count) => {
+            return count.toJSON() as number
+         })
+      )
    }
    /**
     * this gets your a list of the candidates sorted by the number of votes they have
@@ -237,6 +292,8 @@ export class VotingService {
          }
       })
    }
+
+
 }
 /*!SECTION
 
